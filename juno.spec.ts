@@ -23,12 +23,23 @@ const expectedRenderedHtml = `
   <div>
     <p>count: 5</p>
     <button>click</button>
-    <script type="juno/data">{ component: "Counter", state: [5] }</script>
+    <script type="juno/component">{ component: "Counter", state: [5] }</script>
   </div>
 `;
 
-const expectedHydrationJs = `
-  const Counter = () => 
+const expectedClientJs = `
+  const Counter = () => {
+    const [count, setCount] = useState(getSsrCtx().componentState[0]);
+
+    return [
+      [prev(2).text(7,1), [count]],
+      [prev(1), [{ on: "click", () => setCount(count + 1) }]]
+    ];
+  }
+
+  juno.queryComponents().forEach((script, { component, state }) => {
+    
+  })
 `;
 
 export default function (program: Program) {}
