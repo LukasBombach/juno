@@ -28,7 +28,7 @@ const expectedRenderedHtml = `
 
 const expectedClientJs = `
   const Counter = () => {
-    const [count, setCount] = useState(ssrState[0]);
+    const [count, setCount] = useState(ssrCtx.state[0]);
 
     return [
       [{ type: "text", span: [7, 1], value: count }],
@@ -37,8 +37,15 @@ const expectedClientJs = `
   }
 
   const data = [
-    { component: Counter, state: [5]}
+    [Counter, ['j:0:0', 'j:0:1'], [5]]
   ];
+
+  data.forEach(([component, selectors, state]) => {
+    const ssrCtx = { state };
+    component().forEach(props => {
+
+    });
+  });
 
   data.forEach(({ component, state }, componentIndex) => {
     const ssrState = state;
