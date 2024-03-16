@@ -21,25 +21,31 @@ const input = `
 
 const expectedRenderedHtml = `
   <div>
-    <p>count: 5</p>
-    <button>click</button>
-    <script type="juno/component">{ component: "Counter", state: [5] }</script>
+    <p j:0:0>count: 5</p>
+    <button j:0:1>click</button>
   </div>
 `;
 
 const expectedClientJs = `
   const Counter = () => {
-    const [count, setCount] = useState(getSsrCtx().componentState[0]);
+    const [count, setCount] = useState(ssrState[0]);
 
     return [
-      [prev(2).text(7,1), [count]],
-      [prev(1), [{ on: "click", () => setCount(count + 1) }]]
+      [{ type: "text", span: [7, 1], value: count }],
+      [{ type: "event", name: "click", value: () => setCount(count + 1) }]
     ];
   }
 
-  juno.queryComponents().forEach((script, { component, state }) => {
-    
-  })
+  const data = [
+    { component: Counter, state: [5]}
+  ];
+
+  data.forEach(({ component, state }, componentIndex) => {
+    const ssrState = state;
+    component().forEach((props, elementIndex) => {
+      const element = document.querySelector(\`j:\${componentIndex}:\${componentIndex}\`);
+    });
+  });
 `;
 
 export default function (program: Program) {}
