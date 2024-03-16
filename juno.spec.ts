@@ -46,21 +46,6 @@ const expectedClientJs = `
 
     });
   });
-
-  data.forEach(({ component, state }, componentIndex) => {
-    const ssrState = state;
-    component().forEach((props, elementIndex) => {
-      const element = document.querySelector(\`j:\${componentIndex}:\${componentIndex}\`);
-      props.forEach(prop => {
-        if (prop.type === "text") {
-          // todo split tex at span etc
-          element.textContent = prop.value;
-        } else if (prop.type === "event") {
-          element.addEventListener(prop.name, prop.value);
-        }
-      })
-    });
-  });
 `;
 
 export default function (program: Program) {}
