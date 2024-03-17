@@ -26,16 +26,18 @@ const expectedServerJs = `
     setCount(5);
 
     return (
-      React.createElement("p", { "j:0:0": true }, "count: ", count),
-      React.createElement("button", { onClick: () => setCount(count + 1), "j:0:1": true }, "click")
+      juno.el("p", { "j:0:0": true }, "count: ", count),
+      juno.el("button", { onClick: () => setCount(count + 1), "j:0:1": true }, "click")
     );
   }
 
-  export default App = () => {
+  const App = () => {
     return (
-      React.createElement("div", null, React.createElement(Counter, null))
+      juno.el("div", null, juno.el(Counter, null))
     )
   }
+
+  const serverRenderedHtml = juno.renderToString(juno.el(App, null));
 `;
 
 const expectedRenderedHtml = `
