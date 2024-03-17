@@ -20,7 +20,22 @@ const input = `
 `;
 
 const expectedServerJs = `
+  const Counter = () => {
+    const [count, setCount] = useState(0)
 
+    setCount(5);
+
+    return (
+      React.createElement("p", { "j:0:0": true }, "count: ", count),
+      React.createElement("button", { onClick: () => setCount(count + 1), "j:0:1": true }, "click")
+    );
+  }
+
+  export default App = () => {
+    return (
+      React.createElement("div", null, React.createElement(Counter, null))
+    )
+  }
 `;
 
 const expectedRenderedHtml = `
