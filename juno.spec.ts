@@ -19,6 +19,10 @@ const input = `
   }
 `;
 
+const expectedServerJs = `
+
+`;
+
 const expectedRenderedHtml = `
   <div>
     <p j:0:0>count: 5</p>
