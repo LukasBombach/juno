@@ -27,8 +27,8 @@ const expectedRenderedHtml = `
 `;
 
 const expectedClientJs = `
-  const Counter = () => {
-    const [count, setCount] = useState(ssrCtx.state[0]);
+  const Counter = (ssrState) => {
+    const [count, setCount] = useState(ssrState[0]);
 
     return [
       [{ type: "text", span: [7, 1], value: count }],
@@ -41,10 +41,7 @@ const expectedClientJs = `
   ];
 
   data.forEach(([component, selectors, state]) => {
-    const ssrCtx = { state };
-    component().forEach(props => {
-
-    });
+    component(state).forEach((props, i) => juno.hydrate(selectors[i], props));
   });
 `;
 
