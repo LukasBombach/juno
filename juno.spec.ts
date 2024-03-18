@@ -20,6 +20,17 @@ const input = `
 `;
 
 const expectedServerJs = `
+  let componentId = 0;
+  let stateId = 0;
+  function useState(initialValue) {
+    const id = stateId++;
+    const key = \`j:\${componentId}:\${id}\`;
+    return [initialValue, (newValue) => {
+      const el = document.querySelector(\`[juno-id=\${key}]\`);
+      el.textContent = newValue;
+    }];
+  }
+
   const Counter = () => {
     const [count, setCount] = useState(0)
 
