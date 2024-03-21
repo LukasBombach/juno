@@ -20,8 +20,9 @@ const input = `
 `;
 
 const expectedServerJs = `
-  let componentId = 0;
+/*   let componentId = 0;
   let stateId = 0;
+
   function useState(initialValue) {
     const id = stateId++;
     const key = \`j:\${componentId}:\${id}\`;
@@ -29,7 +30,7 @@ const expectedServerJs = `
       const el = document.querySelector(\`[juno-id=\${key}]\`);
       el.textContent = newValue;
     }];
-  }
+  } */
 
   const Counter = () => {
     const [count, setCount] = useState(0)
@@ -48,7 +49,7 @@ const expectedServerJs = `
     )
   }
 
-  const serverRenderedHtml = juno.renderToString(juno.el(App, null));
+  const { html, } = juno.renderToString(juno.el(App, null));
 `;
 
 const expectedRenderedHtml = `
