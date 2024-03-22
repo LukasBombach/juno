@@ -1,5 +1,6 @@
 ```javascript
 function serverRuntime() {
+  const instances = new Set();
   const states = [];
 
   function render(component) {
@@ -7,9 +8,13 @@ function serverRuntime() {
     return [states, html];
   }
 
-  function useState() {}
+  function el(comp, props, ...children) {
+    if (isFunction(comp)) {
+      instances.add();
+    }
+  }
 
-  function el() {}
+  function useState() {}
 }
 ```
 
