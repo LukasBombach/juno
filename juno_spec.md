@@ -1,28 +1,57 @@
-```javascript
-function serverRuntime() {
-  const instances = new Set();
-  const states = [];
+```ts
+import { signal } from "@maverickjs/signals";
+import type { Signal } from "@maverickjs/signals";
 
-  function render(component) {
-    const html = component();
-    return [states, html];
+interface Instance {
+  signals: Signal[];
+}
+
+interface Context {
+  instances: Instance[];
+  current: Instance;
+}
+
+function serverRuntime() {
+  const ctx: Context = {
+    instances: [];
+    current = { signals: [] };
   }
 
   function el(comp, props, ...children) {
     if (isFunction(comp)) {
-      instances.add();
+      // todo when we go async, ctx.current might
+      // todo not hold the currenly executing component
+      // todo we need to inject the instance here or something
+      ctx.current = { signals: [] };
+      instances.push(ctx.current);
+      comp();
     }
   }
 
-  function useState() {}
+  function useSignal<T>(initial: T) {
+    const signal = signal(inital)
+    ctx.current.signals.push(signal);
+    return signal;
+  }
+
+  function render(component) {
+    const html = component();
+    return [signals, html];
+  }
+
+  return {
+    el,
+    useSignal,
+    render,
+  };
 }
 ```
 
 ```javascript
-const { useState, el, render } = serverRuntime();
+const { useSignal, el, render } = serverRuntime();
 
 const Counter = () => {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useSignal(0);
   setCount(Math.round(Math.random() * 1000));
   return (
     <>
@@ -40,7 +69,7 @@ const App = () => (
   );
 );
 
-const [html, states] = render(App);
+const [html, instances] = render(App);
 ```
 
 ```html
