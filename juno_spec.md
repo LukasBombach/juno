@@ -11,6 +11,11 @@ interface Context {
   current: Instance;
 }
 
+/**
+ * todo when we go async, ctx.current might
+ * todo not hold the currenly executing component
+ * todo we need to inject the instance here or something
+ */
 function serverRuntime() {
   const ctx: Context = {
     instances: [];
@@ -19,16 +24,13 @@ function serverRuntime() {
 
   function el(comp, props, ...children) {
     if (isFunction(comp)) {
-      // todo when we go async, ctx.current might
-      // todo not hold the currenly executing component
-      // todo we need to inject the instance here or something
       ctx.current = { signals: [] };
       instances.push(ctx.current);
       comp();
     }
   }
 
-  function useSignal<T>(initial: T) {
+  function useSignal(initial) {
     const signal = signal(inital)
     ctx.current.signals.push(signal);
     return signal;
@@ -39,11 +41,7 @@ function serverRuntime() {
     return [signals, html];
   }
 
-  return {
-    el,
-    useSignal,
-    render,
-  };
+  return { el, useSignal, render };
 }
 ```
 
