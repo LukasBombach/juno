@@ -80,8 +80,7 @@ const [html, instances] = render(App);
 </div>
 ```
 
-#```html
-
+```html
 <div>
   <label>23</label>
   <button>Click</button>
