@@ -48,7 +48,13 @@ const Counter = () => {
   const count = signal(Math.round(Math.random() * 1000));
 
   return [
-    el("section", el("label", {}, count()), <button onClick={() => count.set(count() + 1)}>Click</button>),
+    el(
+      "section",
+      {},
+      el("label", {}, count()),
+      el("hr"),
+      el("button", { onClick: () => count.set(count() + 1) }, "Click")
+    ),
     [count],
   ];
 };
