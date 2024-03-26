@@ -84,10 +84,10 @@ const [html, instances] = render(App);
 <div>
   <label>23</label>
   <button>Click</button>
-  <script type="juno/component"></script>
+  <script type="juno/component" juno-id="1"></script>
   <hr />
   <label>5</label>
   <button>Click</button>
-  <script type="juno/component"></script>
+  <script type="juno/component" juno-id="2"></script>
 </div>
 ```

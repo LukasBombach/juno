@@ -1,9 +1,8 @@
-```jsx
-// Input
+## Input
 
+```jsx
 const Counter = () => {
   let count = Math.round(Math.random() * 1000);
-
   return (
     <>
       <label>{count}</label>
@@ -19,11 +18,27 @@ const App = () => (
     <Counter />
   </main>
 );
+
+render(App);
 ```
 
-```js
-// Server JS
+## Generated HTML
 
+```html
+<div>
+  <label>23</label>
+  <button>Click</button>
+  <script type="juno/component" juno-id="1"></script>
+  <hr />
+  <label>5</label>
+  <button>Click</button>
+  <script type="juno/component" juno-id="2"></script>
+</div>
+```
+
+## Server JS
+
+```js
 import { el } from "juno/server";
 import { signal } from "@maverick-js/signals";
 
