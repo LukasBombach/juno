@@ -4,10 +4,10 @@
 const Counter = () => {
   let count = Math.round(Math.random() * 1000);
   return (
-    <>
+    <section>
       <label>{count}</label>
       <button onClick={() => count++}>Click</button>
-    </>
+    </section>
   );
 };
 
@@ -26,13 +26,15 @@ render(App);
 
 ```html
 <div>
-  <label>23</label>
-  <button>Click</button>
-  <script type="juno/component" juno-id="1"></script>
+  <section juno-id="1">
+    <label>23</label>
+    <button>Click</button>
+  </section>
   <hr />
-  <label>5</label>
-  <button>Click</button>
-  <script type="juno/component" juno-id="2"></script>
+  <section juno-id="2">
+    <label>5</label>
+    <button>Click</button>
+  </section>
 </div>
 ```
 
@@ -45,11 +47,9 @@ import { signal } from "@maverick-js/signals";
 const Counter = () => {
   const count = signal(Math.round(Math.random() * 1000));
 
-  return (
-    <>
-      <label>{count}</label>
-      <button onClick={() => count++}>Click</button>
-    </>
-  );
+  return [
+    el("section", el("label", {}, count()), <button onClick={() => count.set(count() + 1)}>Click</button>),
+    [count],
+  ];
 };
 ```
