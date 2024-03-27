@@ -28,6 +28,21 @@ render(App);
 import { el } from "juno/server";
 import { signal as maverickSignal } from "@maverick-js/signals";
 
+let signalBuffer = [];
+
+function signal(id, initialValue) {
+  const value = maverickSignal();
+  signalBuffer.push({ id, value });
+  return value;
+}
+
+function render(component) {
+  signalBuffer = []; // 💥 async
+  const vdom = component();
+  const signals = [...signalBuffer];
+  return [vdom, signals];
+}
+
 const Counter = () => {
   const count = signal(0, Math.round(Math.random() * 100));
   return el(
@@ -38,8 +53,6 @@ const Counter = () => {
     el("button", { onClick: () => count.set(count() + 1) }, "Click")
   );
 };
-
-function render(component) {}
 ```
 
 ## Generated HTML
