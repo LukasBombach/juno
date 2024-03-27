@@ -46,7 +46,6 @@ import { signal } from "@maverick-js/signals";
 
 const Counter = () => {
   const count = signal(Math.round(Math.random() * 1000));
-
   return [
     el(
       "section",
