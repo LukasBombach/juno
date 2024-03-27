@@ -47,17 +47,14 @@ import { el } from "juno/server";
 import { signal } from "@maverick-js/signals";
 
 const Counter = () => {
-  const count = signal(Math.round(Math.random() * 1000));
-  return [
-    el(
-      "section",
-      {},
-      el("label", {}, count()),
-      el("hr"),
-      el("button", { onClick: () => count.set(count() + 1) }, "Click")
-    ),
-    [count],
-  ];
+  const count = signal(0, Math.round(Math.random() * 1000));
+  return el(
+    "section",
+    {},
+    el("label", {}, count()),
+    el("hr"),
+    el("button", { onClick: () => count.set(count() + 1) }, "Click")
+  );
 };
 ```
 
