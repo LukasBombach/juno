@@ -4,10 +4,10 @@
 const Counter = () => {
   let count = Math.floor(Math.random() * 100);
   return (
-    <section>
+    <>
       <label>{count}</label>
       <button onClick={() => count++}>Click</button>
-    </section>
+    </>
   );
 };
 
@@ -27,16 +27,28 @@ render(App);
 ```html
 <div>
   <script type="juno/component" juno-id="1"></script>
-  <section>
-    <label>23</label>
-    <button>Click</button>
-  </section>
+  <label>23</label>
+  <button>Click</button>
   <hr />
   <script type="juno/component" juno-id="2"></script>
-  <section>
+  <label>5</label>
+  <button>Click</button>
+</div>
+```
+
+alt / webcomponents
+
+```html
+<div>
+  <juno-component data-id="1">
+    <label>23</label>
+    <button>Click</button>
+  </juno-component>
+  <hr />
+  <juno-component data-id="2">
     <label>5</label>
     <button>Click</button>
-  </section>
+  </juno-component>
 </div>
 ```
 
