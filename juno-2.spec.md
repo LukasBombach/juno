@@ -26,12 +26,14 @@ render(App);
 
 ```html
 <div>
-  <section juno-id="1">
+  <script type="juno/component" juno-id="1"></script>
+  <section>
     <label>23</label>
     <button>Click</button>
   </section>
   <hr />
-  <section juno-id="2">
+  <script type="juno/component" juno-id="2"></script>
+  <section>
     <label>5</label>
     <button>Click</button>
   </section>
@@ -57,4 +59,25 @@ const Counter = () => {
     [count],
   ];
 };
+```
+
+## Client JS
+
+```js
+const data = [
+  { id: 1, selectors: ["*:nth-child(1) > *:nth-child(1)", "*:nth-child(1) > *:nth-child(2)"], data: [23] },
+  { id: 2, selectors: ["*:nth-child(1) > *:nth-child(1)", "*:nth-child(1) > *:nth-child(2)"], data: [5] },
+];
+
+const Counter = dataFromSSR => {
+  const count = signal(dataFromSSR[0]);
+  return [{ children: [count] }, { onClick: () => count.set(count() + 1) }];
+};
+
+function hydrate(id, component, selectors, dataFromSSR) {
+  const marker = document.querySelector('script[juno-id="${id}"]');
+  const elements = selectors.map(selector => marker.querySelector(selector));
+  const functionality = component(dataFromSSR);
+  apply(functionality, elements);
+}
 ```
