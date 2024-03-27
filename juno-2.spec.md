@@ -26,10 +26,10 @@ render(App);
 
 ```js
 import { el } from "juno/server";
-import { signal } from "@maverick-js/signals";
+import { signal as maverickSignal } from "@maverick-js/signals";
 
 const Counter = () => {
-  const count = signal(0, Math.round(Math.random() * 1000));
+  const count = signal(0, Math.round(Math.random() * 100));
   return el(
     "section",
     {},
@@ -38,6 +38,8 @@ const Counter = () => {
     el("button", { onClick: () => count.set(count() + 1) }, "Click")
   );
 };
+
+function render(component) {}
 ```
 
 ## Generated HTML
