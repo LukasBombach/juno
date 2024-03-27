@@ -2,7 +2,7 @@
 
 ```jsx
 const Counter = () => {
-  let count = Math.round(Math.random() * 1000);
+  let count = Math.floor(Math.random() * 100);
   return (
     <section>
       <label>{count}</label>
