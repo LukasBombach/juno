@@ -22,36 +22,6 @@ const App = () => (
 render(App);
 ```
 
-## Generated HTML
-
-```html
-<div>
-  <script type="juno/component" juno-id="1"></script>
-  <label>23</label>
-  <button>Click</button>
-  <hr />
-  <script type="juno/component" juno-id="2"></script>
-  <label>5</label>
-  <button>Click</button>
-</div>
-```
-
-alt / webcomponents
-
-```html
-<div>
-  <juno-component data-id="1">
-    <label>23</label>
-    <button>Click</button>
-  </juno-component>
-  <hr />
-  <juno-component data-id="2">
-    <label>5</label>
-    <button>Click</button>
-  </juno-component>
-</div>
-```
-
 ## Server JS
 
 ```js
@@ -68,6 +38,20 @@ const Counter = () => {
     el("button", { onClick: () => count.set(count() + 1) }, "Click")
   );
 };
+```
+
+## Generated HTML
+
+```html
+<div>
+  <script type="juno/component" juno-id="1"></script>
+  <label>23</label>
+  <button>Click</button>
+  <hr />
+  <script type="juno/component" juno-id="2"></script>
+  <label>5</label>
+  <button>Click</button>
+</div>
 ```
 
 ## Client JS
