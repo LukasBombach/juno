@@ -1,3 +1,4 @@
+import { expect, test } from "bun:test";
 import * as maverick from "@maverick-js/signals";
 
 function signal<T>(id: number, initialValue: T): maverick.WriteSignal<T> {
@@ -21,3 +22,7 @@ const Counter = async () => {
 };
 
 console.log(await Counter());
+
+test("2 + 2", () => {
+  expect(2 + 2).toBe(4);
+});
