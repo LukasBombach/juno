@@ -1,0 +1,14 @@
+{
+  "name": "juno",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@maverick-js/signals": "5.11.4"
+  }
+}
