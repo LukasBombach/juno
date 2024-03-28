@@ -6,23 +6,12 @@ function signal<T>(id: number, initialValue: T): maverick.WriteSignal<T> {
   return s;
 }
 
-function el(element: string, props?: Record<string, unknown>, ...children: unknown[]) {}
-
-const Counter = async () => {
-  const a = await Promise.resolve(signal(0, "A"));
-
-  const b = signal(0, "B");
-
-  return (
-    <main>
-      <p>{a()}</p>
-      <p>{b()}</p>
-    </main>
-  );
+const Add1 = (props: { value: number }) => {
+  const a = signal(0, props.value);
+  a.set(a() + 1);
+  return <p>{a().toString()}</p>;
 };
 
-console.log(await Counter());
-
-test("2 + 2", () => {
-  expect(2 + 2).toBe(4);
+test("x", () => {
+  expect(Add1({ value: 1 })).toEqual(<p>2</p>);
 });
