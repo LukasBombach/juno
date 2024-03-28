@@ -1,4 +1,4 @@
-const Counter = await () => {
+const Counter = async () => {
   const count = signal(0, Math.round(Math.random() * 100));
   return el(
     "section",
