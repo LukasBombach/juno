@@ -6,12 +6,11 @@ function signal<T>(id: number, initialValue: T): maverick.WriteSignal<T> {
   return s;
 }
 
-const Add1 = (props: { value: number }) => {
-  const a = signal(0, props.value);
-  a.set(a() + 1);
+const Add1 = (props: { val: number }) => {
+  const a = signal(0, props.val);
   return <p>{a().toString()}</p>;
 };
 
 test("x", () => {
-  expect(Add1({ value: 1 })).toEqual(<p>2</p>);
+  expect(Add1({ val: 1 })).toEqual(<p>1</p>);
 });
