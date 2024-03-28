@@ -8,12 +8,16 @@ function signal<T>(id: number, initialValue: T): maverick.WriteSignal<T> {
 function el(element: string, props?: Record<string, unknown>, ...children: unknown[]) {}
 
 const Counter = async () => {
-  const count = signal(0, Math.round(Math.random() * 100));
-  return el(
-    "section",
-    {},
-    el("label", {}, count()),
-    el("hr"),
-    el("button", { onClick: () => count.set(count() + 1) }, "Click")
+  const a = await Promise.resolve(signal(0, "A"));
+
+  const b = signal(0, "B");
+
+  return (
+    <main>
+      <p>{a()}</p>
+      <p>{b()}</p>
+    </main>
   );
 };
+
+console.log(await Counter());
