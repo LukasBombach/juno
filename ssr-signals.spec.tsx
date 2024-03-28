@@ -1,16 +1,14 @@
 import { expect, test } from "bun:test";
-import * as maverick from "@maverick-js/signals";
+import { signal } from "@maverick-js/signals";
+import type { WriteSignal } from "@maverick-js/signals";
 
-function signal<T>(id: number, initialValue: T): maverick.WriteSignal<T> {
-  const s = maverick.signal(initialValue);
-  return s;
-}
-
-const Add1 = (props: { val: number }) => {
-  const a = signal(0, props.val);
-  return <p>{a().toString()}</p>;
+const Add1 = (props: { val: number }): [JSX.Element, ...WriteSignal<any>[]] => {
+  const a = signal(props.val);
+  return [<p>{a()}</p>, a];
 };
 
 test("x", () => {
-  expect(Add1({ val: 1 })).toEqual(<p>1</p>);
+  const [vdom, ...signals] = Add1({ val: 1 });
+  expect(vdom).toEqual(<p>{1}</p>);
+  expect(signals[0]()).toBe(1);
 });
