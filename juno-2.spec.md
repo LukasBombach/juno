@@ -26,20 +26,10 @@ render(App);
 
 ```js
 import { el } from "juno/server";
-import { signal as maverickSignal } from "@maverick-js/signals";
-
-let signalBuffer = [];
-
-function signal(id, initialValue) {
-  const value = maverickSignal();
-  signalBuffer.push({ id, value });
-  return value;
-}
+import { signal } from "@maverick-js/signals";
 
 function render(component) {
-  signalBuffer = []; // 💥 async
-  const vdom = component();
-  const signals = [...signalBuffer];
+  const [vdom, ...signals] = component();
   return [vdom, signals];
 }
 
