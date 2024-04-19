@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Hello juno</h1>
+    <script type="juno/component" juno-id="1"></script>
+    <section>
+      <label>23</label>
+      <button>Click</button>
+    </section>
+    <hr />
+    <script type="juno/component" juno-id="2"></script>
+    <section>
+      <label>5</label>
+      <button>Click</button>
+    </section>
+    <script type="juno/data">
+      {
+        "1": { component: "_az4e", state: [23] },
+        "2": { component: "_az4e", state: [5] }
+      }
+    </script>
+    <script>
+      const DATA = JSON.parse(document.querySelector('script[type="juno/data"]').textContent);
+
+      function getInstances() {
+        const markers = document.querySelectorAll('script[type="juno/component"]').map((marker) => {
+          const id = marker.getAttribute("juno-id");
+          const { component, state } = DATA[id];
+          const root = marker.nextElementSibling;
+          return [component, state, root];
+        });
+      }
+
+      function initWithState(component, state, root) {
+        const instance = new component();
+        instance.state = state;
+        instance.root = root;
+        instance.render();
+      }
+
+      getInstances().forEach(([component, state, root]) => initWithState(component, state, root));
+    </script>
+    <script>
+      // this was copilot generated code
+      class _az4e {
+        constructor() {
+          this.state = [];
+          this.root = null;
+        }
+
+        render() {
+          const [label, button] = this.root.children;
+          label.textContent = this.state[0];
+          button.addEventListener("click", () => {
+            this.state[0]++;
+            this.render();
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
