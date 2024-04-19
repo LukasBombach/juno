@@ -1,18 +1,15 @@
 {
   "name": "juno",
-  "module": "index.ts",
-  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@maverick-js/signals": "5.11.4"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "18.2.73",
-    "@types/react-dom": "18.2.22"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "@maverick-js/signals": "5.11.4",
+    "@types/react-dom": "18.2.22",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "typescript": "5.4.5"
   }
 }
