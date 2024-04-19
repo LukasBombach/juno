@@ -34,7 +34,10 @@ const Counter: Component = () => {
 };
 
 function renderToHTMLString({ signals, elements }: ReturnType<typeof Counter>) {
-  return elementToHTMLString(elements);
+  return {
+    values: signals.map((signal) => signal()),
+    html: elementToHTMLString(elements),
+  };
 }
 
 function elementToHTMLString({ el, props, children }: Element) {
