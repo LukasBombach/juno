@@ -32,7 +32,7 @@
       const DATA = JSON.parse(document.querySelector('script[type="juno/data"]').textContent);
 
       function getInstances() {
-        const markers = document.querySelectorAll('script[type="juno/component"]').map((marker) => {
+        const markers = document.querySelectorAll('script[type="juno/component"]').map(marker => {
           const id = marker.getAttribute("juno-id");
           const { component, state } = DATA[id];
           const root = marker.nextElementSibling;
@@ -40,32 +40,21 @@
         });
       }
 
-      function initWithState(component, state, root) {
-        const instance = new component();
-        instance.state = state;
-        instance.root = root;
-        instance.render();
-      }
+      function initWithState(component, state, root) {}
 
       getInstances().forEach(([component, state, root]) => initWithState(component, state, root));
-    </script>
-    <script>
-      // this was copilot generated code
-      class _az4e {
-        constructor() {
-          this.state = [];
-          this.root = null;
-        }
 
-        render() {
-          const [label, button] = this.root.children;
-          label.textContent = this.state[0];
-          button.addEventListener("click", () => {
-            this.state[0]++;
-            this.render();
-          });
-        }
-      }
+      const Counter = (props, ssrContext) => {
+        const [count, setCount] = useState(ssrContext.state[0]);
+        const increment = () => setCount(count + 1);
+        return [{ children: [count] }, { onClick: increment }];
+      };
+
+      const Counter2 = () => {
+        const count = lazySignal(0);
+        const increment = () => setCount(count() + 1);
+        return [{ children: [() => dom.text.set(count)] }, { onClick: increment }];
+      };
     </script>
   </body>
 </html>
