@@ -45,15 +45,9 @@
       getInstances().forEach(([component, state, root]) => initWithState(component, state, root));
 
       const Counter = (props, ssrContext) => {
-        const [count, setCount] = useState(ssrContext.state[0]);
-        const increment = () => setCount(count + 1);
+        const count = signal(ssrContext.state[0]);
+        const increment = () => count.set(count() + 1);
         return [{ children: [count] }, { onClick: increment }];
-      };
-
-      const Counter2 = () => {
-        const count = lazySignal(0);
-        const increment = () => setCount(count() + 1);
-        return [{ children: [() => dom.text.set(count)] }, { onClick: increment }];
       };
     </script>
   </body>
