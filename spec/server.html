@@ -32,7 +32,7 @@
       const DATA = JSON.parse(document.querySelector('script[type="juno/data"]').textContent);
 
       function getInstances() {
-        const markers = document.querySelectorAll('script[type="juno/component"]').map(marker => {
+        const markers = document.querySelectorAll('script[type="juno/component"]').map((marker) => {
           const id = marker.getAttribute("juno-id");
           const { component, state } = DATA[id];
           const root = marker.nextElementSibling;
@@ -40,13 +40,25 @@
         });
       }
 
-      function initWithState(component, state, root) {}
+      function createLazySingal(id) {
+        let signal = null;
+        const lazySignal = {
+          id,
+          ssrValue: undefined,
+          get: () => {
+            signal = createSignal;
+            lazySignal.get;
+          },
+        };
+
+        return lazySignal;
+      }
 
       getInstances().forEach(([component, state, root]) => initWithState(component, state, root));
 
-      const Counter = (props, ssrContext) => {
-        const count = signal(ssrContext.state[0]);
-        const increment = () => count.set(count() + 1);
+      const Counter = (props) => {
+        const count = createLazySingal(0);
+        const increment = () => count.set(count.get() + 1);
         return [{ children: [count] }, { onClick: increment }];
       };
     </script>
