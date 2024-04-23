@@ -1,5 +1,6 @@
-import "./style.css";
+import { getState } from "juno/ssr";
+import "style.css";
 
-const DATA = JSON.parse(document.querySelector('script[type="juno/data"]')?.textContent || "{}");
+const DATA = getState();
 
 console.log("juno", DATA);
