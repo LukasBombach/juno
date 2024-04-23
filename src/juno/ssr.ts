@@ -2,7 +2,7 @@ export function getState() {
   return JSON.parse(document.querySelector('script[type="juno/data"]')?.textContent || "{}");
 }
 
-export function getInstances() {
+export function getRoots() {
   const instances = [...document.querySelectorAll('script[type="juno/instance"]')].map((marker) => {
     const id = marker.getAttribute("juno-id");
     const root = marker.nextElementSibling;

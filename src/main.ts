@@ -1,9 +1,9 @@
-import { getState, getInstances } from "juno/ssr";
+import { getState, getRoots } from "juno/ssr";
 import "style.css";
 
 const state = getState();
-const instances = getInstances();
+const roots = getRoots();
 
 console.log("hello juno");
 console.log("state", state);
-console.log("instances", instances);
+console.log("roots", roots);
