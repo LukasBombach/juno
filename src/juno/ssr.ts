@@ -2,12 +2,12 @@ export interface InstanceContext {
   state: any[];
 }
 
-export function getState() {
+export function getState(): Record<string, { component: "string"; state: any[] }> {
   return JSON.parse(document.querySelector('script[type="juno/data"]')?.textContent || "{}");
 }
 
-export function getRoots() {
-  const instances = [...document.querySelectorAll('script[type="juno/instance"]')].map((marker) => {
+export function getRoots(): [string, Element][] {
+  return [...document.querySelectorAll('script[type="juno/instance"]')].map((marker) => {
     const id = marker.getAttribute("juno-id");
     const root = marker.nextElementSibling;
 
@@ -21,6 +21,4 @@ export function getRoots() {
 
     return [id, root];
   });
-
-  return Object.fromEntries(instances);
 }
