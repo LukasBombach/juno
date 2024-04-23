@@ -1,4 +1,6 @@
-export interface InstanceContext {}
+export interface InstanceContext {
+  state: any[];
+}
 
 export function getState() {
   return JSON.parse(document.querySelector('script[type="juno/data"]')?.textContent || "{}");

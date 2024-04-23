@@ -12,7 +12,7 @@ console.log("state", state);
 console.log("roots", roots);
 
 const Counter = (_props: never, ctx: InstanceContext) => {
-  const count = signal(0);
+  const count = signal(ctx.state[0]);
   const increment = () => count.set(count() + 1);
   return [
     { children: [count] }, // label
