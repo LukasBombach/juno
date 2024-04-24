@@ -1,5 +1,6 @@
 import { signal } from "@maverick-js/signals";
 import { getRoots, getState } from "juno/ssr";
+import { apply } from "juno/client";
 import "style.css";
 
 import type { InstanceContext } from "juno/ssr";
@@ -22,18 +23,9 @@ const Counter = (_props: null, ctx: InstanceContext) => {
 
 for (const [id, root] of roots) {
   const ctx = { state: state[id].state };
-  const handlers = Counter(null, ctx);
-  hydrate(root, handlers);
-}
+  const bindings = Counter(null, ctx);
 
-function hydrate(root: Element, handlers: any[]) {
-  for (const i in handlers) {
-    const handler = handlers[i];
-    const element = root.children[i];
-    handle(element, handler);
+  for (const i in bindings) {
+    apply(root.children[i], bindings[i]);
   }
-}
-
-function handle(element: Element, handler: Record<string, any>) {
-  console.log("handle", element, handler);
 }
