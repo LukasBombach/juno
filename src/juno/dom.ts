@@ -8,7 +8,18 @@ export function applyBinding(element: Element, binding: DomBindingProps) {
     if (key.match(/^on[A-Z]/)) {
       element.addEventListener(key.slice(2).toLowerCase(), value);
     } else if (key === "children") {
-      effect(() => (element.textContent = value[0]()));
+      let index = 0;
+      let text = element.firstChild as Text;
+      for (const child of value) {
+        if (typeof child === "number") {
+          index += child;
+        } else {
+          const currentText = text.splitText(index);
+          text = currentText.splitText(String(child()).length) as Text;
+          index = 0;
+          effect(() => (currentText.textContent = child()));
+        }
+      }
     } else {
       effect(() => element.setAttribute(key, value()));
     }

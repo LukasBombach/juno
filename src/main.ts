@@ -17,14 +17,15 @@ const Counter = (_props: null, ctx: InstanceContext): DomBinding[] => {
   const increment = () => count.set(count() + 1);
   return [
     ["*:nth-child(1)", { onClick: increment }],
-    ["*:nth-child(2)", { children: [count] }],
+    ["*:nth-child(2)", { children: [7, count, 6, count] }],
   ];
 };
 
 // todos
 // [x] support child by selector in ssr (child could be nested in another element)
-// [ ] support multiple children
-// [ ] support text children at another index in the text content
+// [x] support text children at another index in the text content
+// [x] support multiple children
+// [ ] support different types of children (ie. components)
 // [ ] support component by name
 
 for (const [root, state] of ssr) {
