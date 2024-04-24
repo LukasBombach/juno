@@ -9,10 +9,7 @@ import type { DomBinding } from "juno/dom";
 const roots = getRoots();
 const instances = getState();
 
-// todo make this code nicer
-const ssr = roots.map(([id, root]) => [root, instances[id].state] as const);
-
-const componentsRegister = new Map<string, (props: any, ctx: InstanceContext) => DomBinding[]>();
+const componentsRegister = new Map<string, Promise<(props: any, ctx: InstanceContext) => DomBinding[]>>();
 
 const Counter = (_props: null, ctx: InstanceContext): DomBinding[] => {
   const count = signal(ctx.state[0]);
@@ -23,15 +20,22 @@ const Counter = (_props: null, ctx: InstanceContext): DomBinding[] => {
   ];
 };
 
-componentsRegister.set("_az4e", Counter);
+componentsRegister.set("_az4e", Promise.resolve(Counter));
+
+const ssr = await Promise.all(
+  roots.map(async ([id, root]) => {
+    const component = await componentsRegister.get(instances[id].component)!;
+    return [root, component, instances[id].state] as const;
+  })
+);
 
 // todos
 // [ ] support different types of children (ie. components)
-// [ ] support component by name
+// [ ] make component by name code nice
 
-for (const [root, state] of ssr) {
+for (const [root, component, state] of ssr) {
   const ctx = { state };
-  const bindings = Counter(null, ctx);
+  const bindings = component(null, ctx);
 
   bindings.forEach(([selector, props]) => {
     const element = root.querySelector(selector)!;
