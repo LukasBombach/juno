@@ -12,6 +12,8 @@ const instances = getState();
 // todo make this code nicer
 const ssr = roots.map(([id, root]) => [root, instances[id].state] as const);
 
+const componentsRegister = new Map<string, (props: any, ctx: InstanceContext) => DomBinding[]>();
+
 const Counter = (_props: null, ctx: InstanceContext): DomBinding[] => {
   const count = signal(ctx.state[0]);
   const increment = () => count.set(count() + 1);
@@ -20,6 +22,8 @@ const Counter = (_props: null, ctx: InstanceContext): DomBinding[] => {
     ["*:nth-child(2)", { children: [7, count, 6, count] }],
   ];
 };
+
+componentsRegister.set("_az4e", Counter);
 
 // todos
 // [ ] support different types of children (ie. components)
