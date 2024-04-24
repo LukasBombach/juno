@@ -15,22 +15,23 @@ const Counter = (_props: null, ctx: InstanceContext) => {
   const count = signal(ctx.state[0]);
   const increment = () => count.set(count() + 1);
   return [
-    { onClick: increment }, // button
-    { children: [count] }, // label
-  ];
+    ["*:nth-child(1)", { onClick: increment }],
+    ["*:nth-child(2)", { children: [count] }],
+  ] as const;
 };
 
 // todos
-// - support child by selector in ssr (child could be nested in another element)
-// - support component by name
-// - support multiple children
-// - support text children at another index in the text content
+// [x] support child by selector in ssr (child could be nested in another element)
+// [ ] support multiple children
+// [ ] support text children at another index in the text content
+// [ ] support component by name
 
 for (const [root, state] of ssr) {
   const ctx = { state };
   const bindings = Counter(null, ctx);
 
-  for (const i in bindings) {
-    applyBinding(root.children[i], bindings[i]);
-  }
+  bindings.forEach(([selector, binding]) => {
+    const element = root.querySelector(selector)!;
+    applyBinding(element, binding);
+  });
 }
