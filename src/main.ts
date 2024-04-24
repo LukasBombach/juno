@@ -4,11 +4,10 @@
 // [ ] make component by name code acutally load a component from a client bundle
 // [ ] make component by name code nice
 
+import { signal } from "@maverick-js/signals";
 import { getRoots, getState } from "juno/ssr";
 import { applyBinding } from "juno/dom";
 import "style.css";
-
-import { Counter } from "app";
 
 import type { InstanceContext } from "juno/ssr";
 import type { DomBinding } from "juno/dom";
@@ -18,8 +17,16 @@ type SSRComponent = (props: any, ctx: InstanceContext) => DomBinding[];
 const roots = getRoots();
 const instances = getState();
 
-const componentsRegister = new Map<string, SSRComponent>();
+const Counter: SSRComponent = (_props, ctx) => {
+  const count = signal(ctx.state[0]);
+  const increment = () => count.set(count() + 1);
+  return [
+    ["*:nth-child(1)", { onClick: increment }],
+    ["*:nth-child(2)", { children: [7, count, 6, count] }],
+  ];
+};
 
+const componentsRegister = new Map<string, SSRComponent>();
 componentsRegister.set("_az4e", Counter);
 
 const ssr = roots.map(([id, root]) => {
