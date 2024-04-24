@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>juno</title>
+  </head>
+  <body>
+    <h1>hello juno</h1>
+
+    <script type="juno/instance" juno-id="1"></script>
+    <section>
+      <button>Click</button>
+      <label>Count: 23, yes 23!</label>
+    </section>
+
+    <script type="juno/instance" juno-id="2"></script>
+    <section>
+      <button>Click</button>
+      <label>Count: 5, yes 5!</label>
+    </section>
+
+    <script type="juno/data">
+      {
+        "1": { "component": "_az4e", "state": [23] },
+        "2": { "component": "_az4e", "state": [5] }
+      }
+    </script>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
