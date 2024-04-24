@@ -22,9 +22,6 @@ const Counter = (_props: null, ctx: InstanceContext): DomBinding[] => {
 };
 
 // todos
-// [x] support child by selector in ssr (child could be nested in another element)
-// [x] support text children at another index in the text content
-// [x] support multiple children
 // [ ] support different types of children (ie. components)
 // [ ] support component by name
 
