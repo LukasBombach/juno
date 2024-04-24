@@ -3,7 +3,7 @@ import { effect } from "@maverick-js/signals";
 import type { WriteSignal } from "@maverick-js/signals";
 
 export type DomBinding = [string, DomBindingProps];
-export type DomBindingProps = Record<string, any> & { children?: number | WriteSignal<unknown> };
+export type DomBindingProps = Record<string, any> & { children?: (number | WriteSignal<any>)[] };
 
 export function applyBinding(element: Element, binding: DomBindingProps) {
   Object.entries(binding).forEach(([key, value]) => {
