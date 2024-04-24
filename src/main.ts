@@ -31,6 +31,7 @@ const ssr = await Promise.all(
 
 // todos
 // [ ] support different types of children (ie. components)
+// [ ] make component by name code acutally load a component from a client bundle
 // [ ] make component by name code nice
 
 for (const [root, component, state] of ssr) {
