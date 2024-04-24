@@ -10,5 +10,6 @@ function getRoot(id: number): Element {
 
 for (const { id, component, state } of getData()) {
   const root = getRoot(id);
+  const ctx = { state };
   console.log(root, component, state);
 }
