@@ -1,7 +1,9 @@
 import { effect } from "@maverick-js/signals";
 
+import type { WriteSignal } from "@maverick-js/signals";
+
 export type DomBinding = [string, DomBindingProps];
-export type DomBindingProps = Record<string, any>;
+export type DomBindingProps = Record<string, any> & { children?: number | WriteSignal<unknown> };
 
 export function applyBinding(element: Element, binding: DomBindingProps) {
   Object.entries(binding).forEach(([key, value]) => {
