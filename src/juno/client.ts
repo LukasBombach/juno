@@ -1,9 +1,9 @@
-import { effect } from "@maverick-js/signals";
+import { effect, type WriteSignal } from "@maverick-js/signals";
 
-import type { InstanceContext } from "juno/ssr";
-import type { DomBinding, DomBindingProps } from "juno/dom";
-
-export type Component = (props: any, ctx: InstanceContext) => DomBinding[];
+type Binding = [string, Props];
+type Props = Record<string, any> & { children?: (number | WriteSignal<any>)[] };
+type InstanceContext = { state: any[] };
+export type Component = (props: any, ctx: InstanceContext) => Binding[];
 
 export function hydrate(id: number, component: Component, state: any[]) {
   const root = getRoot(id);
@@ -20,7 +20,7 @@ function getRoot(id: number): Element {
   return document.querySelector(`script[juno-id="${id}"]`)!.nextElementSibling!;
 }
 
-function attachToDom(element: Element, binding: DomBindingProps) {
+function attachToDom(element: Element, binding: Props) {
   Object.entries(binding).forEach(([key, value]) => {
     if (key.match(/^on[A-Z]/)) {
       element.addEventListener(key.slice(2).toLowerCase(), value);
