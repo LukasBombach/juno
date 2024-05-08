@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import chalk from "chalk";
+import cliCursor from "cli-cursor";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -31,12 +32,14 @@ async function createServer() {
   });
 
   app.listen(3000);
-
-  console.info("");
-  console.info(chalk.hex("#FF8800").bold("  juno"));
-  console.info("");
-  console.info(chalk.bold.dim("› running at"), chalk.bold("http://localhost:3000/"));
-  console.info("");
 }
 
-createServer();
+cliCursor.hide();
+
+await createServer();
+
+console.info("");
+console.info(chalk.hex("#FF8800").bold("  hello juno"));
+console.info("");
+console.info(chalk.bold.dim("› server started at"), chalk.bold("http://localhost:3000/"));
+console.info("");
