@@ -40,5 +40,6 @@ await createServer();
 console.info("");
 console.info(chalk.hex("#FF8800").bold("  hello juno"));
 console.info("");
-console.info(chalk.bold.dim("› server started at"), chalk.bold("http://localhost:3000/"));
+console.info(chalk.bold.dim("› local   "), chalk.bold("http://localhost:3000/"));
+console.info(chalk.dim("› inspect "), chalk.dim("http://localhost:3000/__inspect/"));
 console.info("");
