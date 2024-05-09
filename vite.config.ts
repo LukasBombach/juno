@@ -8,15 +8,15 @@ export default defineConfig({
   plugins: [
     tsconfigPaths(),
     Inspect({ build: true, outputDir: ".vite-inspect" }),
-    {
-      name: "juno test apps",
-      configureServer(server) {
-        server.middlewares.use("/apps", async (req, res, next) => {
-          const fileName = req.url!.replace(/^\/(.*)/, "$1.jsx");
-          console.log((await import(`./apps/${fileName}`)).default);
-          next();
-        });
-      },
-    },
+    //{
+    //  name: "juno test apps",
+    //  configureServer(server) {
+    //    server.middlewares.use("/apps", async (req, res, next) => {
+    //      const fileName = req.url!.replace(/^\/(.*)/, "$1.jsx");
+    //      console.log((await import(`./apps/${fileName}`)).default);
+    //      next();
+    //    });
+    //  },
+    //},
   ],
 });

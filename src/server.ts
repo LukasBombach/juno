@@ -4,6 +4,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import chalk from "chalk";
 import cliCursor from "cli-cursor";
+import { renderToString } from "juno/server";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,8 +27,17 @@ async function createServer() {
   // middlewares). The following is valid even after restarts.
   app.use(vite.middlewares);
 
-  app.use("*", async (_req, res) => {
-    res.send("Hello world!").end();
+  app.use("*", async (req, res) => {
+    const urlPath = !req.url || req.url === "/" ? "/index" : req.url;
+    const fileName = urlPath.replace(/^\/(.*)/, "$1.jsx");
+    const filePath = path.resolve(__dirname, "..", "pages", fileName);
+
+    const { default: Page } = await vite.ssrLoadModule(filePath);
+    const vdom = Page();
+    const html = renderToString(vdom);
+    const viteHtml = await vite.transformIndexHtml(req.originalUrl, html);
+
+    res.send(viteHtml).end();
   });
 
   app.listen(3000);

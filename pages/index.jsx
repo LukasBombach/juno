@@ -1,3 +1,5 @@
+import React from "react";
+
 function Counter() {
   let count = Math.floor(Math.random() * 100);
 
@@ -24,6 +26,7 @@ export default function DemoPage() {
         <h1>hello juno</h1>
         <Counter />
         <Counter />
+        <script type="module" src="/src/demo.ts"></script>
       </body>
     </html>
   );
