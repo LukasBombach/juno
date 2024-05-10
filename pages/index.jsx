@@ -24,6 +24,7 @@ export default function DemoPage() {
       </head>
       <body>
         <h1>hello juno</h1>
+        <p>from your jsx</p>
         <Counter />
         <Counter />
         <script type="module" src="/src/demo.ts"></script>
