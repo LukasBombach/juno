@@ -1,10 +1,18 @@
-import { signal as maverickSignal } from "@maverick-js/signals";
-import { inspect } from "node:util";
+import { signal as createSignal, type WriteSignal } from "@maverick-js/signals";
 
-export { effect } from "@maverick-js/signals";
+export interface RenderContext {
+  signal: <T>(value: T) => WriteSignal<T>;
+  signals: WriteSignal<any>[];
+}
 
-export function signal<T>(value: T) {
-  const s = maverickSignal<T>(value);
-  console.debug(inspect(s, { colors: true, depth: 10 }));
-  return s;
+export function createRenderContext(): RenderContext {
+  const signals: WriteSignal<any>[] = [];
+
+  const signal = <T>(value: T) => {
+    const s = createSignal<T>(value);
+    signals.push(s);
+    return s;
+  };
+
+  return { signal, signals };
 }

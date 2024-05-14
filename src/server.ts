@@ -1,11 +1,11 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { inspect } from "node:util";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import chalk from "chalk";
 import cliCursor from "cli-cursor";
 import { renderToString } from "juno/server";
+import { createRenderContext } from "juno/runtime";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -33,10 +33,11 @@ async function createServer() {
     const fileName = urlPath.replace(/^\/(.*)/, "$1.tsx");
     const filePath = path.resolve(__dirname, "..", "pages", fileName);
 
+    const context = createRenderContext();
     const { default: Page } = await vite.ssrLoadModule(filePath);
-    const vdom = Page();
+    const vdom = Page(context);
 
-    // console.debug(inspect(vdom, { colors: true, depth: 10 }));
+    console.debug(...context.signals.map(s => s()));
 
     const html = renderToString(vdom);
     const viteHtml = await vite.transformIndexHtml(req.originalUrl, html);

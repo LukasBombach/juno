@@ -1,8 +1,7 @@
-import React from "react";
-import { signal } from "../src/juno/runtime";
+import type { RenderContext } from "../src/juno/runtime";
 
-export default function DemoPage() {
-  const count = signal(Math.floor(Math.random() * 100));
+export default function DemoPage(ctx: RenderContext) {
+  const count = ctx.signal(Math.floor(Math.random() * 100));
 
   return (
     <html lang="en">
