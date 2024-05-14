@@ -1,11 +1,11 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import express, { type Request, type Response } from "express";
+import express, { type Request } from "express";
 import { createServer as createViteServer, type ViteDevServer } from "vite";
-import chalk from "chalk";
-import cliCursor from "cli-cursor";
 import { renderToString } from "juno/server";
 import { createRenderContext, type RenderContext } from "juno/runtime";
+import cliCursor from "cli-cursor";
+import chalk from "chalk";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
