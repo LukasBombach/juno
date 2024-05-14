@@ -1,5 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { inspect } from "node:util";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import chalk from "chalk";
@@ -29,11 +30,14 @@ async function createServer() {
 
   app.use("*", async (req, res) => {
     const urlPath = !req.url || req.url === "/" ? "/index" : req.url;
-    const fileName = urlPath.replace(/^\/(.*)/, "$1.jsx");
+    const fileName = urlPath.replace(/^\/(.*)/, "$1.tsx");
     const filePath = path.resolve(__dirname, "..", "pages", fileName);
 
     const { default: Page } = await vite.ssrLoadModule(filePath);
     const vdom = Page();
+
+    // console.debug(inspect(vdom, { colors: true, depth: 10 }));
+
     const html = renderToString(vdom);
     const viteHtml = await vite.transformIndexHtml(req.originalUrl, html);
 
