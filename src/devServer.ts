@@ -41,7 +41,7 @@ async function createServer() {
 async function importPage(vite: ViteDevServer, req: Request): Promise<(ctx: RenderContext) => JSX.Element> {
   const urlPath = !req.url || req.url === "/" ? "/index" : req.url;
   const fileName = urlPath.replace(/^\/(.*)/, "$1.tsx");
-  const filePath = path.resolve(__dirname, "..", "pages", fileName);
+  const filePath = path.resolve(__dirname, "pages", fileName);
   const mod = await vite.ssrLoadModule(filePath);
   return mod.default;
 }
