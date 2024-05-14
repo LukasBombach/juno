@@ -14,6 +14,7 @@ export default function DemoPage(ctx: RenderContext) {
       <body>
         <p>{count()}</p>
         <button onClick={() => count.set(count() + 1)}>Click</button>
+        <script type="juno/data">{JSON.stringify(ctx.ssrData, null, 2)}</script>
       </body>
     </html>
   );
