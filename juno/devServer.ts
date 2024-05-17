@@ -2,8 +2,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express, { type Request } from "express";
 import { createServer as createViteServer, type ViteDevServer } from "vite";
-import { renderToString } from "juno/server";
-import { createRenderContext, type RenderContext } from "juno/runtime";
+import { renderToString } from "juno/renderToString";
+import { createRenderContext, type RenderContext } from "juno/renderContext";
 import cliCursor from "cli-cursor";
 import chalk from "chalk";
 
