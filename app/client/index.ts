@@ -1,9 +1,11 @@
 import { signal, effect } from "@maverick-js/signals";
+import { importClientMeta } from "juno/compiler";
+import { $, getData, findElements } from "juno/client";
 
-const $ = (q: string) => document.querySelector(q)!;
+const Page = await importClientMeta("app/pages");
 
-const dataText = $("script[type='juno/data']").textContent!;
-const data = JSON.parse(dataText);
+const data = getData();
+const elements = findElements(Page);
 
 const p = $("body > *:nth-child(1)");
 const button = $("body > *:nth-child(2)");

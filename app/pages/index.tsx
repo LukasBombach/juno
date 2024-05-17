@@ -1,6 +1,6 @@
 import type { RenderContext } from "juno/renderContext";
 
-export default function DemoPage(ctx: RenderContext) {
+export default function Page(ctx: RenderContext) {
   const count = ctx.signal(Math.floor(Math.random() * 100));
 
   return (

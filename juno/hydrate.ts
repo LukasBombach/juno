@@ -3,6 +3,7 @@ import { effect, type WriteSignal } from "@maverick-js/signals";
 type Binding = [string, Props];
 type Props = Record<string, any> & { children?: (number | WriteSignal<any>)[] };
 type InstanceContext = { state: any[] };
+
 export type Component = (props: any, ctx: InstanceContext) => Binding[];
 
 export function hydrate(id: number, component: Component, state: any[]) {
