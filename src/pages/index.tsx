@@ -15,6 +15,7 @@ export default function DemoPage(ctx: RenderContext) {
         <p>{count()}</p>
         <button onClick={() => count.set(count() + 1)}>Click</button>
         <script type="juno/data">{JSON.stringify(ctx.ssrData, null, 2)}</script>
+        <script type="module" src="/src/client/index.ts"></script>
       </body>
     </html>
   );
