@@ -1,16 +1,12 @@
 export { importClientComponent as importComponent } from "juno/compiler";
 
-export function $(q: string) {
-  return document.querySelector(q)!;
-}
-
 export function getData(): any[] {
-  const text = $("script[type='juno/data']").textContent || "[]";
+  const text = document.body.querySelector("script[type='juno/data']")?.textContent || "[]";
   return JSON.parse(text);
 }
 
-export function hydrate(component: any) {
+export function hydrate(component: { selectors: string[] }, root: HTMLElement) {
   const data = getData();
-  const elements = component.selectors.map((s: string) => $(s));
-  bind(elements, component, data);
+  const elements = component.selectors.map((s) => root.querySelector(s));
+  // bind(elements, component, data);
 }
