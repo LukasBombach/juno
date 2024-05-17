@@ -23,11 +23,11 @@ async function createServer() {
     // load the page
     const Page = await importPage(vite, req);
 
-    // render the page
+    // render vdom
     const context = createRenderContext();
     const vdom = Page(context);
 
-    // render the page to HTML
+    // vdom to HTML
     const html = renderToString(vdom);
     const viteHtml = await vite.transformIndexHtml(req.originalUrl, html);
 
