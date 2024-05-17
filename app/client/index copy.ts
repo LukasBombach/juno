@@ -1,5 +1,8 @@
-import { importComponent, hydrate } from "juno/client";
+import { importClientComponent, getSsrState, hydrate } from "juno/client";
 
-const Page = await importComponent("app/pages");
+const Page = await importClientComponent("app/pages");
 
-hydrate(Page, document.body);
+const ssrState = getSsrState();
+const pageState = ssrState[Page.id];
+
+hydrate(Page, pageState, document.body);

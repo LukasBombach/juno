@@ -1,10 +1,10 @@
 import { signal, effect } from "@maverick-js/signals";
-import { importClientMeta } from "juno/compiler";
-import { $, getData, findElements } from "juno/client";
+import { importClientMeta } from "juno/clientCompiler";
+import { $, getSsrState, findElements } from "juno/client";
 
 const Page = await importClientMeta("app/pages");
 
-const data = getData();
+const data = getSsrState();
 const elements = findElements(Page);
 
 const p = $("body > *:nth-child(1)");
