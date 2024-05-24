@@ -1,21 +1,17 @@
-import { signal, effect } from "@maverick-js/signals";
-import { importClientMeta } from "juno/clientCompiler";
-import { $, getSsrState, findElements } from "juno/client";
+import { importClientComponent, getSsrState, hydrate } from "juno/client";
 
-const Page = await importClientMeta("app/pages");
+import type { Component } from "juno/compiler";
 
-const data = getSsrState();
-const elements = findElements(Page);
+const Page: Component = (ctx) => {
+  const count = ctx.signal(Math.floor(Math.random() * 100));
+  return [
+    ["1,2,1", { children: [count] }],
+    ["1,2,2", { onClick: () => count.set(count() + 1) }],
+  ];
+};
+Page.id = "index";
 
-const p = $("body > *:nth-child(1)");
-const button = $("body > *:nth-child(2)");
+const ssrState = getSsrState();
+const pageState = ssrState[Page.id];
 
-const count = signal(data[0]);
-
-effect(() => {
-  p.textContent = count();
-});
-
-button.addEventListener("click", () => {
-  count.set(count() + 1);
-});
+hydrate(document.body, Page, pageState);

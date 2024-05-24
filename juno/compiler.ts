@@ -1,7 +1,8 @@
 import type { WriteSignal } from "@maverick-js/signals";
+import type { RenderContext } from "juno/renderContext";
 
 export interface Component {
-  (): [selector: string, directives: HydrationDirectives][];
+  (ctx: RenderContext): [path: string, directives: HydrationDirectives][];
   id: string;
 }
 

@@ -2,7 +2,6 @@ import { signal as createSignal, type WriteSignal } from "@maverick-js/signals";
 
 export interface RenderContext {
   signal: <T>(value: T) => WriteSignal<T>;
-  signals: WriteSignal<any>[];
   ssrData: any[];
 }
 
@@ -17,7 +16,6 @@ export function createRenderContext(): RenderContext {
 
   return {
     signal,
-    signals,
     get ssrData() {
       return signals.map((s) => s());
     },
