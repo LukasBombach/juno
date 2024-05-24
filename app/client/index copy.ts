@@ -5,4 +5,4 @@ const Page = await importClientComponent("app/pages");
 const ssrState = getSsrState();
 const pageState = ssrState[Page.id];
 
-hydrate(Page, pageState, document.body);
+hydrate(document.body, Page, pageState);

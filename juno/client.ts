@@ -8,7 +8,7 @@ export function getSsrState(): Record<string, any[]> {
   return JSON.parse(text);
 }
 
-export function hydrate(component: Component, data: any[], root: HTMLElement) {
+export function hydrate(root: HTMLElement, component: Component, data: any[]) {
   const entries = component();
 
   for (const [selector, directives] of entries) {
