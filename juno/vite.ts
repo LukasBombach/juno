@@ -21,5 +21,10 @@ export default function junoVitePlugin(): Plugin {
         return `export default ${JSON.stringify(contents)}`;
       }
     },
+    async transform(code, id) {
+      if (id.startsWith(resolvedVirtualModuleId)) {
+        return code;
+      }
+    },
   };
 }
