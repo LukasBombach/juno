@@ -1,17 +1,27 @@
 import { getSsrState, hydrate } from "juno/client";
 
-import type { Component } from "juno/compiler";
+import type { WriteSignal } from "@maverick-js/signals";
+import type { HydrationDirectives } from "juno/compiler";
 
-const Page: Component = (ctx) => {
-  const count = ctx.signal(ctx.ssrData[Page.id][0]);
+export interface ClientRenderContext {
+  signal: <T>(value: T) => WriteSignal<T>;
+  ssrData: any[];
+}
+
+export interface ClientComponent {
+  (ctx: ClientRenderContext): [path: string, directives: HydrationDirectives][];
+  id: string;
+}
+
+const Page: ClientComponent = ctx => {
+  const count = ctx.signal(ctx.ssrData[0]);
   return [
-    ["1,2,1", { children: [count] }],
-    ["1,2,2", { onClick: () => count.set(count() + 1) }],
+    ["1", { children: [count] }],
+    ["2", { onClick: () => count.set(count() + 1) }],
   ];
 };
 Page.id = "index";
 
 const ssrState = getSsrState();
-const pageState = ssrState[Page.id];
 
-hydrate(document.body, Page, pageState);
+hydrate(document.body, Page, ssrState);

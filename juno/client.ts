@@ -1,21 +1,28 @@
-import { effect } from "@maverick-js/signals";
+import { signal, effect } from "@maverick-js/signals";
 
-import type { Component, HydrationDirectives } from "juno/compiler";
+import type { HydrationDirectives } from "juno/compiler";
+import type { ClientComponent } from "app/client";
 
 export { importClientComponent } from "juno/compiler";
 
-export function getSsrState(): Record<string, any[]> {
+export function getSsrState(): any[] {
   const text = document.body.querySelector("script[type='juno/data']")?.textContent || "{}";
   return JSON.parse(text);
 }
 
-export function hydrate(root: HTMLElement, component: Component, data: any[]) {
-  const entries = component();
+export function hydrate(root: HTMLElement, component: ClientComponent, ssrData: any[]) {
+  const ctx = { signal, ssrData };
+  const entries = component(ctx);
 
-  for (const [selector, directives] of entries) {
-    const element = root.querySelector(selector)!;
+  for (const [path, directives] of entries) {
+    const element = getElement(root, path);
     hydrateElement(element, directives);
   }
+}
+
+function getElement(root: HTMLElement, path: string): Element {
+  const selector = ["&", ...path.split(",").map(n => `> *:nth-child(${n})`)].join(" ");
+  return root.querySelector(selector)!;
 }
 
 function hydrateElement(element: Element, binding: HydrationDirectives) {
@@ -32,7 +39,7 @@ function hydrateElement(element: Element, binding: HydrationDirectives) {
           const currentText = text.splitText(index);
           text = currentText.splitText(String(child()).length) as Text;
           index = 0;
-          effect(() => (currentText.textContent = child()));
+          effect(() => ((currentText.textContent = String(child())), undefined));
         }
       }
     } else {
