@@ -1,4 +1,5 @@
-import fs from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import type { Plugin } from "vite";
 
 export default function junoVitePlugin(): Plugin {
@@ -15,7 +16,9 @@ export default function junoVitePlugin(): Plugin {
     async load(id) {
       if (id.startsWith(resolvedVirtualModuleId)) {
         const path = id.slice(resolvedVirtualModuleId.length);
-        return `export const msg = "${path}"`;
+        const absPath = resolve(process.cwd(), path + ".tsx");
+        const contents = await readFile(absPath, { encoding: "utf8" });
+        return `export default ${JSON.stringify(contents)}`;
       }
     },
   };

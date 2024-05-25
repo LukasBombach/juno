@@ -1,10 +1,10 @@
 import { getSsrState, hydrate } from "juno/client";
-import { msg } from "virtual:juno/client/";
+import file from "virtual:juno/client/app/pages/index";
 import type { ClientComponent } from "juno/client";
 
-console.log("msg", msg);
+console.log(file);
 
-const Page: ClientComponent = ctx => {
+const Page: ClientComponent = (ctx) => {
   const count = ctx.signal(ctx.ssrData[0]);
   return [
     ["1", { children: [count] }],
