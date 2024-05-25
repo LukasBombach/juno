@@ -14,7 +14,7 @@ export default function Page(ctx: RenderContext) {
       <body>
         <p>{count()}</p>
         <button onClick={() => count.set(count() + 1)}>Click</button>
-        <script type="juno/data">{JSON.stringify(ctx.ssrData, null, 2)}</script>
+        <script type="juno/data">{JSON.stringify(ctx.ssrData)}</script>
         <script type="module" src="/app/client/index.ts"></script>
       </body>
     </html>
