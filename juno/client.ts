@@ -1,9 +1,19 @@
 import { signal, effect } from "@maverick-js/signals";
 
-import type { HydrationDirectives } from "juno/compiler";
-import type { ClientComponent } from "app/client";
+import type { WriteSignal } from "@maverick-js/signals";
 
-export { importClientComponent } from "juno/compiler";
+export type HydrationDirectives = {
+  children?: (number | WriteSignal<any> | ClientComponent)[];
+} & Record<Exclude<string, "children">, any>;
+
+export interface ClientRenderContext {
+  signal: <T>(value: T) => WriteSignal<T>;
+  ssrData: any[];
+}
+
+export interface ClientComponent {
+  (ctx: ClientRenderContext): [path: string, directives: HydrationDirectives][];
+}
 
 export function getSsrState(): any[] {
   const text = document.body.querySelector("script[type='juno/data']")?.textContent || "{}";
