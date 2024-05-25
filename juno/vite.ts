@@ -1,3 +1,4 @@
+import fs from "node:fs/promises";
 import type { Plugin } from "vite";
 
 export default function junoVitePlugin(): Plugin {
@@ -11,9 +12,10 @@ export default function junoVitePlugin(): Plugin {
         return "\0" + id;
       }
     },
-    load(id) {
+    async load(id) {
       if (id.startsWith(resolvedVirtualModuleId)) {
-        return `export const msg = "from virtual module"`;
+        const path = id.slice(resolvedVirtualModuleId.length);
+        return `export const msg = "${path}"`;
       }
     },
   };
