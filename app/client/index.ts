@@ -1,5 +1,8 @@
 import { getSsrState, hydrate } from "juno/client";
+import { msg } from "virtual:juno/client/";
 import type { ClientComponent } from "juno/client";
+
+console.log("msg", msg);
 
 const Page: ClientComponent = ctx => {
   const count = ctx.signal(ctx.ssrData[0]);
