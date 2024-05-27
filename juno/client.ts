@@ -20,7 +20,7 @@ export function getSsrState(): any[] {
   return JSON.parse(text);
 }
 
-export function hydrate(root: HTMLElement, component: ClientComponent, ssrData: any[]) {
+export function hydrate(root: HTMLElement | Document, component: ClientComponent, ssrData: any[]) {
   const ctx = { signal, ssrData };
   const entries = component(ctx);
 
@@ -30,8 +30,8 @@ export function hydrate(root: HTMLElement, component: ClientComponent, ssrData: 
   }
 }
 
-function getElement(root: HTMLElement, path: string): Element {
-  const selector = ["&", ...path.split(",").map(n => `> *:nth-child(${n})`)].join(" ");
+function getElement(root: HTMLElement | Document, path: string): Element {
+  const selector = ["&", ...path.split(",").map((n) => `> *:nth-child(${n})`)].join(" ");
   return root.querySelector(selector)!;
 }
 
