@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { transformToClientCode } from "./transform";
 import type { Plugin } from "vite";
 
 export default function junoVitePlugin(): Plugin {
@@ -23,7 +24,7 @@ export default function junoVitePlugin(): Plugin {
     },
     async transform(code, id) {
       if (id.startsWith(resolvedVirtualModuleId)) {
-        return code;
+        return transformToClientCode(code);
       }
     },
   };
