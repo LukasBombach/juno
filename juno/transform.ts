@@ -17,8 +17,8 @@ export type NodeOfType<T extends NodeType> = Extract<Node, { type: T }>;
 export async function transformToClientCode(input: string): Promise<string> {
   const module = await parse(input, { syntax: "typescript", tsx: true });
 
-  for (const ret of find(module, "ReturnStatement")) {
-    const returnValue = getReturnValue(ret);
+  for (const returnStatement of find(module, "ReturnStatement")) {
+    const returnValue = getReturnValue(returnStatement);
 
     if (is(returnValue, "JSXElement")) {
       console.log(returnValue);
