@@ -18,14 +18,13 @@ export async function transformToClientCode(input: string): Promise<string> {
   const module = await parse(input, { syntax: "typescript", tsx: true });
 
   for (const returnStatement of find(module, "ReturnStatement")) {
-    const returnValue = getReturnValue(returnStatement);
+    const returnVal = getReturnValue(returnStatement);
 
-    if (is(returnValue, "JSXElement")) {
-      for (const openingElement of find(returnValue, "JSXOpeningElement")) {
-        for (const attribute of find(openingElement, "JSXAttribute")) {
-          const name = is(attribute.name, "Identifier") ? attribute.name.value : attribute.name.name.value;
-          if (name.match(/^on[A-Z]/)) {
-            console.log(name, openingElement);
+    if (is(returnVal, "JSXElement")) {
+      for (const opener of find(returnVal, "JSXOpeningElement")) {
+        for (const attr of find(opener, "JSXAttribute")) {
+          if (getName(attr).match(/^on[A-Z]/)) {
+            console.log(getName(attr), opener);
           }
         }
       }
@@ -37,6 +36,10 @@ export async function transformToClientCode(input: string): Promise<string> {
 
 function is<T extends NodeType>(node: Node | undefined, type: T): node is NodeOfType<T> {
   return node?.type === type;
+}
+
+function getName(node: t.JSXAttribute): string {
+  return is(node.name, "Identifier") ? node.name.value : node.name.name.value;
 }
 
 function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
