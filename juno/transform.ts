@@ -24,6 +24,10 @@ export async function transformToClientCode(input: string): Promise<string> {
     if (is(returnVal, "JSXElement")) {
       for (const el of find(returnVal, "JSXElement")) {
         if (hasEventHandler(el)) {
+          const usages = [...find(returnStatement, "Identifier")].filter((identifier) =>
+            isSameIdentifier(identifier, el.opening.name)
+          );
+
           console.log(el);
         }
       }
@@ -48,18 +52,6 @@ function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
 
 function hasEventHandler(node: t.JSXElement): boolean {
   return node.opening.attributes.some((attr) => getName(attr).match(/^on[A-Z]/));
-}
-
-function findUsages(parent: Node, identifier: t.Identifier): t.Identifier[] {
-  const usages = new Set<t.Identifier>();
-
-  for (const node of traverse(parent)) {
-    if (is(node, "Identifier") && isSameIdentifier(node, identifier)) {
-      usages.add(node);
-    }
-  }
-
-  return [...usages];
 }
 
 function isSameIdentifier(a: t.Identifier, b: t.Identifier): boolean {
