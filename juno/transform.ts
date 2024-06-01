@@ -18,7 +18,13 @@ export async function transformToClientCode(input: string): Promise<string> {
   const module = await parse(input, { syntax: "typescript", tsx: true });
 
   for (const ret of find(module, "ReturnStatement")) {
-    console.log(ret);
+    const retValue = is(ret.argument, "ParenthesisExpression") ? ret.argument.expression : ret.argument;
+
+    if (!is(retValue, "JSXElement")) {
+      continue;
+    }
+
+    console.log(retValue);
   }
 
   const { code: output } = await print(module);
@@ -27,7 +33,7 @@ export async function transformToClientCode(input: string): Promise<string> {
 
 function* find<T extends NodeType>(parent: Node, type: T): Generator<NodeOfType<T>> {
   for (const node of traverse(parent)) {
-    if (isType(node, type)) {
+    if (is(node, type)) {
       yield node;
     }
   }
@@ -48,6 +54,6 @@ function* traverse(obj: any): Generator<Node> {
   }
 }
 
-function isType<T extends NodeType>(node: Node, type: T): node is NodeOfType<T> {
-  return node.type === type;
+function is<T extends NodeType>(node: Node | undefined, type: T): node is NodeOfType<T> {
+  return node?.type === type;
 }
