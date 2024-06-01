@@ -21,7 +21,14 @@ export async function transformToClientCode(input: string): Promise<string> {
     const returnValue = getReturnValue(returnStatement);
 
     if (is(returnValue, "JSXElement")) {
-      console.log(returnValue);
+      for (const openingElement of find(returnValue, "JSXOpeningElement")) {
+        for (const attribute of find(openingElement, "JSXAttribute")) {
+          const name = is(attribute.name, "Identifier") ? attribute.name.value : attribute.name.name.value;
+          if (name.match(/^on[A-Z]/)) {
+            console.log(name, openingElement);
+          }
+        }
+      }
     }
   }
 
