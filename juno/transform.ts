@@ -50,6 +50,22 @@ function hasEventHandler(node: t.JSXElement): boolean {
   return node.opening.attributes.some((attr) => getName(attr).match(/^on[A-Z]/));
 }
 
+function findUsages(parent: Node, identifier: t.Identifier): t.Identifier[] {
+  const usages = new Set<t.Identifier>();
+
+  for (const node of traverse(parent)) {
+    if (is(node, "Identifier") && isSameIdentifier(node, identifier)) {
+      usages.add(node);
+    }
+  }
+
+  return [...usages];
+}
+
+function isSameIdentifier(a: t.Identifier, b: t.Identifier): boolean {
+  return a.value === b.value && a.span.ctxt === b.span.ctxt;
+}
+
 function* find<T extends NodeType>(parent: Node, type: T): Generator<NodeOfType<T>> {
   for (const node of traverse(parent)) {
     if (is(node, type)) {
