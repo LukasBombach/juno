@@ -18,13 +18,11 @@ export async function transformToClientCode(input: string): Promise<string> {
   const module = await parse(input, { syntax: "typescript", tsx: true });
 
   for (const ret of find(module, "ReturnStatement")) {
-    const retValue = is(ret.argument, "ParenthesisExpression") ? ret.argument.expression : ret.argument;
+    const returnValue = getReturnValue(ret);
 
-    if (!is(retValue, "JSXElement")) {
-      continue;
+    if (is(returnValue, "JSXElement")) {
+      console.log(returnValue);
     }
-
-    console.log(retValue);
   }
 
   const { code: output } = await print(module);
@@ -56,4 +54,8 @@ function* traverse(obj: any): Generator<Node> {
 
 function is<T extends NodeType>(node: Node | undefined, type: T): node is NodeOfType<T> {
   return node?.type === type;
+}
+
+function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
+  return is(node.argument, "ParenthesisExpression") ? node.argument.expression : node.argument;
 }
