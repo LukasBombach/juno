@@ -28,6 +28,14 @@ export async function transformToClientCode(input: string): Promise<string> {
   return await print(module).then((r) => r.code);
 }
 
+function is<T extends NodeType>(node: Node | undefined, type: T): node is NodeOfType<T> {
+  return node?.type === type;
+}
+
+function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
+  return is(node.argument, "ParenthesisExpression") ? node.argument.expression : node.argument;
+}
+
 function* find<T extends NodeType>(parent: Node, type: T): Generator<NodeOfType<T>> {
   for (const node of traverse(parent)) {
     if (is(node, type)) {
@@ -45,12 +53,4 @@ function* traverse(obj: any): Generator<Node> {
       for (const key in obj) if (obj.hasOwnProperty(key)) yield* traverse(obj[key]);
     }
   }
-}
-
-function is<T extends NodeType>(node: Node | undefined, type: T): node is NodeOfType<T> {
-  return node?.type === type;
-}
-
-function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
-  return is(node.argument, "ParenthesisExpression") ? node.argument.expression : node.argument;
 }
