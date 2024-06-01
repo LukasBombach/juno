@@ -42,12 +42,8 @@ function* traverse(obj: any): Generator<Node> {
     if (Array.isArray(obj)) {
       for (let i = 0; i < obj.length; i++) yield* traverse(obj[i]);
     } else {
-      if ("type" in obj) {
-        yield obj;
-      }
-      for (const key in obj) {
-        if (obj.hasOwnProperty(key)) yield* traverse(obj[key]);
-      }
+      if ("type" in obj) yield obj;
+      for (const key in obj) if (obj.hasOwnProperty(key)) yield* traverse(obj[key]);
     }
   }
 }
