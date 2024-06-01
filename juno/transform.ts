@@ -27,22 +27,27 @@ export async function transformToClientCode(input: string): Promise<string> {
 
 function* find<T extends NodeType>(parent: Node, type: T): Generator<NodeOfType<T>> {
   for (const node of traverse(parent)) {
-    if (node.type === type) {
+    if (isType(node, type)) {
       yield node;
     }
   }
 }
 
-function* traverse(obj: any): Generator<any> {
+function* traverse(obj: any): Generator<Node> {
   if (typeof obj === "object" && obj !== null) {
     if (Array.isArray(obj)) {
       for (let i = 0; i < obj.length; i++) yield* traverse(obj[i]);
     } else {
+      if ("type" in obj) {
+        yield obj;
+      }
       for (const key in obj) {
         if (obj.hasOwnProperty(key)) yield* traverse(obj[key]);
       }
     }
-  } else {
-    yield obj;
   }
+}
+
+function isType<T extends NodeType>(node: Node, type: T): node is NodeOfType<T> {
+  return node.type === type;
 }

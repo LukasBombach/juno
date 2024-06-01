@@ -19,12 +19,12 @@ export default function junoVitePlugin(): Plugin {
         const path = id.slice(resolvedVirtualModuleId.length);
         const absPath = resolve(process.cwd(), path + ".tsx");
         const contents = await readFile(absPath, { encoding: "utf8" });
-        return `export default ${JSON.stringify(contents)}`;
+        return contents;
       }
     },
     async transform(code, id) {
       if (id.startsWith(resolvedVirtualModuleId)) {
-        return transformToClientCode(code);
+        return `export default ${JSON.stringify(transformToClientCode(code))}`;
       }
     },
   };
