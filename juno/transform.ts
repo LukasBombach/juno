@@ -6,6 +6,7 @@ export type Node =
   | t.Statement
   | t.Expression
   | t.Declaration
+  | t.SpreadElement
   | t.VariableDeclarator
   | t.JSXOpeningElement
   | t.JSXAttribute
@@ -21,11 +22,9 @@ export async function transformToClientCode(input: string): Promise<string> {
     const returnVal = getReturnValue(returnStatement);
 
     if (is(returnVal, "JSXElement")) {
-      for (const opener of find(returnVal, "JSXOpeningElement")) {
-        for (const attr of find(opener, "JSXAttribute")) {
-          if (getName(attr).match(/^on[A-Z]/)) {
-            console.log(getName(attr), opener);
-          }
+      for (const el of find(returnVal, "JSXElement")) {
+        if (hasEventHandler(el)) {
+          console.log(el);
         }
       }
     }
@@ -38,12 +37,17 @@ function is<T extends NodeType>(node: Node | undefined, type: T): node is NodeOf
   return node?.type === type;
 }
 
-function getName(node: t.JSXAttribute): string {
+function getName(node: t.JSXAttributeOrSpread): string {
+  if (is(node, "SpreadElement")) throw new Error("SpreadElement is not supported yet");
   return is(node.name, "Identifier") ? node.name.value : node.name.name.value;
 }
 
 function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
   return is(node.argument, "ParenthesisExpression") ? node.argument.expression : node.argument;
+}
+
+function hasEventHandler(node: t.JSXElement): boolean {
+  return node.opening.attributes.some((attr) => getName(attr).match(/^on[A-Z]/));
 }
 
 function* find<T extends NodeType>(parent: Node, type: T): Generator<NodeOfType<T>> {
