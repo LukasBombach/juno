@@ -25,8 +25,7 @@ export async function transformToClientCode(input: string): Promise<string> {
     }
   }
 
-  const { code: output } = await print(module);
-  return output;
+  return await print(module).then((r) => r.code);
 }
 
 function* find<T extends NodeType>(parent: Node, type: T): Generator<NodeOfType<T>> {
