@@ -41,7 +41,7 @@ export async function transformToClientCode(input: string): Promise<string> {
       }
     }
 
-    console.log([...keepJsxElements].map(el => el.opening.name.value));
+    console.log([...keepJsxElements].sort((a, b) => a.span.start - b.span.start).map(el => el.opening.name.value));
   }
 
   return await print(module).then(r => r.code);
