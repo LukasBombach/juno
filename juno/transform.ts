@@ -20,21 +20,24 @@ export async function transformToClientCode(input: string): Promise<string> {
 
   for (const returnStatement of find(module, "ReturnStatement")) {
     const returnVal = getReturnValue(returnStatement);
+    const keepJsxElements = new Set<t.JSXElement>();
 
     if (is(returnVal, "JSXElement")) {
       for (const el of find(returnVal, "JSXElement")) {
         if (hasEventHandler(el)) {
-          const usages = [...find(returnStatement, "Identifier")].filter((identifier) =>
-            isSameIdentifier(identifier, el.opening.name)
-          );
+          keepJsxElements.add(el);
 
-          console.log(el);
+          const identifiers = [...find(el, "Identifier")];
+
+          const usages = identifiers.flatMap(identifier =>
+            [...find(returnStatement, "Identifier")].filter(id => isSameIdentifier(identifier, id))
+          );
         }
       }
     }
   }
 
-  return await print(module).then((r) => r.code);
+  return await print(module).then(r => r.code);
 }
 
 function is<T extends NodeType>(node: Node | undefined, type: T): node is NodeOfType<T> {
@@ -51,7 +54,7 @@ function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
 }
 
 function hasEventHandler(node: t.JSXElement): boolean {
-  return node.opening.attributes.some((attr) => getName(attr).match(/^on[A-Z]/));
+  return node.opening.attributes.some(attr => getName(attr).match(/^on[A-Z]/));
 }
 
 function isSameIdentifier(a: t.Identifier, b: t.Identifier): boolean {
