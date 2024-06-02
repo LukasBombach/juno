@@ -17,6 +17,7 @@ export type NodeOfType<T extends NodeType> = Extract<Node, { type: T }>;
 
 export async function transformToClientCode(input: string): Promise<string> {
   const module = await parse(input, { syntax: "typescript", tsx: true });
+  const parentMap = createParentMap(module);
 
   for (const returnStatement of find(module, "ReturnStatement")) {
     const returnVal = getReturnValue(returnStatement);
@@ -32,12 +33,39 @@ export async function transformToClientCode(input: string): Promise<string> {
           const usages = identifiers.flatMap(identifier =>
             [...find(returnStatement, "Identifier")].filter(id => isSameIdentifier(identifier, id))
           );
+
+          const elements = usages.map(id => findParent(parentMap, id, "JSXElement")).filter(nonNullable);
+
+          elements.forEach(el => keepJsxElements.add(el));
         }
       }
     }
+
+    console.log([...keepJsxElements].map(el => el.opening.name.value));
   }
 
   return await print(module).then(r => r.code);
+}
+
+function createParentMap(node: Node): Map<Node, Node> {
+  const parentMap = new Map<Node, Node>();
+  let parent = node;
+  for (const child of traverse(node)) {
+    parentMap.set(child, parent);
+    parent = child;
+  }
+  return parentMap;
+}
+
+function findParent<T extends NodeType>(parentMap: Map<Node, Node>, node: Node, type: T): NodeOfType<T> | undefined {
+  let parent = parentMap.get(node);
+  while (parent) {
+    if (is(parent, type)) {
+      return parent;
+    }
+    parent = parentMap.get(parent);
+  }
+  return undefined;
 }
 
 function is<T extends NodeType>(node: Node | undefined, type: T): node is NodeOfType<T> {
@@ -59,6 +87,10 @@ function hasEventHandler(node: t.JSXElement): boolean {
 
 function isSameIdentifier(a: t.Identifier, b: t.Identifier): boolean {
   return a.value === b.value && a.span.ctxt === b.span.ctxt;
+}
+
+function nonNullable<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined;
 }
 
 function* find<T extends NodeType>(parent: Node, type: T): Generator<NodeOfType<T>> {
