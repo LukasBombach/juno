@@ -41,11 +41,15 @@ export async function transformToClientCode(input: string): Promise<string> {
       }
     }
 
-    console.log(
-      [...keepJsxElements]
-        .sort((a, b) => a.span.start - b.span.start)
-        .map(el => el.opening.name.type === "Identifier" && el.opening.name.value)
-    );
+    const jsxElements = [...keepJsxElements].sort((a, b) => a.span.start - b.span.start);
+
+    console.log(...jsxElements.map(el => JSON.stringify(el, null, 2)));
+
+    const attrs = jsxElements.map(el => { 
+      return el.opening.attributes.filter(attr => )
+    })
+
+    // console.log(jsxElements.map(el => el.opening.name.type === "Identifier" && el.opening.name.value));
   }
 
   return await print(module).then(r => r.code);
