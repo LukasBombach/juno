@@ -21,6 +21,7 @@ export async function transformToClientCode(input: string): Promise<string> {
 
   for (const returnStatement of find(module, "ReturnStatement")) {
     const returnVal = getReturnValue(returnStatement);
+    const reactiveIdentifiers = new Set<t.Identifier>();
     const keepJsxElements = new Set<t.JSXElement>();
 
     if (is(returnVal, "JSXElement")) {
@@ -28,28 +29,37 @@ export async function transformToClientCode(input: string): Promise<string> {
         if (hasEventHandler(el)) {
           keepJsxElements.add(el);
 
-          const identifiers = [...find(el, "Identifier")];
-
-          const usages = identifiers.flatMap(identifier =>
-            [...find(returnStatement, "Identifier")].filter(id => isSameIdentifier(identifier, id))
-          );
-
-          const elements = usages.map(id => findParent(parentMap, id, "JSXElement")).filter(nonNullable);
-
-          elements.forEach(el => keepJsxElements.add(el));
+          for (const identifier of find(el, "Identifier")) {
+            reactiveIdentifiers.add(identifier);
+          }
         }
       }
     }
 
+    for (const reactiveidentifier of reactiveIdentifiers) {
+      for (const identifier of find(returnStatement, "Identifier")) {
+        if (isSameIdentifier(reactiveidentifier, identifier)) {
+          reactiveIdentifiers.add(identifier);
+        }
+      }
+    }
+
+    for (const reactiveidentifier of reactiveIdentifiers) {
+      const parentElement = findParent(parentMap, reactiveidentifier, "JSXElement");
+      if (parentElement) keepJsxElements.add(parentElement);
+    }
+
     const jsxElements = [...keepJsxElements].sort((a, b) => a.span.start - b.span.start);
 
-    console.log(...jsxElements.map(el => JSON.stringify(el, null, 2)));
+    //console.log(...jsxElements.map(el => JSON.stringify(el, null, 2)));
 
-    const attrs = jsxElements.map(el => { 
-      return el.opening.attributes.filter(attr => )
-    })
+    //const attrs = jsxElements.map(el => {
+    //return el.opening.attributes.filter(attr => )
+    //})
 
-    // console.log(jsxElements.map(el => el.opening.name.type === "Identifier" && el.opening.name.value));
+    console.log(...[...reactiveIdentifiers]);
+
+    console.log(jsxElements.map(el => el.opening.name.type === "Identifier" && el.opening.name.value));
   }
 
   return await print(module).then(r => r.code);
