@@ -57,7 +57,7 @@ export async function transformToClientCode(input: string): Promise<string> {
     //return el.opening.attributes.filter(attr => )
     //})
 
-    console.log(...[...reactiveIdentifiers]);
+    console.log(...reactiveIdentifiers);
 
     console.log(jsxElements.map(el => el.opening.name.type === "Identifier" && el.opening.name.value));
   }
