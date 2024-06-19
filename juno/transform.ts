@@ -56,24 +56,13 @@ export async function transformToClientCode(input: string): Promise<string> {
     console.log(el.opening.name.type === "Identifier" && el.opening.name.value);
 
     let parent = parentMap.get(el);
-    while (parent && parent.type !== "Module") {
+    while (parent) {
       console.log(parent.type);
       parent = parentMap.get(parent);
     }
   }
 
-  return await print(module).then((r) => r.code);
-}
-
-function createParentMap(node: Node): Map<Node, Node> {
-  const parentMap = new Map<Node, Node>();
-  let parent = node;
-  for (const child of traverse(node)) {
-    console.log(parent.type.padStart(40, " "), "<", child.type);
-    parentMap.set(child, parent);
-    parent = child;
-  }
-  return parentMap;
+  return await print(module).then(r => r.code);
 }
 
 function findParent<T extends NodeType>(parentMap: Map<Node, Node>, node: Node, type: T): NodeOfType<T> | undefined {
@@ -101,7 +90,7 @@ function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
 }
 
 function hasEventHandler(node: t.JSXElement): boolean {
-  return node.opening.attributes.some((attr) => getName(attr).match(/^on[A-Z]/));
+  return node.opening.attributes.some(attr => getName(attr).match(/^on[A-Z]/));
 }
 
 function isSameIdentifier(a: t.Identifier, b: t.Identifier): boolean {
@@ -139,24 +128,29 @@ function* traverse(obj: any): Generator<Node> {
     }
   }
 }
-/* 
-function createParentMap(node: Node): Map<Node, Node> {
-  const parentMap = new Map<Node, Node>();
 
+function isNode(value: unknown): value is Node {
+  return typeof value === "object" && value !== null && "type" in value;
+}
+
+type Child = Node;
+type Parent = Node;
+
+function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): Map<Child, Parent> {
   let parent = node;
+  let property: keyof typeof parent;
 
-  if (typeof node === "object" && node !== null) {
-    if (Array.isArray(node)) {
-      for (let i = 0; i < node.length; i++) {
-        parentMap.set(node[i], parent);
-      }
-    } else {
-      if ("type" in node) {
-        yield node;
-      }
-      for (const key in node) {
-        if (node.hasOwnProperty(key)) {
-          yield * traverse(node[key]);
+  for (property in parent) {
+    const child = parent[property];
+    if (isNode(child)) {
+      parentMap.set(child, parent);
+      createParentMap(child, parentMap);
+    }
+    if (Array.isArray(child)) {
+      for (const nthChild of child) {
+        if (isNode(nthChild)) {
+          parentMap.set(nthChild, parent);
+          createParentMap(nthChild, parentMap);
         }
       }
     }
@@ -164,4 +158,3 @@ function createParentMap(node: Node): Map<Node, Node> {
 
   return parentMap;
 }
- */
