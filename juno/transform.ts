@@ -51,24 +51,25 @@ export async function transformToClientCode(input: string): Promise<string> {
 
     const jsxElements = [...keepJsxElements].sort((a, b) => a.span.start - b.span.start);
 
-    //console.log(...jsxElements.map(el => JSON.stringify(el, null, 2)));
+    const el = jsxElements[0];
 
-    //const attrs = jsxElements.map(el => {
-    //return el.opening.attributes.filter(attr => )
-    //})
+    console.log(el.opening.name.type === "Identifier" && el.opening.name.value);
 
-    console.log(...reactiveIdentifiers);
-
-    console.log(jsxElements.map(el => el.opening.name.type === "Identifier" && el.opening.name.value));
+    let parent = parentMap.get(el);
+    while (parent && parent.type !== "Module") {
+      console.log(parent.type);
+      parent = parentMap.get(parent);
+    }
   }
 
-  return await print(module).then(r => r.code);
+  return await print(module).then((r) => r.code);
 }
 
 function createParentMap(node: Node): Map<Node, Node> {
   const parentMap = new Map<Node, Node>();
   let parent = node;
   for (const child of traverse(node)) {
+    console.log(parent.type.padStart(40, " "), "<", child.type);
     parentMap.set(child, parent);
     parent = child;
   }
@@ -100,7 +101,7 @@ function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
 }
 
 function hasEventHandler(node: t.JSXElement): boolean {
-  return node.opening.attributes.some(attr => getName(attr).match(/^on[A-Z]/));
+  return node.opening.attributes.some((attr) => getName(attr).match(/^on[A-Z]/));
 }
 
 function isSameIdentifier(a: t.Identifier, b: t.Identifier): boolean {
@@ -120,15 +121,16 @@ function* find<T extends NodeType>(parent: Node, type: T): Generator<NodeOfType<
 }
 
 function* traverse(obj: any): Generator<Node> {
+  if (typeof obj === "object" && obj !== null && "type" in obj) {
+    yield obj;
+  }
+
   if (typeof obj === "object" && obj !== null) {
     if (Array.isArray(obj)) {
       for (let i = 0; i < obj.length; i++) {
         yield* traverse(obj[i]);
       }
     } else {
-      if ("type" in obj) {
-        yield obj;
-      }
       for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
           yield* traverse(obj[key]);
@@ -137,3 +139,29 @@ function* traverse(obj: any): Generator<Node> {
     }
   }
 }
+/* 
+function createParentMap(node: Node): Map<Node, Node> {
+  const parentMap = new Map<Node, Node>();
+
+  let parent = node;
+
+  if (typeof node === "object" && node !== null) {
+    if (Array.isArray(node)) {
+      for (let i = 0; i < node.length; i++) {
+        parentMap.set(node[i], parent);
+      }
+    } else {
+      if ("type" in node) {
+        yield node;
+      }
+      for (const key in node) {
+        if (node.hasOwnProperty(key)) {
+          yield * traverse(node[key]);
+        }
+      }
+    }
+  }
+
+  return parentMap;
+}
+ */
