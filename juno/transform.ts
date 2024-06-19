@@ -51,10 +51,19 @@ export async function transformToClientCode(input: string): Promise<string> {
 
     const jsxElements = [...keepJsxElements].sort((a, b) => a.span.start - b.span.start);
 
-    console.log(jsxElements.map(el => getParentPath(parentMap, el)));
+    console.log(
+      jsxElements.map(el => [getParentPath(parentMap, el), getClientProperties(el, reactiveIdentifiers, parentMap)])
+    );
   }
 
   return await print(module).then(r => r.code);
+}
+
+function getClientProperties(node: t.JSXElement, reactiveIdentifiers: Set<t.Identifier>, parentMap: Map<Node, Node>) {
+  const props = node.opening.attributes
+    .filter((attr): attr is t.JSXAttribute => is(attr, "JSXAttribute"))
+    .filter(attr => [...reactiveIdentifiers.values()].some(id => getParents(id, parentMap).includes(attr)));
+  return Object.fromEntries(props.map(prop => [getName(prop), prop.value]));
 }
 
 function getParentPath(parentMap: Map<Node, Node>, el: t.JSXElement): number[] {
@@ -79,6 +88,16 @@ function getParentPath(parentMap: Map<Node, Node>, el: t.JSXElement): number[] {
   }
 
   return path.reverse();
+}
+
+function getParents(node: Node, parentMap: Map<Node, Node>): Node[] {
+  const parents: Node[] = [];
+  let parent = parentMap.get(node);
+  while (parent) {
+    parents.push(parent);
+    parent = parentMap.get(parent);
+  }
+  return parents;
 }
 
 function findParent<T extends NodeType>(parentMap: Map<Node, Node>, node: Node, type: T): NodeOfType<T> | undefined {
