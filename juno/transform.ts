@@ -51,18 +51,34 @@ export async function transformToClientCode(input: string): Promise<string> {
 
     const jsxElements = [...keepJsxElements].sort((a, b) => a.span.start - b.span.start);
 
-    const el = jsxElements[0];
-
-    console.log(el.opening.name.type === "Identifier" && el.opening.name.value);
-
-    let parent = parentMap.get(el);
-    while (parent) {
-      console.log(parent.type);
-      parent = parentMap.get(parent);
-    }
+    console.log(jsxElements.map(el => getParentPath(parentMap, el)));
   }
 
   return await print(module).then(r => r.code);
+}
+
+function getParentPath(parentMap: Map<Node, Node>, el: t.JSXElement): number[] {
+  // gets the null-based index if child in parent.children but disregards JSXText that contains only whitespace
+  function getJsxElementIndex(parent: t.JSXElement, child: t.JSXElement): number {
+    let index = 0;
+    for (const node of parent.children) {
+      if (node.type === "JSXText" && !node.value.trim()) continue;
+      if (node === child) return index;
+      index++;
+    }
+    return -1;
+  }
+
+  const path: number[] = [];
+  let child = el;
+  let parent = parentMap.get(child);
+  while (parent?.type === "JSXElement") {
+    path.push(getJsxElementIndex(parent, child));
+    child = parent;
+    parent = parentMap.get(parent);
+  }
+
+  return path.reverse();
 }
 
 function findParent<T extends NodeType>(parentMap: Map<Node, Node>, node: Node, type: T): NodeOfType<T> | undefined {
