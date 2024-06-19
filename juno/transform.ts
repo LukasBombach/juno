@@ -193,3 +193,60 @@ function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): Map<
 
   return parentMap;
 }
+
+function createClientSideJsxReplacementArray(): t.ArrayExpression {
+  const span: t.Span = {
+    start: 0,
+    end: 0,
+    ctxt: 0,
+  };
+  return {
+    type: "ArrayExpression",
+    span,
+    elements: [
+      {
+        expression: {
+          type: "ObjectExpression",
+          span,
+          properties: [
+            {
+              type: "KeyValueProperty",
+              key: {
+                type: "Identifier",
+                span,
+                value: "path",
+                optional: false,
+              },
+              value: {
+                type: "ArrayExpression",
+                span,
+                elements: [],
+              },
+            },
+            {
+              type: "KeyValueProperty",
+              key: {
+                type: "Identifier",
+                span,
+                value: "onClick",
+                optional: false,
+              },
+              value: {
+                type: "ArrowFunctionExpression",
+                span,
+                params: [],
+                body: {
+                  type: "BlockStatement",
+                  span,
+                  stmts: [],
+                },
+                async: false,
+                generator: false,
+              },
+            },
+          ],
+        },
+      },
+    ],
+  };
+}
