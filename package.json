@@ -16,6 +16,7 @@
     "recast": "0.23.7",
     "typescript": "5.2.2",
     "vite": "5.2.0",
+    "vite-plugin-full-reload": "1.1.0",
     "vite-plugin-inspect": "0.8.4",
     "vite-tsconfig-paths": "4.3.2"
   },

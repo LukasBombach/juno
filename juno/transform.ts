@@ -15,6 +15,17 @@ export type Node =
 export type NodeType = Node["type"];
 export type NodeOfType<T extends NodeType> = Extract<Node, { type: T }>;
 
+type Child = Node;
+type Parent = Node;
+
+type ParentMap = Map<Child, Parent>;
+
+const span: t.Span = {
+  start: 0,
+  end: 0,
+  ctxt: 0,
+};
+
 export async function transformToClientCode(input: string): Promise<string> {
   const module = await parse(input, { syntax: "typescript", tsx: true });
   const parentMap = createParentMap(module);
@@ -51,25 +62,90 @@ export async function transformToClientCode(input: string): Promise<string> {
 
     const jsxElements = [...keepJsxElements].sort((a, b) => a.span.start - b.span.start);
 
-    console.log(
-      jsxElements.map(el => [getParentPath(parentMap, el), getClientProperties(el, reactiveIdentifiers, parentMap)])
-    );
+    returnStatement.argument = {
+      type: "ArrayExpression",
+      span,
+      elements: jsxElements.map((el) => convertToHydrationDirective(parentMap, reactiveIdentifiers, el)),
+    };
   }
 
-  return await print(module).then(r => {
+  return await print(module).then((r) => {
     console.log(r.code);
     return r.code;
   });
 }
 
-function getClientProperties(node: t.JSXElement, reactiveIdentifiers: Set<t.Identifier>, parentMap: Map<Node, Node>) {
-  const props = node.opening.attributes
-    .filter((attr): attr is t.JSXAttribute => is(attr, "JSXAttribute"))
-    .filter(attr => [...reactiveIdentifiers.values()].some(id => getParents(id, parentMap).includes(attr)));
-  return Object.fromEntries(props.map(prop => [getName(prop), prop.value]));
+function convertToHydrationDirective(
+  parentMap: ParentMap,
+  reactiveIdentifiers: Set<t.Identifier>,
+  el: t.JSXElement
+): t.ExprOrSpread {
+  return {
+    expression: {
+      type: "ObjectExpression",
+      span,
+      properties: [
+        {
+          type: "KeyValueProperty",
+          key: {
+            type: "Identifier",
+            span,
+            value: "path",
+            optional: false,
+          },
+          value: {
+            type: "ArrayExpression",
+            span,
+            elements: getParentPath(parentMap, el),
+          },
+        },
+        ...getClientProperties(el, reactiveIdentifiers, parentMap),
+      ],
+    },
+  };
 }
 
-function getParentPath(parentMap: Map<Node, Node>, el: t.JSXElement): number[] {
+function getClientProperties(
+  node: t.JSXElement,
+  reactiveIdentifiers: Set<t.Identifier>,
+  parentMap: Map<Node, Node>
+): t.KeyValueProperty[] {
+  const props = node.opening.attributes
+    .filter((attr): attr is t.JSXAttribute => is(attr, "JSXAttribute"))
+    .filter((attr) => [...reactiveIdentifiers.values()].some((id) => getParents(id, parentMap).includes(attr)));
+  return props
+    .map((prop): [string, t.Expression] => {
+      const name = getName(prop);
+
+      if (!prop.value) {
+        throw new Error(`JSXAttribute ${name} has no value`);
+      }
+
+      if (!is(prop.value, "JSXExpressionContainer")) {
+        throw new Error(`JSXAttribute ${name} has an unsupported value`);
+      }
+
+      if (is(prop.value.expression, "JSXEmptyExpression")) {
+        throw new Error(`JSXAttribute ${name} has an empty expression`);
+      }
+
+      return [name, prop.value.expression];
+    })
+    .map(([name, expression]) => {
+      return {
+        type: "KeyValueProperty",
+        key: {
+          type: "Identifier",
+          span,
+          value: name,
+          optional: false,
+        },
+        value: expression,
+      };
+    });
+}
+
+function getParentPath(parentMap: Map<Node, Node>, el: t.JSXElement): t.ExprOrSpread[] {
   // gets the null-based index if child in parent.children but disregards JSXText that contains only whitespace
   function getJsxElementIndex(parent: t.JSXElement, child: t.JSXElement): number {
     let index = 0;
@@ -90,7 +166,11 @@ function getParentPath(parentMap: Map<Node, Node>, el: t.JSXElement): number[] {
     parent = parentMap.get(parent);
   }
 
-  return path.reverse();
+  return path
+    .reverse()
+    .map(
+      (value: number): t.ExprOrSpread => ({ spread: undefined, expression: { type: "NumericLiteral", span, value } })
+    );
 }
 
 function getParents(node: Node, parentMap: Map<Node, Node>): Node[] {
@@ -128,7 +208,7 @@ function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
 }
 
 function hasEventHandler(node: t.JSXElement): boolean {
-  return node.opening.attributes.some(attr => getName(attr).match(/^on[A-Z]/));
+  return node.opening.attributes.some((attr) => getName(attr).match(/^on[A-Z]/));
 }
 
 function isSameIdentifier(a: t.Identifier, b: t.Identifier): boolean {
@@ -171,10 +251,7 @@ function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
 }
 
-type Child = Node;
-type Parent = Node;
-
-function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): Map<Child, Parent> {
+function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): ParentMap {
   let parent = node;
   let property: keyof typeof parent;
 
@@ -198,11 +275,6 @@ function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): Map<
 }
 
 function createClientSideJsxReplacementArray(): t.ArrayExpression {
-  const span: t.Span = {
-    start: 0,
-    end: 0,
-    ctxt: 0,
-  };
   return {
     type: "ArrayExpression",
     span,

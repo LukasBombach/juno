@@ -10,6 +10,7 @@ export default function junoVitePlugin(): Plugin {
   return {
     name: "juno ",
     resolveId(id) {
+      console.log("RESOLVE ID", id);
       if (id.startsWith(virtualModuleId)) {
         return "\0" + id;
       }
@@ -20,6 +21,15 @@ export default function junoVitePlugin(): Plugin {
         const absPath = resolve(process.cwd(), path + ".tsx");
         const contents = await readFile(absPath, { encoding: "utf8" });
         return contents;
+      }
+    },
+    shouldTransformCachedModule({ id }) {
+      console.log("SHOULD TRANSFORM CACHED MODULE", id);
+
+      return true;
+
+      if (id.startsWith(resolvedVirtualModuleId)) {
+        return true;
       }
     },
     async transform(code, id) {
