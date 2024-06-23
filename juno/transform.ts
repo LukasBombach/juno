@@ -32,6 +32,57 @@ export async function transformToClientCode(input: string): Promise<string> {
 
   for (const functionLike of find(module, "FunctionExpression")) {
     const ctxParam = is(functionLike.params[0].pat, "Identifier") ? functionLike.params[0].pat : null;
+    const usages = ctxParam ? [...find(functionLike, "Identifier")].filter(id => isSameIdentifier(id, ctxParam)) : [];
+    usages
+      .map(id => parentMap.get(id))
+      .filter((parent): parent is t.MemberExpression => is(parent, "MemberExpression"))
+      .filter(memberExpr => {
+        return memberExpr.property.type === "Identifier" && memberExpr.property.value === "signal";
+      })
+      .map(memberExpr => parentMap.get(memberExpr))
+      .filter((parent): parent is t.CallExpression => is(parent, "CallExpression"))
+      .forEach((callExpr, i) => {
+        const span: t.Span = {
+          start: 0,
+          end: 0,
+          ctxt: ctxParam?.span.ctxt ?? 0,
+        };
+
+        callExpr.arguments = [
+          {
+            spread: undefined,
+            expression: {
+              type: "MemberExpression",
+              span,
+              object: {
+                type: "MemberExpression",
+                span,
+                object: {
+                  type: "Identifier",
+                  span,
+                  value: "ctx",
+                  optional: false,
+                },
+                property: {
+                  type: "Identifier",
+                  span,
+                  value: "ssrData",
+                  optional: false,
+                },
+              },
+              property: {
+                type: "Computed",
+                span,
+                expression: {
+                  type: "NumericLiteral",
+                  span,
+                  value: i,
+                },
+              },
+            },
+          },
+        ];
+      });
 
     for (const returnStatement of find(functionLike, "ReturnStatement")) {
       const returnVal = getReturnValue(returnStatement);
