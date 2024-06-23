@@ -8,7 +8,7 @@ export default function junoVitePlugin(): Plugin {
   const resolvedVirtualModuleId = "\0" + virtualModuleId;
 
   return {
-    name: "juno ",
+    name: "juno",
     resolveId(id) {
       if (id.startsWith(virtualModuleId)) {
         return "\0" + id;
@@ -19,22 +19,13 @@ export default function junoVitePlugin(): Plugin {
         const path = id.slice(resolvedVirtualModuleId.length);
         const absPath = resolve(process.cwd(), path + ".tsx");
         const contents = await readFile(absPath, { encoding: "utf8" });
-        return contents;
+        return await transformToClientCode(contents);
       }
     },
-    shouldTransformCachedModule({ id }) {
-      console.log("SHOULD TRANSFORM CACHED MODULE", id);
-
-      return true;
-
-      if (id.startsWith(resolvedVirtualModuleId)) {
-        return true;
-      }
-    },
-    async transform(code, id) {
-      if (id.startsWith(resolvedVirtualModuleId)) {
-        return `export default ${JSON.stringify(transformToClientCode(code))}`;
-      }
-    },
+    // async transform(code, id) {
+    //   if (id.startsWith(resolvedVirtualModuleId)) {
+    //     return await transformToClientCode(code);
+    //   }
+    // },
   };
 }

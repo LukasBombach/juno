@@ -4,7 +4,7 @@ import type { ClientComponent } from "juno/client";
 
 console.log(file);
 
-const Page: ClientComponent = (ctx) => {
+const Page: ClientComponent = ctx => {
   const count = ctx.signal(ctx.ssrData[0]);
   return [
     ["2,1", { children: [count] }],
