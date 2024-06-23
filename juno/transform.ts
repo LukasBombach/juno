@@ -30,46 +30,50 @@ export async function transformToClientCode(input: string): Promise<string> {
   const module = await parse(input, { syntax: "typescript", tsx: true });
   const parentMap = createParentMap(module);
 
-  for (const returnStatement of find(module, "ReturnStatement")) {
-    const returnVal = getReturnValue(returnStatement);
-    const reactiveIdentifiers = new Set<t.Identifier>();
-    const keepJsxElements = new Set<t.JSXElement>();
+  for (const functionLike of find(module, "FunctionExpression")) {
+    const ctxParam = is(functionLike.params[0].pat, "Identifier") ? functionLike.params[0].pat : null;
 
-    if (is(returnVal, "JSXElement")) {
-      for (const el of find(returnVal, "JSXElement")) {
-        if (hasEventHandler(el)) {
-          keepJsxElements.add(el);
+    for (const returnStatement of find(functionLike, "ReturnStatement")) {
+      const returnVal = getReturnValue(returnStatement);
+      const reactiveIdentifiers = new Set<t.Identifier>();
+      const keepJsxElements = new Set<t.JSXElement>();
 
-          for (const identifier of find(el, "Identifier")) {
+      if (is(returnVal, "JSXElement")) {
+        for (const el of find(returnVal, "JSXElement")) {
+          if (hasEventHandler(el)) {
+            keepJsxElements.add(el);
+
+            for (const identifier of find(el, "Identifier")) {
+              reactiveIdentifiers.add(identifier);
+            }
+          }
+        }
+      }
+
+      for (const reactiveidentifier of reactiveIdentifiers) {
+        for (const identifier of find(returnStatement, "Identifier")) {
+          if (isSameIdentifier(reactiveidentifier, identifier)) {
             reactiveIdentifiers.add(identifier);
           }
         }
       }
-    }
 
-    for (const reactiveidentifier of reactiveIdentifiers) {
-      for (const identifier of find(returnStatement, "Identifier")) {
-        if (isSameIdentifier(reactiveidentifier, identifier)) {
-          reactiveIdentifiers.add(identifier);
-        }
+      for (const reactiveidentifier of reactiveIdentifiers) {
+        const parentElement = findParent(parentMap, reactiveidentifier, "JSXElement");
+        if (parentElement) keepJsxElements.add(parentElement);
       }
+
+      const jsxElements = [...keepJsxElements].sort((a, b) => a.span.start - b.span.start);
+
+      returnStatement.argument = {
+        type: "ArrayExpression",
+        span,
+        elements: jsxElements.map(el => convertToHydrationDirective(parentMap, reactiveIdentifiers, el)),
+      };
     }
-
-    for (const reactiveidentifier of reactiveIdentifiers) {
-      const parentElement = findParent(parentMap, reactiveidentifier, "JSXElement");
-      if (parentElement) keepJsxElements.add(parentElement);
-    }
-
-    const jsxElements = [...keepJsxElements].sort((a, b) => a.span.start - b.span.start);
-
-    returnStatement.argument = {
-      type: "ArrayExpression",
-      span,
-      elements: jsxElements.map((el) => convertToHydrationDirective(parentMap, reactiveIdentifiers, el)),
-    };
   }
 
-  return await print(module).then((r) => {
+  return await print(module).then(r => {
     console.log(r.code);
     return r.code;
   });
@@ -112,7 +116,7 @@ function getClientProperties(
 ): t.KeyValueProperty[] {
   const props = node.opening.attributes
     .filter((attr): attr is t.JSXAttribute => is(attr, "JSXAttribute"))
-    .filter((attr) => [...reactiveIdentifiers.values()].some((id) => getParents(id, parentMap).includes(attr)));
+    .filter(attr => [...reactiveIdentifiers.values()].some(id => getParents(id, parentMap).includes(attr)));
   return props
     .map((prop): [string, t.Expression] => {
       const name = getName(prop);
@@ -194,8 +198,8 @@ function findParent<T extends NodeType>(parentMap: Map<Node, Node>, node: Node, 
   return undefined;
 }
 
-function is<T extends NodeType>(node: Node | undefined, type: T): node is NodeOfType<T> {
-  return node?.type === type;
+function is<T extends NodeType>(node: unknown, type: T): node is NodeOfType<T> {
+  return typeof node === "object" && node !== null && "type" in node && node.type === type;
 }
 
 function getName(node: t.JSXAttributeOrSpread): string {
@@ -208,7 +212,7 @@ function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
 }
 
 function hasEventHandler(node: t.JSXElement): boolean {
-  return node.opening.attributes.some((attr) => getName(attr).match(/^on[A-Z]/));
+  return node.opening.attributes.some(attr => getName(attr).match(/^on[A-Z]/));
 }
 
 function isSameIdentifier(a: t.Identifier, b: t.Identifier): boolean {
