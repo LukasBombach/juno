@@ -10,7 +10,6 @@ export default function junoVitePlugin(): Plugin {
   return {
     name: "juno ",
     resolveId(id) {
-      console.log("RESOLVE ID", id);
       if (id.startsWith(virtualModuleId)) {
         return "\0" + id;
       }
