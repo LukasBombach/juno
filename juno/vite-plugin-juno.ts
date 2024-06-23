@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { transformWithEsbuild } from "vite";
 import { transformToClientCode } from "./transform";
 import type { Plugin } from "vite";
 
@@ -18,14 +19,16 @@ export default function junoVitePlugin(): Plugin {
       if (id.startsWith(resolvedVirtualModuleId)) {
         const path = id.slice(resolvedVirtualModuleId.length);
         const absPath = resolve(process.cwd(), path + ".tsx");
-        const contents = await readFile(absPath, { encoding: "utf8" });
-        return await transformToClientCode(contents);
+        return await readFile(absPath, { encoding: "utf8" });
       }
     },
-    // async transform(code, id) {
-    //   if (id.startsWith(resolvedVirtualModuleId)) {
-    //     return await transformToClientCode(code);
-    //   }
-    // },
+    async transform(code, id) {
+      if (id.startsWith(resolvedVirtualModuleId)) {
+        const transformed = await transformToClientCode(code);
+        console.log(transformed);
+        return transformed;
+        return await transformWithEsbuild(transformed, id + ".ts", { loader: "ts" });
+      }
+    },
   };
 }

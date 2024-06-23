@@ -125,7 +125,6 @@ export async function transformToClientCode(input: string): Promise<string> {
   }
 
   return await print(module).then(r => {
-    console.log(r.code);
     return r.code;
   });
 }
