@@ -164,10 +164,9 @@ function getClientProperties(
   reactiveIdentifiers: Set<t.Identifier>,
   parentMap: Map<Node, Node>
 ): t.KeyValueProperty[] {
-  const props = node.opening.attributes
+  const props: t.KeyValueProperty[] = node.opening.attributes
     .filter((attr): attr is t.JSXAttribute => is(attr, "JSXAttribute"))
-    .filter((attr) => [...reactiveIdentifiers.values()].some((id) => getParents(id, parentMap).includes(attr)));
-  return props
+    .filter((attr) => [...reactiveIdentifiers.values()].some((id) => getParents(id, parentMap).includes(attr)))
     .map((prop): [string, t.Expression] => {
       const name = getName(prop);
 
@@ -197,6 +196,28 @@ function getClientProperties(
         value: expression,
       };
     });
+
+  const childrenThatAreExpressions = node.children
+    .filter((child): child is t.JSXExpressionContainer => is(child, "JSXExpressionContainer"))
+    .map((child) => child.expression)
+    .filter((exp): exp is t.Expression => exp.type !== "JSXEmptyExpression"); // todo unsafe way to get expressions only
+
+  const children: t.KeyValueProperty = {
+    type: "KeyValueProperty",
+    key: {
+      type: "Identifier",
+      span,
+      value: "children",
+      optional: false,
+    },
+    value: {
+      type: "ArrayExpression",
+      span,
+      elements: childrenThatAreExpressions.map((exp) => ({ expression: exp })),
+    },
+  };
+
+  return [...props, ...(childrenThatAreExpressions.length ? [children] : [])];
 }
 
 function getParentPath(parentMap: Map<Node, Node>, el: t.JSXElement): t.ExprOrSpread[] {
