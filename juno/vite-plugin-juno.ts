@@ -1,5 +1,6 @@
 import { transformWithEsbuild } from "vite";
-import { transformToClientCode } from "./transform";
+import { transformToClientCode } from "juno/transform";
+import { transformToClientCode2 } from "juno/transform2";
 import type { Plugin } from "vite";
 
 export default function junoVitePlugin(): Plugin {
@@ -8,9 +9,7 @@ export default function junoVitePlugin(): Plugin {
     enforce: "pre",
     async transform(code, id) {
       if (id.endsWith("?juno")) {
-        const transformed = await transformToClientCode(code);
-        const filename = id.replace("?juno", "");
-        return await transformWithEsbuild(transformed, filename, { sourcefile: filename, loader: "tsx" });
+        return await transformToClientCode2(code);
       }
     },
   };

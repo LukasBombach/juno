@@ -31,28 +31,9 @@ class Api<T extends Node> {
     return this.node.type === type;
   }
 
-  /* static isNode(value: unknown): value is Node {
-    return typeof value === "object" && value !== null && "type" in value;
-  }
-
-  has(prop: PropertyKey): prop is keyof T {
-    return this.node.hasOwnProperty(prop);
-  }
-
-  isNode(prop: keyof T): boolean {
-    return Api.isNode(this.node[prop]);
-  } */
-
   getNode(prop: string): Node | undefined {
-    if (
-      prop in this.node &&
-      typeof this.node[prop] === "object" &&
-      this.node[prop] !== null &&
-      "type" in this.node[prop]
-    ) {
-      return this.node[prop];
-    }
-    return undefined;
+    const val = this.node[prop as keyof T] as unknown;
+    return Api.isNode(val) ? val : undefined;
   }
 
   query<T extends string>(query: T): QueryResult<T> | undefined {
@@ -60,22 +41,25 @@ class Api<T extends Node> {
     let node: Node = this.node;
 
     for (const part of parts) {
-      const maybeNode = this.getNode(part);
-      if (maybeNode) {
-        node = maybeNode;
+      if (part.includes("=")) {
+        const [prop, value] = part.split("=");
+        const maybeNode = this.getNode(prop);
+        if (maybeNode && maybeNode.type === value) {
+          node = maybeNode;
+        } else {
+          return undefined;
+        }
       } else {
-        return undefined;
+        const maybeNode = this.getNode(part);
+        if (maybeNode) {
+          node = maybeNode;
+        } else {
+          return undefined;
+        }
       }
     }
 
-    return node;
-
-    /* const property = query.split(".")[0];
-    const [key, value] = property.split("=");
-
-    if (key && value && this.node[key as keyof Node] === value) {
-      return this.node as any; // TODO ANY;
-    } */
+    return node as any;
   }
 
   *find<T extends NodeType>(type: T): Generator<Api<NodeOfType<T>>> {
@@ -84,6 +68,10 @@ class Api<T extends Node> {
         yield node;
       }
     }
+  }
+
+  static isNode(value: unknown): value is Node {
+    return typeof value === "object" && value !== null && "type" in value;
   }
 
   private *traverse(obj: any): Generator<Api<Node>> {
