@@ -3,6 +3,7 @@ import { signal, effect } from "@maverick-js/signals";
 import type { WriteSignal } from "@maverick-js/signals";
 
 export type HydrationDirectives = {
+  path: number[];
   children?: (number | WriteSignal<any> | ClientComponent)[];
 } & Record<Exclude<string, "children">, any>;
 
@@ -12,7 +13,7 @@ export interface ClientRenderContext {
 }
 
 export interface ClientComponent {
-  (ctx: ClientRenderContext): [path: number[], directives: HydrationDirectives][];
+  (ctx: ClientRenderContext): HydrationDirectives[];
 }
 
 export function getSsrState(): any[] {
@@ -24,8 +25,8 @@ export function hydrate(root: HTMLElement | Document, component: ClientComponent
   const ctx = { signal, ssrData };
   const entries = component(ctx);
 
-  for (const [path, directives] of entries) {
-    const element = getElement(root, path);
+  for (const directives of entries) {
+    const element = getElement(root, directives.path);
     hydrateElement(element, directives);
   }
 }
@@ -52,6 +53,8 @@ function hydrateElement(element: Element, binding: HydrationDirectives) {
           effect(() => ((currentText.textContent = String(child())), undefined));
         }
       }
+    } else if (key === "path") {
+      // do nothing
     } else {
       effect(() => element.setAttribute(key, value()));
     }

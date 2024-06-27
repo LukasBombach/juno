@@ -200,7 +200,13 @@ function getClientProperties(
   const childrenThatAreExpressions = node.children
     .filter((child): child is t.JSXExpressionContainer => is(child, "JSXExpressionContainer"))
     .map((child) => child.expression)
-    .filter((exp): exp is t.Expression => exp.type !== "JSXEmptyExpression"); // todo unsafe way to get expressions only
+    .filter((exp): exp is t.Expression => exp.type !== "JSXEmptyExpression") // todo unsafe way to get expressions only
+    .map((exp) => {
+      if (exp.type === "CallExpression" && is(exp.callee, "Identifier") && reactiveIdentifiers.has(exp.callee)) {
+        return exp.callee;
+      }
+      return exp;
+    });
 
   const children: t.KeyValueProperty = {
     type: "KeyValueProperty",
