@@ -1,5 +1,4 @@
-import { parse } from "juno/ast";
-import { print } from "@swc/core";
+import { parse, print } from "@swc/core";
 import type * as t from "@swc/types";
 
 export type Node =

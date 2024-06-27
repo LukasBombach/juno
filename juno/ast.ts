@@ -16,42 +16,49 @@ export type Node =
 export type NodeType = Node["type"];
 export type NodeOfType<T extends NodeType> = Extract<Node, { type: T }>;
 
-interface Api {
-  // find: <T extends NodeType>(type: T) => Generator<Wrapped<NodeOfType<T>>>;
-  is: <T extends NodeType>() => this is Wrapped<NodeOfType<T>>;
+type TypeQuery<T extends NodeType> = `${string}type=${T}`;
+
+type QueryResult<P extends string> = P extends TypeQuery<infer T> ? NodeOfType<T> | undefined : Node | undefined;
+
+export async function parse(src: string, options?: ParseOptions): Promise<Api<Module>> {
+  const module = await swcparse(src, options);
+  return new Api(module);
 }
 
-type Wrapped<N extends Node> = N & Api;
+class Api<T extends Node> {
+  constructor(public node: T) {}
 
-export async function parse(src: string, options?: ParseOptions): Promise<Wrapped<Module>> {
-  const module = await swcparse(src, options);
-
-  const api = {
-    is<T extends NodeType>(target: unknown): (type: T) => target is NodeOfType<T> {
-      return (type): target is NodeOfType<T> =>
-        typeof target === "object" && target !== null && "type" in target && target.type === type;
-    },
-  };
-
-  function wrap<T extends Node>(node: T): Wrapped<T> {
-    return new Proxy<T>(node, {
-      get(target, prop, receiver) {
-        if (prop === "is") {
-          return api.is(target);
-        }
-
-        return Reflect.get(target, prop, receiver);
-      },
-    });
+  is<T extends NodeType>(type: T): this is Api<NodeOfType<T>> {
+    return this.node.type === type;
   }
 
-  return wrap(module);
-}
+  query<T extends string>(query: T): QueryResult<T> {}
 
-class ApiNode<T> {
-  constructor(private node: Node) {}
+  *find<T extends NodeType>(type: T): Generator<Api<NodeOfType<T>>> {
+    for (const node of this.traverse(this.node)) {
+      if (node.is(type)) {
+        yield node;
+      }
+    }
+  }
 
-  is<T extends NodeType>(type: T): this is Wrapped<NodeOfType<T>> {
-    return this.node.type === type;
+  private *traverse(obj: any): Generator<Api<Node>> {
+    if (typeof obj === "object" && obj !== null && "type" in obj) {
+      yield new Api(obj);
+    }
+
+    if (typeof obj === "object" && obj !== null) {
+      if (Array.isArray(obj)) {
+        for (let i = 0; i < obj.length; i++) {
+          yield* this.traverse(obj[i]);
+        }
+      } else {
+        for (const key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            yield* this.traverse(obj[key]);
+          }
+        }
+      }
+    }
   }
 }
