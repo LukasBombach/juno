@@ -12,7 +12,7 @@ export interface ClientRenderContext {
 }
 
 export interface ClientComponent {
-  (ctx: ClientRenderContext): [path: string, directives: HydrationDirectives][];
+  (ctx: ClientRenderContext): [path: number[], directives: HydrationDirectives][];
 }
 
 export function getSsrState(): any[] {
@@ -30,8 +30,8 @@ export function hydrate(root: HTMLElement | Document, component: ClientComponent
   }
 }
 
-function getElement(root: HTMLElement | Document, path: string): Element {
-  const selector = ["&", ...path.split(",").map((n) => `> *:nth-child(${n})`)].join(" ");
+function getElement(root: HTMLElement | Document, path: number[]): Element {
+  const selector = ["&", ...path.map((n) => `> *:nth-child(${n})`)].join(" ");
   return root.querySelector(selector)!;
 }
 

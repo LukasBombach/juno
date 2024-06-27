@@ -32,14 +32,14 @@ export async function transformToClientCode(input: string): Promise<string> {
 
   for (const functionLike of find(module, "FunctionExpression")) {
     const ctxParam = is(functionLike.params[0].pat, "Identifier") ? functionLike.params[0].pat : null;
-    const usages = ctxParam ? [...find(functionLike, "Identifier")].filter(id => isSameIdentifier(id, ctxParam)) : [];
+    const usages = ctxParam ? [...find(functionLike, "Identifier")].filter((id) => isSameIdentifier(id, ctxParam)) : [];
     usages
-      .map(id => parentMap.get(id))
+      .map((id) => parentMap.get(id))
       .filter((parent): parent is t.MemberExpression => is(parent, "MemberExpression"))
-      .filter(memberExpr => {
+      .filter((memberExpr) => {
         return memberExpr.property.type === "Identifier" && memberExpr.property.value === "signal";
       })
-      .map(memberExpr => parentMap.get(memberExpr))
+      .map((memberExpr) => parentMap.get(memberExpr))
       .filter((parent): parent is t.CallExpression => is(parent, "CallExpression"))
       .forEach((callExpr, i) => {
         const span: t.Span = {
@@ -119,12 +119,12 @@ export async function transformToClientCode(input: string): Promise<string> {
       returnStatement.argument = {
         type: "ArrayExpression",
         span,
-        elements: jsxElements.map(el => convertToHydrationDirective(parentMap, reactiveIdentifiers, el)),
+        elements: jsxElements.map((el) => convertToHydrationDirective(parentMap, reactiveIdentifiers, el)),
       };
     }
   }
 
-  return await print(module).then(r => {
+  return await print(module).then((r) => {
     return r.code;
   });
 }
@@ -166,7 +166,7 @@ function getClientProperties(
 ): t.KeyValueProperty[] {
   const props = node.opening.attributes
     .filter((attr): attr is t.JSXAttribute => is(attr, "JSXAttribute"))
-    .filter(attr => [...reactiveIdentifiers.values()].some(id => getParents(id, parentMap).includes(attr)));
+    .filter((attr) => [...reactiveIdentifiers.values()].some((id) => getParents(id, parentMap).includes(attr)));
   return props
     .map((prop): [string, t.Expression] => {
       const name = getName(prop);
@@ -222,6 +222,7 @@ function getParentPath(parentMap: Map<Node, Node>, el: t.JSXElement): t.ExprOrSp
 
   return path
     .reverse()
+    .map((i) => i + 1) // 1-based index
     .map(
       (value: number): t.ExprOrSpread => ({ spread: undefined, expression: { type: "NumericLiteral", span, value } })
     );
@@ -262,7 +263,7 @@ function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
 }
 
 function hasEventHandler(node: t.JSXElement): boolean {
-  return node.opening.attributes.some(attr => getName(attr).match(/^on[A-Z]/));
+  return node.opening.attributes.some((attr) => getName(attr).match(/^on[A-Z]/));
 }
 
 function isSameIdentifier(a: t.Identifier, b: t.Identifier): boolean {
