@@ -1,4 +1,5 @@
-import { parse, print } from "@swc/core";
+import { parse } from "juno/ast";
+import { print } from "@swc/core";
 import type * as t from "@swc/types";
 
 export type Node =
@@ -26,21 +27,21 @@ const span: t.Span = {
   ctxt: 0,
 };
 
-export async function transformToClientCode(input: string): Promise<string> {
-  const module = await parse(input, { syntax: "typescript", tsx: true });
+export async function transformToClientCode(src: string): Promise<string> {
+  const module = await parse(src, { syntax: "typescript", tsx: true });
   const parentMap = createParentMap(module);
 
   for (const functionLike of find(module, "FunctionExpression")) {
-    const ctxParam = is(functionLike.params[0].pat, "Identifier") ? functionLike.params[0].pat : null;
+    const ctxParam = is("Identifier")(functionLike.params[0].pat) ? functionLike.params[0].pat : null;
     const usages = ctxParam ? [...find(functionLike, "Identifier")].filter((id) => isSameIdentifier(id, ctxParam)) : [];
     usages
       .map((id) => parentMap.get(id))
-      .filter((parent): parent is t.MemberExpression => is(parent, "MemberExpression"))
+      .filter(is("MemberExpression"))
       .filter((memberExpr) => {
         return memberExpr.property.type === "Identifier" && memberExpr.property.value === "signal";
       })
       .map((memberExpr) => parentMap.get(memberExpr))
-      .filter((parent): parent is t.CallExpression => is(parent, "CallExpression"))
+      .filter(is("CallExpression"))
       .forEach((callExpr, i) => {
         const span: t.Span = {
           start: 0,
@@ -89,7 +90,7 @@ export async function transformToClientCode(input: string): Promise<string> {
       const reactiveIdentifiers = new Set<t.Identifier>();
       const keepJsxElements = new Set<t.JSXElement>();
 
-      if (is(returnVal, "JSXElement")) {
+      if (is("JSXElement")(returnVal)) {
         for (const el of find(returnVal, "JSXElement")) {
           if (hasEventHandler(el)) {
             keepJsxElements.add(el);
@@ -165,7 +166,7 @@ function getClientProperties(
   parentMap: Map<Node, Node>
 ): t.KeyValueProperty[] {
   const props: t.KeyValueProperty[] = node.opening.attributes
-    .filter((attr): attr is t.JSXAttribute => is(attr, "JSXAttribute"))
+    .filter(is("JSXAttribute"))
     .filter((attr) => [...reactiveIdentifiers.values()].some((id) => getParents(id, parentMap).includes(attr)))
     .map((prop): [string, t.Expression] => {
       const name = getName(prop);
@@ -174,11 +175,11 @@ function getClientProperties(
         throw new Error(`JSXAttribute ${name} has no value`);
       }
 
-      if (!is(prop.value, "JSXExpressionContainer")) {
+      if (!is("JSXExpressionContainer")(prop.value)) {
         throw new Error(`JSXAttribute ${name} has an unsupported value`);
       }
 
-      if (is(prop.value.expression, "JSXEmptyExpression")) {
+      if (is("JSXEmptyExpression")(prop.value.expression)) {
         throw new Error(`JSXAttribute ${name} has an empty expression`);
       }
 
@@ -198,11 +199,11 @@ function getClientProperties(
     });
 
   const childrenThatAreExpressions = node.children
-    .filter((child): child is t.JSXExpressionContainer => is(child, "JSXExpressionContainer"))
+    .filter(is("JSXExpressionContainer"))
     .map((child) => child.expression)
     .filter((exp): exp is t.Expression => exp.type !== "JSXEmptyExpression") // todo unsafe way to get expressions only
     .map((exp) => {
-      if (exp.type === "CallExpression" && is(exp.callee, "Identifier") && reactiveIdentifiers.has(exp.callee)) {
+      if (exp.type === "CallExpression" && is("Identifier")(exp.callee) && reactiveIdentifiers.has(exp.callee)) {
         return exp.callee;
       }
       return exp;
@@ -268,7 +269,7 @@ function getParents(node: Node, parentMap: Map<Node, Node>): Node[] {
 function findParent<T extends NodeType>(parentMap: Map<Node, Node>, node: Node, type: T): NodeOfType<T> | undefined {
   let parent = parentMap.get(node);
   while (parent) {
-    if (is(parent, type)) {
+    if (is(type)(parent)) {
       return parent;
     }
     parent = parentMap.get(parent);
@@ -276,17 +277,18 @@ function findParent<T extends NodeType>(parentMap: Map<Node, Node>, node: Node, 
   return undefined;
 }
 
-function is<T extends NodeType>(node: unknown, type: T): node is NodeOfType<T> {
-  return typeof node === "object" && node !== null && "type" in node && node.type === type;
+function is<T extends NodeType>(type: T): (node: unknown) => node is NodeOfType<T> {
+  return (node): node is NodeOfType<T> =>
+    typeof node === "object" && node !== null && "type" in node && node.type === type;
 }
 
 function getName(node: t.JSXAttributeOrSpread): string {
-  if (is(node, "SpreadElement")) throw new Error("SpreadElement is not supported yet");
-  return is(node.name, "Identifier") ? node.name.value : node.name.name.value;
+  if (is("SpreadElement")(node)) throw new Error("SpreadElement is not supported yet");
+  return is("Identifier")(node.name) ? node.name.value : node.name.name.value;
 }
 
 function getReturnValue(node: t.ReturnStatement): t.Expression | undefined {
-  return is(node.argument, "ParenthesisExpression") ? node.argument.expression : node.argument;
+  return is("ParenthesisExpression")(node.argument) ? node.argument.expression : node.argument;
 }
 
 function hasEventHandler(node: t.JSXElement): boolean {
@@ -303,7 +305,7 @@ function nonNullable<T>(value: T | null | undefined): value is T {
 
 function* find<T extends NodeType>(parent: Node, type: T): Generator<NodeOfType<T>> {
   for (const node of traverse(parent)) {
-    if (is(node, type)) {
+    if (is(type)(node)) {
       yield node;
     }
   }
