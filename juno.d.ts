@@ -1,1 +1,1 @@
-declare module "virtual:juno/client/*";
+declare module "*?juno";
