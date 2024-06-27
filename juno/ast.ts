@@ -43,9 +43,8 @@ class Api<T extends Node> {
     for (const part of parts) {
       if (part.includes("=")) {
         const [prop, value] = part.split("=");
-        const maybeNode = this.getNode(prop);
-        if (maybeNode && maybeNode.type === value) {
-          node = maybeNode;
+        if (this.node[prop as keyof T] === value) {
+          node = this.node;
         } else {
           return undefined;
         }
