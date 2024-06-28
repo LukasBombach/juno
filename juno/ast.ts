@@ -78,13 +78,14 @@ class Api<T extends Node> {
     }
   }
 
-  *findUsages(): Generator<Api<t.Identifier>> {
-    if (!this.is("Identifier")) return;
+  findUsages(): Api<t.Identifier>[] {
+    if (!this.is("Identifier")) return [];
+    const usages: Api<t.Identifier>[] = [];
     const scope = this.findScope();
-    console.log(scope.node.type);
     for (const id of scope.find("Identifier")) {
-      if (id.node !== this.node && id.node.value === this.node.value) yield id;
+      if (id.node !== this.node && id.node.value === this.node.value) usages.push(id);
     }
+    return usages;
   }
 
   *find<T extends NodeType>(type: T): Generator<Api<NodeOfType<T>>> {
