@@ -31,34 +31,35 @@ class Api<T extends Node> {
     return this.node.type === type;
   }
 
-  getNode(prop: string): Node | undefined {
-    const val = this.node[prop as keyof T] as unknown;
-    return Api.isNode(val) ? val : undefined;
-  }
-
   query<T extends string>(query: T): QueryResult<T> | undefined {
     const parts = query.split(".");
-    let node: Node = this.node;
+    let node: unknown = this.node;
 
     for (const part of parts) {
+      debugger;
+
       if (part.includes("=")) {
         const [prop, value] = part.split("=");
-        if (this.node[prop as keyof T] === value) {
-          node = this.node;
+
+        if (Api.isNode(node) && prop in node && node[prop as keyof typeof node] === value) {
+          node = node;
         } else {
           return undefined;
         }
+      } else if (/^\d+$/.test(part) && Array.isArray(node)) {
+        node = node[parseInt(part, 10)];
+      } else if (typeof node === "object" && node !== null && part in node) {
+        node = node[part as keyof typeof node];
       } else {
-        const maybeNode = this.getNode(part);
-        if (maybeNode) {
-          node = maybeNode;
-        } else {
-          return undefined;
-        }
+        return undefined;
       }
     }
 
-    return node as any;
+    if (Api.isNode(node)) {
+      return new Api(node) as QueryResult<T>;
+    } else {
+      return undefined;
+    }
   }
 
   *find<T extends NodeType>(type: T): Generator<Api<NodeOfType<T>>> {
