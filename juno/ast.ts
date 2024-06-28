@@ -24,12 +24,12 @@ export async function parse(src: string, options?: ParseOptions): Promise<Api<Mo
   return new Api(module, Api.mapParents(module));
 }
 
-export function toParent<T extends NodeType>(type: T): (node: Api<Node>) => Api<NodeOfType<T>> | undefined {
-  return node => node.parent(type);
+export function toParent<T extends NodeType>(type: T): (node?: Api<Node>) => Api<NodeOfType<T>> | undefined {
+  return node => node?.parent(type);
 }
 
-export function byQuery(query: string): (node?: Api<Node>) => boolean {
-  return node => node?.query(query) !== undefined;
+export function byQuery<T extends string>(query: T): (node?: Api<Node>) => node is QueryResult<T> {
+  return (node): node is QueryResult<T> => node?.query(query) !== undefined;
 }
 
 export class Api<T extends Node> {

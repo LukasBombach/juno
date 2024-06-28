@@ -8,7 +8,8 @@ export async function transformToClientCode2(src: string): Promise<string> {
     const usages = ctxParam
       ?.findUsages()
       .map(toParent("MemberExpression"))
-      .filter(byQuery("property.type=Identifier&value=signal"));
+      .filter(byQuery("property.type=Identifier&value=signal"))
+      .map(toParent("CallExpression"));
 
     console.log(usages?.length);
   }
