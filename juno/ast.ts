@@ -24,8 +24,12 @@ export async function parse(src: string, options?: ParseOptions): Promise<Api<Mo
   return new Api(module, Api.mapParents(module));
 }
 
-class Api<T extends Node> {
+export class Api<T extends Node> {
   constructor(public readonly node: T, private readonly parents: Map<Node, Node>) {}
+
+  static toParent<T extends NodeType>(type: T): (node: Api<Node>) => Api<NodeOfType<T>> | undefined {
+    return node => node.parent(type);
+  }
 
   is<T extends NodeType>(type: T): this is Api<NodeOfType<T>>;
   is<T extends NodeType>(...type: T[]): this is Api<NodeOfType<T>>;
@@ -34,16 +38,22 @@ class Api<T extends Node> {
   }
 
   query<T extends string>(query: T): QueryResult<T> | undefined {
-    const parts = query.split(".");
+    const parts = query.split(/\.|\[|\]\./);
+
     let node: unknown = this.node;
 
     for (const part of parts) {
       debugger;
 
       if (part.includes("=")) {
-        const [prop, value] = part.split("=");
+        const params = part.split("&");
 
-        if (Api.isNode(node) && prop in node && node[prop as keyof typeof node] === value) {
+        if (
+          params.every(param => {
+            const [prop, value] = param.split("=");
+            return Api.isNode(node) && prop in node && node[prop as keyof typeof node] === value;
+          })
+        ) {
           node = node;
         } else {
           return undefined;
@@ -64,18 +74,21 @@ class Api<T extends Node> {
     }
   }
 
+  parent<T extends NodeType>(type: T): Api<NodeOfType<T>> | undefined {
+    let parent = this.parents.get(this.node);
+    while (parent) {
+      if (parent.type === type) {
+        return new Api(parent, this.parents) as Api<NodeOfType<T>>;
+      }
+      parent = this.parents.get(parent);
+    }
+    return undefined;
+  }
+
   findScope(): Api<t.FunctionExpression | t.Module> {
     return [...this.findParents()].filter((node): node is Api<t.FunctionExpression | t.Module> =>
       node.is("FunctionExpression", "Module")
     )[0];
-  }
-
-  *findParents(): Generator<Api<Node>> {
-    let parent = this.parents.get(this.node);
-    while (parent) {
-      yield new Api(parent, this.parents);
-      parent = this.parents.get(parent);
-    }
   }
 
   findUsages(): Api<t.Identifier>[] {
@@ -88,6 +101,13 @@ class Api<T extends Node> {
     return usages;
   }
 
+  *findParents(): Generator<Api<Node>> {
+    let parent = this.parents.get(this.node);
+    while (parent) {
+      yield new Api(parent, this.parents);
+      parent = this.parents.get(parent);
+    }
+  }
   *find<T extends NodeType>(type: T): Generator<Api<NodeOfType<T>>> {
     for (const node of this.traverse(this.node)) {
       if (node.is(type)) {
