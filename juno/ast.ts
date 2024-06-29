@@ -25,7 +25,7 @@ export async function parse(src: string, options?: ParseOptions): Promise<Api<Mo
 }
 
 export function toParent<T extends NodeType>(type: T): (node?: Api<Node>) => Api<NodeOfType<T>> | undefined {
-  return node => node?.parent(type);
+  return (node) => node?.parent(type);
 }
 
 export function byQuery<T extends string>(query: T): (node?: Api<Node>) => node is QueryResult<T> {
@@ -38,7 +38,7 @@ export class Api<T extends Node> {
   is<T extends NodeType>(type: T): this is Api<NodeOfType<T>>;
   is<T extends NodeType>(...type: T[]): this is Api<NodeOfType<T>>;
   is<T extends NodeType>(type: T | T[]): this is Api<NodeOfType<T>> {
-    return Array.isArray(type) ? type.some(t => (this.node.type = t)) : this.node.type === type;
+    return Array.isArray(type) ? type.some((t) => (this.node.type = t)) : this.node.type === type;
   }
 
   query<T extends string>(query: T): QueryResult<T> | undefined {
@@ -53,7 +53,7 @@ export class Api<T extends Node> {
         const params = part.split("&");
 
         if (
-          params.every(param => {
+          params.every((param) => {
             const [prop, value] = param.split("=");
             return Api.isNode(node) && prop in node && node[prop as keyof typeof node] === value;
           })
@@ -95,7 +95,7 @@ export class Api<T extends Node> {
     )[0];
   }
 
-  findUsages(): Api<t.Identifier>[] {
+  findReferences(): Api<t.Identifier>[] {
     if (!this.is("Identifier")) return [];
     const usages: Api<t.Identifier>[] = [];
     const scope = this.findScope();
