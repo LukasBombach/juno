@@ -167,3 +167,12 @@ export class Api<T extends Node> {
     }
   }
 }
+
+export async function toAst(src: string) {
+  const module = await swcparse(src, { syntax: "typescript", tsx: true });
+  return module.body[0];
+}
+
+export function nonNullable<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined;
+}
