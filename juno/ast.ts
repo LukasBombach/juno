@@ -168,9 +168,13 @@ export class Api<T extends Node> {
   }
 }
 
-export async function toAst(src: string) {
+export async function toAst<T extends NodeType>(src: string, expectType: T): Promise<NodeOfType<T>> {
   const module = await swcparse(src, { syntax: "typescript", tsx: true });
-  return module.body[0];
+  const node = module.body[0];
+  if (Api.isNode(node) && node.type === expectType) {
+    return node as NodeOfType<T>;
+  }
+  throw new Error(`Expected ${expectType} but got ${node.type}`); // todo this code is so shit
 }
 
 export function nonNullable<T>(value: T | null | undefined): value is T {
