@@ -39,6 +39,8 @@ export async function transformToClientCode2(src: string): Promise<string> {
       parent({ type: "CallExpression" })
     );
 
+    const signalCalls35 = pipe(fn, contextParameter(), references(), callToSignal());
+
     const signalCalls4 = pipe(
       fn,
       contextParameter(),
