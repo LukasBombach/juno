@@ -23,6 +23,14 @@ export async function transformToClientCode2(src: string): Promise<string> {
       parent({ type: "CallExpression" })
     );
 
+    const signalCalls25 = pipe(
+      fn,
+      functionParams({ index: 0, type: "Identifier" }),
+      references(),
+      parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
+      parent({ type: "CallExpression" })
+    );
+
     const signalCalls3 = pipe(
       fn,
       contextParameter(),
