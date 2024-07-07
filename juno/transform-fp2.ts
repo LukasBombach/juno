@@ -7,46 +7,10 @@ export async function transformToClientCode2(src: string): Promise<string> {
   for (const fn of module.find("FunctionExpression")) {
     const signalCalls = pipe(
       fn,
-      get("params[0].pat.type=Identifier"),
-      parent("MemberExpression"),
-      filter("property.type=Identifier&value=signal"),
-      parent("CallExpression"),
-      filter(nonNullable)
-    );
-
-    const signalCalls2 = pipe(
-      fn,
-      functionParams(0),
-      filter({ type: "Identifier" }),
+      children({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
       references(),
       parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       parent({ type: "CallExpression" })
-    );
-
-    const signalCalls25 = pipe(
-      fn,
-      functionParams({ index: 0, type: "Identifier" }),
-      references(),
-      parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
-      parent({ type: "CallExpression" })
-    );
-
-    const signalCalls3 = pipe(
-      fn,
-      contextParameter(),
-      references(),
-      parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
-      parent({ type: "CallExpression" })
-    );
-
-    const signalCalls35 = pipe(fn, contextParameter(), references(), callToSignal());
-
-    const signalCalls4 = pipe(
-      fn,
-      contextParameter(),
-      references(),
-      parent(MemberExpression({ property: Identifier("signal") })),
-      parent(CallExpression)
     );
   }
 
