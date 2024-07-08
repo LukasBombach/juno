@@ -34,12 +34,15 @@ type Node =
   | t.JSXExpressionContainer;
 
 function children(query: Query) {
+  return (node: Node): Node[] =>
+    [...traverse(node)].filter((child) =>
+      isEqualWith(child, query, (childValue, queryValue, prop, child) => {
+        if (prop === "index") {
+          return;
+        }
+      })
+    );
   return (node: Node): Node[] => [...traverse(node)].filter((n) => isEqual(n, query));
-  /* isEqualWith(node, query, (nodeValue, queryValue, prop, node) => {
-      if (prop === "index") {
-        return ;
-      }
-    }); */
 }
 
 function* traverse(obj: any): Generator<Node> {
