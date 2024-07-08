@@ -1,5 +1,6 @@
 import { pipe } from "fp-ts/function";
 import { parse } from "juno/ast";
+import { isEqual, isEqualWith } from "lodash";
 
 import type * as t from "@swc/types";
 
@@ -33,5 +34,30 @@ type Node =
   | t.JSXExpressionContainer;
 
 function children(query: Query) {
-  return (node: Node): Node[] => node.children.filter(byQuery(query));
+  return (node: Node): Node[] => [...traverse(node)].filter((n) => isEqual(n, query));
+  /* isEqualWith(node, query, (nodeValue, queryValue, prop, node) => {
+      if (prop === "index") {
+        return ;
+      }
+    }); */
+}
+
+function* traverse(obj: any): Generator<Node> {
+  if (typeof obj === "object" && obj !== null && "type" in obj) {
+    yield obj;
+  }
+
+  if (typeof obj === "object" && obj !== null) {
+    if (Array.isArray(obj)) {
+      for (let i = 0; i < obj.length; i++) {
+        yield* traverse(obj[i]);
+      }
+    } else {
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          yield* traverse(obj[key]);
+        }
+      }
+    }
+  }
 }

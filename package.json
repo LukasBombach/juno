@@ -9,6 +9,7 @@
   "devDependencies": {
     "@swc/core": "1.5.7",
     "@types/express": "4.17.21",
+    "@types/lodash": "4.17.6",
     "@types/react": "18.3.1",
     "chalk": "5.3.0",
     "cli-cursor": "4.0.0",
@@ -23,6 +24,7 @@
   "dependencies": {
     "@maverick-js/signals": "5.11.5",
     "express": "4.19.2",
-    "fp-ts": "2.16.6"
+    "fp-ts": "2.16.6",
+    "lodash": "4.17.21"
   }
 }
