@@ -23,14 +23,6 @@ export async function transformToClientCode(src: string): Promise<string> {
   return src;
 }
 
-const y = children({ type: "Parameter", index: 0, pat: { type: "Identifier" } as t.Identifier } as const);
-
-type Query = { type: NodeType };
-type Y = typeof y;
-
-type TypeQuery<T extends NodeType> = { type: T };
-type QueryResult<Q> = Q extends TypeQuery<infer T> ? NodeOfType<T>[] : Node[];
-
 type Node =
   | t.Program
   | t.Statement
@@ -43,11 +35,15 @@ type Node =
   | t.JSXAttribute
   | t.JSXExpressionContainer;
 
-export type NodeType = Node["type"];
-export type NodeOfType<T extends NodeType> = Extract<Node, { type: T }>;
+type NodeType = Node["type"];
+type GetNode<T extends NodeType> = Extract<Node, { type: T }>;
+type TypeProp<T extends NodeType> = { type: T };
 
-function children<Q extends Query>({ index: queryIndex, ...query }: Q) {
-  return (node: Node): QueryResult<Q> => {
+function children<Q extends TypeProp<NodeType>>(
+  q: Q
+): (node: Node) => Q extends TypeProp<infer T> ? GetNode<T>[] : Node[] {
+  const { index: queryIndex, ...query } = q;
+  return (node: Node): Q extends TypeProp<infer T> ? GetNode<T>[] : Node[] => {
     const children: Node[] = [];
     const matcher = matches(query);
     const isMatch =
@@ -60,7 +56,7 @@ function children<Q extends Query>({ index: queryIndex, ...query }: Q) {
 }
 
 function get(name: string): (nodes: Node[]) => unknown[] {
-  return (nodes: Node[]) => nodes.map((node) => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
+  return (nodes: Node[]) => nodes.map(node => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
 }
 
 function isNode(value: unknown): value is Node {
