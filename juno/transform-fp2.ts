@@ -1,20 +1,22 @@
 import { pipe } from "fp-ts/function";
 import { parse } from "juno/ast";
-import { isEqual, isEqualWith } from "lodash";
+import { isMatch } from "lodash";
 
 import type * as t from "@swc/types";
 
-export async function transformToClientCode2(src: string): Promise<string> {
+export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
 
   for (const fn of module.find("FunctionExpression")) {
     const signalCalls = pipe(
       fn.node,
-      children({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
-      references(),
-      parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
-      parent({ type: "CallExpression" })
+      children({ type: "Parameter", index: 0, pat: { type: "Identifier" } })
+      // references(),
+      // parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
+      // parent({ type: "CallExpression" })
     );
+
+    console.log(signalCalls);
   }
 
   return src;
@@ -33,28 +35,17 @@ type Node =
   | t.JSXAttribute
   | t.JSXExpressionContainer;
 
-function children(query: Query) {
+function children({ index: queryIndex, ...query }: Query) {
   return (node: Node): Node[] => {
     const children: Node[] = [];
     traverseWithParent(node, (child, parent, property, index) => {
-      if (
-        isEqualWith(child, query, (childValue, queryValue, prop) => {
-          return prop === "index" && queryValue === index;
-        })
-      ) {
+      if (queryIndex !== undefined && queryIndex === index) {
+        if (isMatch(child, query)) children.push(child);
+      } else if (isMatch(child, query)) {
         children.push(child);
       }
     });
     return children;
-    /* 
-    [...traverse(node)].filter((child) =>
-      isEqualWith(child, query, (childValue, queryValue, prop, child) => {
-        if (prop === "index") {
-          return;
-        }
-      })
-    );
-  return (node: Node): Node[] => [...traverse(node)].filter((n) => isEqual(n, query)); */
   };
 }
 
