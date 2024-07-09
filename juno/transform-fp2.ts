@@ -11,7 +11,7 @@ export async function transformToClientCode(src: string): Promise<string> {
     const signalCalls = pipe(
       fn.node,
       children({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
-      property("pat")
+      get("pat")
       // references(),
       // parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       // parent({ type: "CallExpression" })
@@ -23,7 +23,13 @@ export async function transformToClientCode(src: string): Promise<string> {
   return src;
 }
 
-type Query = Record<string, unknown>;
+const y = children({ type: "Parameter", index: 0, pat: { type: "Identifier" } as t.Identifier } as const);
+
+type Query = { type: NodeType };
+type Y = typeof y;
+
+type TypeQuery<T extends NodeType> = { type: T };
+type QueryResult<Q> = Q extends TypeQuery<infer T> ? NodeOfType<T>[] : Node[];
 
 type Node =
   | t.Program
@@ -32,12 +38,16 @@ type Node =
   | t.Declaration
   | t.SpreadElement
   | t.VariableDeclarator
+  | t.Param
   | t.JSXOpeningElement
   | t.JSXAttribute
   | t.JSXExpressionContainer;
 
-function children({ index: queryIndex, ...query }: Query) {
-  return (node: Node): Node[] => {
+export type NodeType = Node["type"];
+export type NodeOfType<T extends NodeType> = Extract<Node, { type: T }>;
+
+function children<Q extends Query>({ index: queryIndex, ...query }: Q) {
+  return (node: Node): QueryResult<Q> => {
     const children: Node[] = [];
     const matcher = matches(query);
     const isMatch =
@@ -49,7 +59,7 @@ function children({ index: queryIndex, ...query }: Query) {
   };
 }
 
-function property(name: string): (nodes: Node[]) => unknown[] {
+function get(name: string): (nodes: Node[]) => unknown[] {
   return (nodes: Node[]) => nodes.map((node) => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
 }
 
