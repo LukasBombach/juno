@@ -10,7 +10,8 @@ export async function transformToClientCode(src: string): Promise<string> {
   for (const fn of module.find("FunctionExpression")) {
     const signalCalls = pipe(
       fn.node,
-      children({ type: "Parameter", index: 0, pat: { type: "Identifier" } })
+      children({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
+      property("pat")
       // references(),
       // parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       // parent({ type: "CallExpression" })
@@ -48,6 +49,10 @@ function children({ index: queryIndex, ...query }: Query) {
   };
 }
 
+function property(name: string): (nodes: Node[]) => unknown[] {
+  return (nodes: Node[]) => nodes.map((node) => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
+}
+
 function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
 }
@@ -75,6 +80,14 @@ function traverseWithParent(
       }
     }
   }
+}
+
+function isKeyOf<T extends object>(obj: T, key: PropertyKey): key is keyof T {
+  return key in obj;
+}
+
+function nonNullable<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined;
 }
 
 function* traverse(obj: any): Generator<Node> {
