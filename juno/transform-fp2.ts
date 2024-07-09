@@ -34,7 +34,15 @@ type Node =
   | t.JSXExpressionContainer;
 
 function children(query: Query) {
-  return (node: Node): Node[] =>
+  return (node: Node): Node[] => {
+    const children: Node[] = [];
+    traverseWithParent(node, (child, parent) => {
+      if (isEqual(child, query)) {
+        console.log("parent: ", parent);
+      }
+    });
+    return children;
+    /* 
     [...traverse(node)].filter((child) =>
       isEqualWith(child, query, (childValue, queryValue, prop, child) => {
         if (prop === "index") {
@@ -42,7 +50,33 @@ function children(query: Query) {
         }
       })
     );
-  return (node: Node): Node[] => [...traverse(node)].filter((n) => isEqual(n, query));
+  return (node: Node): Node[] => [...traverse(node)].filter((n) => isEqual(n, query)); */
+  };
+}
+
+function isNode(value: unknown): value is Node {
+  return typeof value === "object" && value !== null && "type" in value;
+}
+
+function traverseWithParent(current: Node, callback: (node: Node, parent: Node) => void): void {
+  let parent = current;
+  let property: keyof typeof parent;
+
+  for (property in parent) {
+    const child = parent[property];
+    if (isNode(child)) {
+      callback(child, parent);
+      traverseWithParent(child, callback);
+    }
+    if (Array.isArray(child)) {
+      for (const nthChild of child) {
+        if (isNode(nthChild)) {
+          callback(nthChild, parent);
+          traverseWithParent(nthChild, callback);
+        }
+      }
+    }
+  }
 }
 
 function* traverse(obj: any): Generator<Node> {
