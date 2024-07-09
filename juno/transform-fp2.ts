@@ -55,7 +55,7 @@ function children<Q extends TypeProp<NodeType>>(
   };
 }
 
-function get(name: string): (nodes: Node[]) => unknown[] {
+function get<N extends Node, P extends keyof N>(name: P): (nodes: N[]) => N[P][] {
   return (nodes: Node[]) => nodes.map(node => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
 }
 
