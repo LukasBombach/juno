@@ -1,6 +1,6 @@
 import { pipe } from "fp-ts/function";
 import { parse } from "juno/ast";
-import { isMatch } from "lodash";
+import { matches } from "lodash";
 
 import type * as t from "@swc/types";
 
@@ -38,12 +38,11 @@ type Node =
 function children({ index: queryIndex, ...query }: Query) {
   return (node: Node): Node[] => {
     const children: Node[] = [];
-    traverseWithParent(node, (child, parent, property, index) => {
-      if (queryIndex !== undefined && queryIndex === index) {
-        if (isMatch(child, query)) children.push(child);
-      } else if (isMatch(child, query)) {
-        children.push(child);
-      }
+    const matcher = matches(query);
+    const isMatch =
+      queryIndex === undefined ? matcher : (child: Node, index: number) => index === queryIndex && matcher(child);
+    traverseWithParent(node, (child, parent, prop, index) => {
+      if (isMatch(child, index)) children.push(child);
     });
     return children;
   };
