@@ -36,9 +36,13 @@ type Node =
 function children(query: Query) {
   return (node: Node): Node[] => {
     const children: Node[] = [];
-    traverseWithParent(node, (child, parent) => {
-      if (isEqual(child, query)) {
-        console.log("parent: ", parent);
+    traverseWithParent(node, (child, parent, property, index) => {
+      if (
+        isEqualWith(child, query, (childValue, queryValue, prop) => {
+          return prop === "index" && queryValue === index;
+        })
+      ) {
+        children.push(child);
       }
     });
     return children;
@@ -58,20 +62,24 @@ function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
 }
 
-function traverseWithParent(current: Node, callback: (node: Node, parent: Node) => void): void {
+function traverseWithParent(
+  current: Node,
+  callback: (node: Node, parent: Node, property: string, index: number) => void
+): void {
   let parent = current;
   let property: keyof typeof parent;
 
   for (property in parent) {
     const child = parent[property];
     if (isNode(child)) {
-      callback(child, parent);
+      callback(child, parent, property, -1);
       traverseWithParent(child, callback);
     }
     if (Array.isArray(child)) {
-      for (const nthChild of child) {
+      for (const i in child) {
+        const nthChild = child[i];
         if (isNode(nthChild)) {
-          callback(nthChild, parent);
+          callback(nthChild, parent, property, parseInt(i, 10));
           traverseWithParent(nthChild, callback);
         }
       }
