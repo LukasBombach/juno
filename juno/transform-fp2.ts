@@ -64,68 +64,12 @@ function findFirst<Q extends TypeProp<NodeType>>(
   };
 }
 
-function findAll<Q extends TypeProp<NodeType>>({
-  index: queryIndex,
-  ...query
-}: Q): (node: Node) => (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] {
-  const matchQuery = matches(query);
-
-  const isMatchingNode: (node: Node, index: number) => node is Q extends TypeProp<infer U> ? GetNode<U> : Node =
-    queryIndex === undefined
-      ? (node, _): node is Q extends TypeProp<infer U> ? GetNode<U> : Node => matchQuery(node)
-      : (node, index): node is Q extends TypeProp<infer U> ? GetNode<U> : Node =>
-          index === queryIndex && matchQuery(node);
-
-  return (node: Node): (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] => {
-    const children: (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] = [];
-    traverseWithParent(node, (child, _, __, index) => isMatchingNode(child, index) && children.push(child));
-    return children;
-  };
-}
-
 function get<N extends Node, P extends keyof N>(name: P): (node: Option<N>) => Option<N[P]> {
   return O.map((node) => node[name]);
 }
 
-/* function get<N extends Node, P extends keyof N>(name: P): (nodes: N[]) => N[P][] {
-  return (nodes: N[]) => nodes.map((node) => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
-} */
-
 function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
-}
-
-function isKeyOf<T extends object>(obj: T, key: PropertyKey): key is keyof T {
-  return key in obj;
-}
-
-function nonNullable<T>(value: T | null | undefined): value is T {
-  return value !== null && value !== undefined;
-}
-
-function traverseWithParent(
-  current: Node,
-  callback: (node: Node, parent: Node, property: string, index: number) => void
-): void {
-  let parent = current;
-  let property: keyof typeof parent;
-
-  for (property in parent) {
-    const child = parent[property];
-    if (isNode(child)) {
-      callback(child, parent, property, -1);
-      traverseWithParent(child, callback);
-    }
-    if (Array.isArray(child)) {
-      for (const i in child) {
-        const nthChild = child[i];
-        if (isNode(nthChild)) {
-          callback(nthChild, parent, property, parseInt(i, 10));
-          traverseWithParent(nthChild, callback);
-        }
-      }
-    }
-  }
 }
 
 function* traverse(current: Node): Generator<[node: Node, parent: Node, property: string, index: number]> {
