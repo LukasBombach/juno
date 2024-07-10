@@ -47,7 +47,7 @@ function findAll<Q extends TypeProp<NodeType>>({
 
   const isMatchingNode: (node: Node, index: number) => node is Q extends TypeProp<infer U> ? GetNode<U> : Node =
     queryIndex === undefined
-      ? (node, index): node is Q extends TypeProp<infer U> ? GetNode<U> : Node => matchQuery(node)
+      ? (node, _): node is Q extends TypeProp<infer U> ? GetNode<U> : Node => matchQuery(node)
       : (node, index): node is Q extends TypeProp<infer U> ? GetNode<U> : Node =>
           index === queryIndex && matchQuery(node);
 
@@ -59,7 +59,7 @@ function findAll<Q extends TypeProp<NodeType>>({
 }
 
 function get<N extends Node, P extends keyof N>(name: P): (nodes: N[]) => N[P][] {
-  return (nodes: Node[]) => nodes.map((node) => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
+  return (nodes: N[]) => nodes.map((node) => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
 }
 
 function isNode(value: unknown): value is Node {
