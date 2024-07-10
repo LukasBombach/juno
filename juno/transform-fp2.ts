@@ -7,10 +7,10 @@ import type * as t from "@swc/types";
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
 
-  for (const fn of module.find("FunctionExpression")) {
+  for (const { node: fn } of module.find("FunctionExpression")) {
     const signalCalls = pipe(
-      fn.node,
-      findAll({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
+      fn,
+      findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
       get("pat")
       // references(),
       // parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
@@ -39,6 +39,10 @@ type NodeType = Node["type"];
 type GetNode<T extends NodeType> = Extract<Node, { type: T }>;
 type TypeProp<T extends NodeType> = { type: T } & Record<string, unknown>;
 
+function findFirst<Q extends TypeProp<NodeType>>(
+  q: Q
+): (node: Node) => Q extends TypeProp<infer T> ? GetNode<T> : Node {}
+
 function findAll<Q extends TypeProp<NodeType>>({
   index: queryIndex,
   ...query
@@ -58,9 +62,13 @@ function findAll<Q extends TypeProp<NodeType>>({
   };
 }
 
-function get<N extends Node, P extends keyof N>(name: P): (nodes: N[]) => N[P][] {
-  return (nodes: N[]) => nodes.map((node) => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
+function get<N extends Node, P extends keyof N>(name: P): (node: N) => N[P] {
+  return (node) => node[name];
 }
+
+/* function get<N extends Node, P extends keyof N>(name: P): (nodes: N[]) => N[P][] {
+  return (nodes: N[]) => nodes.map((node) => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
+} */
 
 function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
