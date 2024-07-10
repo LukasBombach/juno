@@ -10,7 +10,7 @@ export async function transformToClientCode(src: string): Promise<string> {
   for (const fn of module.find("FunctionExpression")) {
     const signalCalls = pipe(
       fn.node,
-      children({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
+      findAll({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
       get("pat")
       // references(),
       // parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
@@ -39,12 +39,12 @@ type NodeType = Node["type"];
 type GetNode<T extends NodeType> = Extract<Node, { type: T }>;
 type TypeProp<T extends NodeType> = { type: T } & Record<string, unknown>;
 
-function children<Q extends TypeProp<NodeType>>({
+function findAll<Q extends TypeProp<NodeType>>({
   index: queryIndex,
   ...query
-}: Q): (node: Node) => Q extends TypeProp<infer T> ? GetNode<T>[] : Node[] {
-  return (node: Node): Q extends TypeProp<infer T> ? GetNode<T>[] : Node[] => {
-    const children: Node[] = [];
+}: Q): (node: Node) => (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] {
+  return (node: Node): (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] => {
+    const children: (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] = [];
     const matcher = matches(query);
     const isMatch =
       queryIndex === undefined ? matcher : (child: Node, index: number) => index === queryIndex && matcher(child);
