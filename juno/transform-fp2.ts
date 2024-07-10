@@ -1,8 +1,10 @@
 import { pipe } from "fp-ts/function";
+import * as O from "fp-ts/Option";
 import { parse } from "juno/ast";
 import { matches } from "lodash";
 
 import type * as t from "@swc/types";
+import type { Option } from "fp-ts/Option";
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
@@ -41,7 +43,26 @@ type TypeProp<T extends NodeType> = { type: T } & Record<string, unknown>;
 
 function findFirst<Q extends TypeProp<NodeType>>(
   q: Q
-): (node: Node) => Q extends TypeProp<infer T> ? GetNode<T> : Node {}
+): (node: Node) => Option<Q extends TypeProp<infer T> ? GetNode<T> : Node> {
+  const { index: queryIndex, ...query } = q;
+
+  const matchQuery = matches(query);
+
+  const isMatchingNode: (node: Node, index: number) => node is Q extends TypeProp<infer U> ? GetNode<U> : Node =
+    queryIndex === undefined
+      ? (node, _): node is Q extends TypeProp<infer U> ? GetNode<U> : Node => matchQuery(node)
+      : (node, index): node is Q extends TypeProp<infer U> ? GetNode<U> : Node =>
+          index === queryIndex && matchQuery(node);
+
+  return (node: Node): Option<Q extends TypeProp<infer T> ? GetNode<T> : Node> => {
+    for (const [child, , , index] of traverse(node)) {
+      if (isMatchingNode(child, index)) {
+        return O.some(child);
+      }
+    }
+    return O.none;
+  };
+}
 
 function findAll<Q extends TypeProp<NodeType>>({
   index: queryIndex,
@@ -62,8 +83,8 @@ function findAll<Q extends TypeProp<NodeType>>({
   };
 }
 
-function get<N extends Node, P extends keyof N>(name: P): (node: N) => N[P] {
-  return (node) => node[name];
+function get<N extends Node, P extends keyof N>(name: P): (node: Option<N>) => Option<N[P]> {
+  return O.map((node) => node[name]);
 }
 
 /* function get<N extends Node, P extends keyof N>(name: P): (nodes: N[]) => N[P][] {
@@ -72,6 +93,14 @@ function get<N extends Node, P extends keyof N>(name: P): (node: N) => N[P] {
 
 function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
+}
+
+function isKeyOf<T extends object>(obj: T, key: PropertyKey): key is keyof T {
+  return key in obj;
+}
+
+function nonNullable<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined;
 }
 
 function traverseWithParent(
@@ -99,28 +128,22 @@ function traverseWithParent(
   }
 }
 
-function isKeyOf<T extends object>(obj: T, key: PropertyKey): key is keyof T {
-  return key in obj;
-}
+function* traverse(current: Node): Generator<[node: Node, parent: Node, property: string, index: number]> {
+  let parent = current;
+  let property: keyof typeof parent;
 
-function nonNullable<T>(value: T | null | undefined): value is T {
-  return value !== null && value !== undefined;
-}
-
-function* traverse(obj: any): Generator<Node> {
-  if (typeof obj === "object" && obj !== null && "type" in obj) {
-    yield obj;
-  }
-
-  if (typeof obj === "object" && obj !== null) {
-    if (Array.isArray(obj)) {
-      for (let i = 0; i < obj.length; i++) {
-        yield* traverse(obj[i]);
-      }
-    } else {
-      for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          yield* traverse(obj[key]);
+  for (property in parent) {
+    const child = parent[property];
+    if (isNode(child)) {
+      yield [child, parent, property, -1];
+      yield* traverse(child);
+    }
+    if (Array.isArray(child)) {
+      for (const i in child) {
+        const nthChild = child[i];
+        if (isNode(nthChild)) {
+          yield [nthChild, parent, property, parseInt(i, 10)];
+          yield* traverse(nthChild);
         }
       }
     }
