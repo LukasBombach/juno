@@ -37,12 +37,12 @@ type Node =
 
 type NodeType = Node["type"];
 type GetNode<T extends NodeType> = Extract<Node, { type: T }>;
-type TypeProp<T extends NodeType> = { type: T };
+type TypeProp<T extends NodeType> = { type: T } & Record<string, unknown>;
 
-function children<Q extends TypeProp<NodeType>>(
-  q: Q
-): (node: Node) => Q extends TypeProp<infer T> ? GetNode<T>[] : Node[] {
-  const { index: queryIndex, ...query } = q;
+function children<Q extends TypeProp<NodeType>>({
+  index: queryIndex,
+  ...query
+}: Q): (node: Node) => Q extends TypeProp<infer T> ? GetNode<T>[] : Node[] {
   return (node: Node): Q extends TypeProp<infer T> ? GetNode<T>[] : Node[] => {
     const children: Node[] = [];
     const matcher = matches(query);
@@ -56,7 +56,7 @@ function children<Q extends TypeProp<NodeType>>(
 }
 
 function get<N extends Node, P extends keyof N>(name: P): (nodes: N[]) => N[P][] {
-  return (nodes: Node[]) => nodes.map(node => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
+  return (nodes: Node[]) => nodes.map((node) => (isKeyOf(node, name) ? node[name] : undefined)).filter(nonNullable);
 }
 
 function isNode(value: unknown): value is Node {
