@@ -43,22 +43,17 @@ function findAll<Q extends TypeProp<NodeType>>({
   index: queryIndex,
   ...query
 }: Q): (node: Node) => (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] {
+  const matchQuery = matches(query);
+
+  const isMatchingNode: (node: Node, index: number) => node is Q extends TypeProp<infer U> ? GetNode<U> : Node =
+    queryIndex === undefined
+      ? (node, index): node is Q extends TypeProp<infer U> ? GetNode<U> : Node => matchQuery(node)
+      : (node, index): node is Q extends TypeProp<infer U> ? GetNode<U> : Node =>
+          index === queryIndex && matchQuery(node);
+
   return (node: Node): (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] => {
     const children: (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] = [];
-
-    const matcher = matches(query);
-
-    const isMatch =
-      queryIndex === undefined ? matcher : (child: Node, index: number) => index === queryIndex && matcher(child);
-
-    const isMatchingNode = (node: Node, index: number): node is Q extends TypeProp<infer U> ? GetNode<U> : Node => {
-      return isMatch(node, index);
-    };
-
-    traverseWithParent(node, (child, parent, prop, index) => {
-      if (isMatchingNode(child, index)) children.push(child);
-    });
-
+    traverseWithParent(node, (child, _, __, index) => isMatchingNode(child, index) && children.push(child));
     return children;
   };
 }
