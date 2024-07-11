@@ -41,7 +41,7 @@ type GetNode<T extends NodeType> = Extract<Node, { type: T }>;
 type TypeProp<T extends NodeType> = { type: T } & Record<string, unknown>;
 type Option<T> = T | undefined;
 
-function getReferences(): (node?: Node) => t.Identifier[] {}
+function getReferences(): (node: Option<Node>) => t.Identifier[] {}
 
 function findFirst<Q extends TypeProp<NodeType>>(
   q: Q
@@ -66,7 +66,7 @@ function findFirst<Q extends TypeProp<NodeType>>(
   };
 }
 
-function get<N extends Node, P extends keyof N>(name: P): (node?: N) => Option<N[P]> {
+function get<N extends Node, P extends keyof N>(name: P): (node: Option<N>) => Option<N[P]> {
   return (node) => node?.[name];
 }
 
