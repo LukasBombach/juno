@@ -1,10 +1,8 @@
 import { pipe } from "fp-ts/function";
-import * as O from "fp-ts/Option";
 import { parse } from "juno/ast";
 import { matches } from "lodash";
 
 import type * as t from "@swc/types";
-import type { Option } from "fp-ts/Option";
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
@@ -13,8 +11,8 @@ export async function transformToClientCode(src: string): Promise<string> {
     const signalCalls = pipe(
       fn,
       findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
-      get("pat")
-      // references(),
+      get("pat"),
+      getReferences()
       // parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       // parent({ type: "CallExpression" })
     );
@@ -32,14 +30,18 @@ type Node =
   | t.Declaration
   | t.SpreadElement
   | t.VariableDeclarator
-  | t.Param
   | t.JSXOpeningElement
   | t.JSXAttribute
-  | t.JSXExpressionContainer;
+  | t.JSXExpressionContainer
+  | t.Param
+  | t.Pattern;
 
 type NodeType = Node["type"];
 type GetNode<T extends NodeType> = Extract<Node, { type: T }>;
 type TypeProp<T extends NodeType> = { type: T } & Record<string, unknown>;
+type Option<T> = T | undefined;
+
+function getReferences(): (node?: Node) => t.Identifier[] {}
 
 function findFirst<Q extends TypeProp<NodeType>>(
   q: Q
@@ -57,15 +59,15 @@ function findFirst<Q extends TypeProp<NodeType>>(
   return (node: Node): Option<Q extends TypeProp<infer T> ? GetNode<T> : Node> => {
     for (const [child, , , index] of traverse(node)) {
       if (isMatchingNode(child, index)) {
-        return O.some(child);
+        return child;
       }
     }
-    return O.none;
+    return undefined;
   };
 }
 
-function get<N extends Node, P extends keyof N>(name: P): (node: Option<N>) => Option<N[P]> {
-  return O.map((node) => node[name]);
+function get<N extends Node, P extends keyof N>(name: P): (node?: N) => Option<N[P]> {
+  return (node) => node?.[name];
 }
 
 function isNode(value: unknown): value is Node {
