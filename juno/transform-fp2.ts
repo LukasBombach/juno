@@ -1,11 +1,13 @@
-import { pipe } from "fp-ts/function";
+import { pipe } from "juno/pipe";
 import { parse } from "juno/ast";
 import { matches } from "lodash";
 
 import type * as t from "@swc/types";
+import type { Node, NodeType, GetNode, TypeProp, Option } from "juno/node";
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
+  const ancestors: Map<Node, Node> = mapAncestors(module.node);
 
   for (const { node: fn } of module.find("FunctionExpression")) {
     const signalCalls = pipe(
@@ -23,25 +25,9 @@ export async function transformToClientCode(src: string): Promise<string> {
   return src;
 }
 
-type Node =
-  | t.Program
-  | t.Statement
-  | t.Expression
-  | t.Declaration
-  | t.SpreadElement
-  | t.VariableDeclarator
-  | t.JSXOpeningElement
-  | t.JSXAttribute
-  | t.JSXExpressionContainer
-  | t.Param
-  | t.Pattern;
-
-type NodeType = Node["type"];
-type GetNode<T extends NodeType> = Extract<Node, { type: T }>;
-type TypeProp<T extends NodeType> = { type: T } & Record<string, unknown>;
-type Option<T> = T | undefined;
-
-function getReferences(): (node: Option<Node>) => t.Identifier[] {}
+function getReferences(): (node: Option<Node>) => t.Identifier[] {
+  throw new Error("not done yet");
+}
 
 function findFirst<Q extends TypeProp<NodeType>>(
   q: Q
@@ -72,6 +58,12 @@ function get<N extends Node, P extends keyof N>(name: P): (node: Option<N>) => O
 
 function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
+}
+
+function mapAncestors(module: t.Module): Map<Node, Node> {
+  const ancestors = new Map<Node, Node>();
+  for (const [child, parent] of traverse(module)) ancestors.set(child, parent);
+  return ancestors;
 }
 
 function* traverse(current: Node): Generator<[node: Node, parent: Node, property: string, index: number]> {
