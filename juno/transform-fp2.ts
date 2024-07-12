@@ -1,4 +1,4 @@
-import { pipe } from "juno/pipe";
+import { createPipe } from "juno/pipe";
 import { parse } from "juno/ast";
 import { matches } from "lodash";
 
@@ -7,7 +7,7 @@ import type { Node, NodeType, GetNode, TypeProp, Option, Ancestors } from "juno/
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
-  const ancestors: Map<Node, Node> = mapAncestors(module.node);
+  const pipe = createPipe(module.node);
 
   for (const { node: fn } of module.find("FunctionExpression")) {
     const signalCalls = pipe(

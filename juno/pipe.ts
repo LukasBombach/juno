@@ -1,22 +1,27 @@
+import type * as t from "@swc/types";
 import type { Ancestors } from "juno/node";
 
-export function pipe<A>(a: A): A;
-export function pipe<A, B>(a: A, ab: (a: A, ancestors: Ancestors) => B): B;
-export function pipe<A, B, C>(a: A, ab: (a: A, ancestors: Ancestors) => B, bc: (b: B, ancestors: Ancestors) => C): C;
-export function pipe<A, B, C, D>(
+export function createPipe(module: t.Module): typeof pipe {
+  throw new Error("not done yet");
+}
+
+function pipe<A>(a: A): A;
+function pipe<A, B>(a: A, ab: (a: A, ancestors: Ancestors) => B): B;
+function pipe<A, B, C>(a: A, ab: (a: A, ancestors: Ancestors) => B, bc: (b: B, ancestors: Ancestors) => C): C;
+function pipe<A, B, C, D>(
   a: A,
   ab: (a: A, ancestors: Ancestors) => B,
   bc: (b: B, ancestors: Ancestors) => C,
   cd: (c: C, ancestors: Ancestors) => D
 ): D;
-export function pipe<A, B, C, D, E>(
+function pipe<A, B, C, D, E>(
   a: A,
   ab: (a: A, ancestors: Ancestors) => B,
   bc: (b: B, ancestors: Ancestors) => C,
   cd: (c: C, ancestors: Ancestors) => D,
   de: (d: D, ancestors: Ancestors) => E
 ): E;
-export function pipe<A, B, C, D, E, F>(
+function pipe<A, B, C, D, E, F>(
   a: A,
   ab: (a: A, ancestors: Ancestors) => B,
   bc: (b: B, ancestors: Ancestors) => C,
@@ -24,7 +29,7 @@ export function pipe<A, B, C, D, E, F>(
   de: (d: D, ancestors: Ancestors) => E,
   ef: (e: E, ancestors: Ancestors) => F
 ): F;
-export function pipe<A, B, C, D, E, F, G>(
+function pipe<A, B, C, D, E, F, G>(
   a: A,
   ab: (a: A, ancestors: Ancestors) => B,
   bc: (b: B, ancestors: Ancestors) => C,
@@ -33,7 +38,7 @@ export function pipe<A, B, C, D, E, F, G>(
   ef: (e: E, ancestors: Ancestors) => F,
   fg: (f: F, ancestors: Ancestors) => G
 ): G;
-export function pipe<A, B, C, D, E, F, G, H>(
+function pipe<A, B, C, D, E, F, G, H>(
   a: A,
   ab: (a: A, ancestors: Ancestors) => B,
   bc: (b: B, ancestors: Ancestors) => C,
@@ -43,7 +48,7 @@ export function pipe<A, B, C, D, E, F, G, H>(
   fg: (f: F, ancestors: Ancestors) => G,
   gh: (g: G, ancestors: Ancestors) => H
 ): H;
-export function pipe<A, B, C, D, E, F, G, H, I>(
+function pipe<A, B, C, D, E, F, G, H, I>(
   a: A,
   ab: (a: A, ancestors: Ancestors) => B,
   bc: (b: B, ancestors: Ancestors) => C,
@@ -54,7 +59,7 @@ export function pipe<A, B, C, D, E, F, G, H, I>(
   gh: (g: G, ancestors: Ancestors) => H,
   hi: (h: H, ancestors: Ancestors) => I
 ): I;
-export function pipe(
+function pipe(
   a: unknown,
   ab?: Function,
   bc?: Function,
