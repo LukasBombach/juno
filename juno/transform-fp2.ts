@@ -1,4 +1,4 @@
-import { createPipe } from "juno/pipe";
+import { pipe } from "juno/pipe";
 import { parse } from "juno/ast";
 import { matches } from "lodash";
 
@@ -7,14 +7,13 @@ import type { Node, NodeType, GetNode, TypeProp, Option, Ancestors } from "juno/
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
-  const pipe = createPipe(module.node);
 
   for (const { node: fn } of module.find("FunctionExpression")) {
-    const signalCalls = pipe(
+    const signalCalls = pipe(module.node)(
       fn,
       findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
-      get("pat")
-      //getReferences()
+      get("pat"),
+      getReferences()
       // parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       // parent({ type: "CallExpression" })
     );
@@ -26,7 +25,11 @@ export async function transformToClientCode(src: string): Promise<string> {
 }
 
 function getReferences(): (node: Option<Node>, ancestors: Ancestors) => t.Identifier[] {
-  throw new Error("not done yet");
+  // @ts-expect-error WORK IN PROGRESS
+  return (node, ancestors) => {
+    console.log([...ancestors()].map((n) => n.type));
+    return node;
+  };
 }
 
 function findFirst<Q extends TypeProp<NodeType>>(

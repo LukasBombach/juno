@@ -13,7 +13,7 @@ export type Node =
   | t.Param
   | t.Pattern;
 
-export type Ancestors = Node[];
+export type Ancestors = () => Generator<Node>;
 
 export type NodeType = Node["type"];
 
