@@ -13,13 +13,13 @@ export async function transformToClientCode(src: string): Promise<string> {
     const signalCalls = pipe(
       fn,
       findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
-      get("pat"),
-      getReferences()
+      get("pat")
+      //getReferences()
       // parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       // parent({ type: "CallExpression" })
     );
 
-    console.log(signalCalls);
+    console.log("Signal calls\n-----\n", signalCalls);
   }
 
   return src;
@@ -60,7 +60,7 @@ function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
 }
 
-function mapAncestors(module: t.Module): Map<Node, Node> {
+export function mapAncestors(module: t.Module): Map<Node, Node> {
   const ancestors = new Map<Node, Node>();
   for (const [child, parent] of traverse(module)) ancestors.set(child, parent);
   return ancestors;
