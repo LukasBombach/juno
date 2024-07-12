@@ -3,7 +3,7 @@ import { parse } from "juno/ast";
 import { matches } from "lodash";
 
 import type * as t from "@swc/types";
-import type { Node, NodeType, GetNode, TypeProp, Option } from "juno/node";
+import type { Node, NodeType, GetNode, TypeProp, Option, Ancestors } from "juno/node";
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
@@ -25,7 +25,7 @@ export async function transformToClientCode(src: string): Promise<string> {
   return src;
 }
 
-function getReferences(): (node: Option<Node>) => t.Identifier[] {
+function getReferences(): (node: Option<Node>, ancestors: Ancestors) => t.Identifier[] {
   throw new Error("not done yet");
 }
 

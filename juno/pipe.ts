@@ -1,238 +1,59 @@
+import type { Ancestors } from "juno/node";
+
 export function pipe<A>(a: A): A;
-export function pipe<A, B>(a: A, ab: (a: A) => B): B;
-export function pipe<A, B, C>(a: A, ab: (a: A) => B, bc: (b: B) => C): C;
-export function pipe<A, B, C, D>(a: A, ab: (a: A) => B, bc: (b: B) => C, cd: (c: C) => D): D;
-export function pipe<A, B, C, D, E>(a: A, ab: (a: A) => B, bc: (b: B) => C, cd: (c: C) => D, de: (d: D) => E): E;
+export function pipe<A, B>(a: A, ab: (a: A, ancestors: Ancestors) => B): B;
+export function pipe<A, B, C>(a: A, ab: (a: A, ancestors: Ancestors) => B, bc: (b: B, ancestors: Ancestors) => C): C;
+export function pipe<A, B, C, D>(
+  a: A,
+  ab: (a: A, ancestors: Ancestors) => B,
+  bc: (b: B, ancestors: Ancestors) => C,
+  cd: (c: C, ancestors: Ancestors) => D
+): D;
+export function pipe<A, B, C, D, E>(
+  a: A,
+  ab: (a: A, ancestors: Ancestors) => B,
+  bc: (b: B, ancestors: Ancestors) => C,
+  cd: (c: C, ancestors: Ancestors) => D,
+  de: (d: D, ancestors: Ancestors) => E
+): E;
 export function pipe<A, B, C, D, E, F>(
   a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F
+  ab: (a: A, ancestors: Ancestors) => B,
+  bc: (b: B, ancestors: Ancestors) => C,
+  cd: (c: C, ancestors: Ancestors) => D,
+  de: (d: D, ancestors: Ancestors) => E,
+  ef: (e: E, ancestors: Ancestors) => F
 ): F;
 export function pipe<A, B, C, D, E, F, G>(
   a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G
+  ab: (a: A, ancestors: Ancestors) => B,
+  bc: (b: B, ancestors: Ancestors) => C,
+  cd: (c: C, ancestors: Ancestors) => D,
+  de: (d: D, ancestors: Ancestors) => E,
+  ef: (e: E, ancestors: Ancestors) => F,
+  fg: (f: F, ancestors: Ancestors) => G
 ): G;
 export function pipe<A, B, C, D, E, F, G, H>(
   a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H
+  ab: (a: A, ancestors: Ancestors) => B,
+  bc: (b: B, ancestors: Ancestors) => C,
+  cd: (c: C, ancestors: Ancestors) => D,
+  de: (d: D, ancestors: Ancestors) => E,
+  ef: (e: E, ancestors: Ancestors) => F,
+  fg: (f: F, ancestors: Ancestors) => G,
+  gh: (g: G, ancestors: Ancestors) => H
 ): H;
 export function pipe<A, B, C, D, E, F, G, H, I>(
   a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I
+  ab: (a: A, ancestors: Ancestors) => B,
+  bc: (b: B, ancestors: Ancestors) => C,
+  cd: (c: C, ancestors: Ancestors) => D,
+  de: (d: D, ancestors: Ancestors) => E,
+  ef: (e: E, ancestors: Ancestors) => F,
+  fg: (f: F, ancestors: Ancestors) => G,
+  gh: (g: G, ancestors: Ancestors) => H,
+  hi: (h: H, ancestors: Ancestors) => I
 ): I;
-export function pipe<A, B, C, D, E, F, G, H, I, J>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J
-): J;
-export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J,
-  jk: (j: J) => K
-): K;
-export function pipe<A, B, C, D, E, F, G, H, I, J, K, L>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J,
-  jk: (j: J) => K,
-  kl: (k: K) => L
-): L;
-export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J,
-  jk: (j: J) => K,
-  kl: (k: K) => L,
-  lm: (l: L) => M
-): M;
-export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J,
-  jk: (j: J) => K,
-  kl: (k: K) => L,
-  lm: (l: L) => M,
-  mn: (m: M) => N
-): N;
-export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J,
-  jk: (j: J) => K,
-  kl: (k: K) => L,
-  lm: (l: L) => M,
-  mn: (m: M) => N,
-  no: (n: N) => O
-): O;
-
-export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J,
-  jk: (j: J) => K,
-  kl: (k: K) => L,
-  lm: (l: L) => M,
-  mn: (m: M) => N,
-  no: (n: N) => O,
-  op: (o: O) => P
-): P;
-
-export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J,
-  jk: (j: J) => K,
-  kl: (k: K) => L,
-  lm: (l: L) => M,
-  mn: (m: M) => N,
-  no: (n: N) => O,
-  op: (o: O) => P,
-  pq: (p: P) => Q
-): Q;
-
-export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J,
-  jk: (j: J) => K,
-  kl: (k: K) => L,
-  lm: (l: L) => M,
-  mn: (m: M) => N,
-  no: (n: N) => O,
-  op: (o: O) => P,
-  pq: (p: P) => Q,
-  qr: (q: Q) => R
-): R;
-
-export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J,
-  jk: (j: J) => K,
-  kl: (k: K) => L,
-  lm: (l: L) => M,
-  mn: (m: M) => N,
-  no: (n: N) => O,
-  op: (o: O) => P,
-  pq: (p: P) => Q,
-  qr: (q: Q) => R,
-  rs: (r: R) => S
-): S;
-
-export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>(
-  a: A,
-  ab: (a: A) => B,
-  bc: (b: B) => C,
-  cd: (c: C) => D,
-  de: (d: D) => E,
-  ef: (e: E) => F,
-  fg: (f: F) => G,
-  gh: (g: G) => H,
-  hi: (h: H) => I,
-  ij: (i: I) => J,
-  jk: (j: J) => K,
-  kl: (k: K) => L,
-  lm: (l: L) => M,
-  mn: (m: M) => N,
-  no: (n: N) => O,
-  op: (o: O) => P,
-  pq: (p: P) => Q,
-  qr: (q: Q) => R,
-  rs: (r: R) => S,
-  st: (s: S) => T
-): T;
 export function pipe(
   a: unknown,
   ab?: Function,
