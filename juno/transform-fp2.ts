@@ -18,7 +18,7 @@ export async function transformToClientCode(src: string): Promise<string> {
       // parent({ type: "CallExpression" })
     );
 
-    console.log("Signal calls\n-----\n", signalCalls);
+    console.log("\n-----\n\n", signalCalls);
   }
 
   return src;
@@ -28,10 +28,21 @@ function getReferences(): (node: Option<Node>, ancestors: Ancestors) => t.Identi
   // @ts-expect-error WORK IN PROGRESS
   return (node, ancestors) => {
     if (node) {
-      console.log([...ancestors(node)].map((n) => n.type));
+      const scope = getScope(node, ancestors);
     }
     return node;
   };
+}
+
+// @ts-expect-error WORK IN PROGRESS
+function getScope(node: Node, ancestors: Ancestors): GetNode<"FunctionExpression" | "Module"> {
+  const scopeTypes = ["FunctionExpression", "Module"];
+  for (const ancestor of ancestors(node)) {
+    if (scopeTypes.includes(ancestor.type)) {
+      // @ts-expect-error WORK IN PROGRESS
+      return ancestor;
+    }
+  }
 }
 
 function findFirst<Q extends TypeProp<NodeType>>(
