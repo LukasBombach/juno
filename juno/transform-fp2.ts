@@ -25,14 +25,8 @@ export async function transformToClientCode(src: string): Promise<string> {
 }
 
 function getReferences(): (node: Option<Node>, ancestors: Ancestors) => t.Identifier[] {
-  // @ts-expect-error WORK IN PROGRESS
-  return (node, ancestors) => {
-    if (node) {
-      const scope = getScope(node, ancestors);
-      console.log(scope.type);
-    }
-    return node;
-  };
+  return (node, ancestors) =>
+    pipe(node, is("Identifier"), getScope(), findAll({ type: "Identifier", value: node.value }), exclude(node));
 }
 
 function getScope(node: Node, ancestors: Ancestors): t.FunctionExpression | t.Module {
