@@ -14,7 +14,7 @@ export function pipe(module: t.Module): Pipe {
       const ancestors: Ancestors = function* (node) {
         let current: Node | undefined = node;
         while (current) {
-          current = ancestorMap.get(node);
+          current = ancestorMap.get(current);
           if (current) yield current;
         }
       };

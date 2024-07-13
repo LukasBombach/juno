@@ -79,6 +79,7 @@ function* traverse(current: Node): Generator<[node: Node, parent: Node, property
     const child = parent[property];
     if (isNode(child)) {
       yield [child, parent, property, -1];
+      // console.log(parent.type.padStart(15, " "), ">", child.type);
       yield* traverse(child);
     }
     if (Array.isArray(child)) {
@@ -86,6 +87,7 @@ function* traverse(current: Node): Generator<[node: Node, parent: Node, property
         const nthChild = child[i];
         if (isNode(nthChild)) {
           yield [nthChild, parent, property, parseInt(i, 10)];
+          // console.log(parent.type.padStart(15, " "), ">", nthChild.type);
           yield* traverse(nthChild);
         }
       }
