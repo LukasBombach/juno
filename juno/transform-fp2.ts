@@ -27,7 +27,9 @@ export async function transformToClientCode(src: string): Promise<string> {
 function getReferences(): (node: Option<Node>, ancestors: Ancestors) => t.Identifier[] {
   // @ts-expect-error WORK IN PROGRESS
   return (node, ancestors) => {
-    console.log([...ancestors()].map((n) => n.type));
+    if (node) {
+      console.log([...ancestors(node)].map((n) => n.type));
+    }
     return node;
   };
 }

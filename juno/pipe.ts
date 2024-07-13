@@ -1,7 +1,7 @@
 import { mapAncestors } from "juno/transform-fp2";
 
 import type * as t from "@swc/types";
-import type { Ancestors } from "juno/node";
+import type { Ancestors, Node } from "juno/node";
 
 type Pipe = typeof _pipe;
 
@@ -11,7 +11,14 @@ export function pipe(module: t.Module): Pipe {
   return (a: unknown, ...fns: ((val: any, ancestors: Ancestors) => any)[]): unknown => {
     let val = a;
     for (let i = 0; i < fns.length; i++) {
-      const ancestors: Ancestors = () => {};
+      const ancestors: Ancestors = function* (node) {
+        let current: Node | undefined = node;
+        while (current) {
+          current = ancestorMap.get(node);
+          if (current) yield current;
+        }
+      };
+
       val = fns[i](val, ancestors);
     }
     return val;
