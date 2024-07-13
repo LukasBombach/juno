@@ -29,18 +29,23 @@ function getReferences(): (node: Option<Node>, ancestors: Ancestors) => t.Identi
   return (node, ancestors) => {
     if (node) {
       const scope = getScope(node, ancestors);
+      console.log(scope.type);
     }
     return node;
   };
 }
 
-// @ts-expect-error WORK IN PROGRESS
-function getScope(node: Node, ancestors: Ancestors): GetNode<"FunctionExpression" | "Module"> {
+function getScope(node: Node, ancestors: Ancestors): t.FunctionExpression | t.Module {
+  return scopes(node, ancestors).next().value;
+}
+
+function* scopes<T = t.FunctionExpression | t.Module>(node: Node, ancestors: Ancestors): Generator<T> {
   const scopeTypes = ["FunctionExpression", "Module"];
+
   for (const ancestor of ancestors(node)) {
     if (scopeTypes.includes(ancestor.type)) {
       // @ts-expect-error WORK IN PROGRESS
-      return ancestor;
+      yield ancestor;
     }
   }
 }
