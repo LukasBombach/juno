@@ -4,6 +4,7 @@ import { matches } from "lodash";
 
 import type * as t from "@swc/types";
 import type { Node, NodeType, GetNode, TypeProp, Option, Ancestors } from "juno/node";
+import type { PipeApi } from "juno/pipe";
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
@@ -24,8 +25,8 @@ export async function transformToClientCode(src: string): Promise<string> {
   return src;
 }
 
-function getReferences(): (node: Option<Node>, ancestors: Ancestors) => t.Identifier[] {
-  return (node, ancestors) =>
+function getReferences(): (node: Option<Node>, api: PipeApi) => t.Identifier[] {
+  return (node, { pipe }) =>
     pipe(node, is("Identifier"), getScope(), findAll({ type: "Identifier", value: node.value }), exclude(node));
 }
 
