@@ -36,6 +36,10 @@ function getReferences(): (node: Option<Node>, api: PipeApi) => t.Identifier[] {
     );
 }
 
+function exclude<T extends Node>(node: Option<Node>): (nodes: T[]) => T[] {
+  return (nodes) => (node ? nodes.filter((n) => n !== node) : nodes);
+}
+
 function getScope(): (node: Option<Node>, api: PipeApi) => Option<t.FunctionExpression | t.Module> {
   return (node, { ancestors }) => (node ? scopes(node, ancestors).next().value : undefined);
 }
