@@ -30,8 +30,8 @@ function getReferences(): (node: Option<Node>, api: PipeApi) => t.Identifier[] {
     pipe(node, is("Identifier"), getScope(), findAll({ type: "Identifier", value: node.value }), exclude(node));
 }
 
-function getScope(node: Node, ancestors: Ancestors): t.FunctionExpression | t.Module {
-  return scopes(node, ancestors).next().value;
+function getScope(): (node: Option<Node>, api: PipeApi) => Option<t.FunctionExpression | t.Module> {
+  return (node, { ancestors }) => (node ? scopes(node, ancestors).next().value : undefined);
 }
 
 function* scopes<T = t.FunctionExpression | t.Module>(node: Node, ancestors: Ancestors): Generator<T> {
@@ -43,6 +43,10 @@ function* scopes<T = t.FunctionExpression | t.Module>(node: Node, ancestors: Anc
       yield ancestor;
     }
   }
+}
+
+function is<T extends NodeType>(type: T): (node: Option<Node>) => Option<GetNode<T>> {
+  return (node): Option<GetNode<T>> => (node?.type === type ? (node as GetNode<T>) : undefined);
 }
 
 function findFirst<Q extends TypeProp<NodeType>>(
