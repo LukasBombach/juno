@@ -27,7 +27,13 @@ export async function transformToClientCode(src: string): Promise<string> {
 
 function getReferences(): (node: Option<Node>, api: PipeApi) => t.Identifier[] {
   return (node, { pipe }) =>
-    pipe(node, is("Identifier"), getScope(), findAll({ type: "Identifier", value: node.value }), exclude(node));
+    pipe(
+      node,
+      is("Identifier"),
+      getScope(),
+      findAll({ type: "Identifier", value: (node as t.Identifier).value }),
+      exclude(node)
+    );
 }
 
 function getScope(): (node: Option<Node>, api: PipeApi) => Option<t.FunctionExpression | t.Module> {
@@ -49,13 +55,35 @@ function is<T extends NodeType>(type: T): (node: Option<Node>) => Option<GetNode
   return (node): Option<GetNode<T>> => (node?.type === type ? (node as GetNode<T>) : undefined);
 }
 
+function findAll<Q extends TypeProp<NodeType>>(
+  q: Q
+): (node: Option<Node>) => (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] {
+  const { index: queryIndex, ...query } = q;
+  const matchQuery = matches(query);
+  const isMatchingNode: (node: Node, index: number) => node is Q extends TypeProp<infer U> ? GetNode<U> : Node =
+    queryIndex === undefined
+      ? (node, _): node is Q extends TypeProp<infer U> ? GetNode<U> : Node => matchQuery(node)
+      : (node, index): node is Q extends TypeProp<infer U> ? GetNode<U> : Node =>
+          index === queryIndex && matchQuery(node);
+
+  return (node: Option<Node>): (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] => {
+    const matches: (Q extends TypeProp<infer T> ? GetNode<T> : Node)[] = [];
+    if (node) {
+      for (const [child, , , index] of traverse(node)) {
+        if (isMatchingNode(child, index)) {
+          matches.push(child);
+        }
+      }
+    }
+    return matches;
+  };
+}
+
 function findFirst<Q extends TypeProp<NodeType>>(
   q: Q
 ): (node: Node) => Option<Q extends TypeProp<infer T> ? GetNode<T> : Node> {
   const { index: queryIndex, ...query } = q;
-
   const matchQuery = matches(query);
-
   const isMatchingNode: (node: Node, index: number) => node is Q extends TypeProp<infer U> ? GetNode<U> : Node =
     queryIndex === undefined
       ? (node, _): node is Q extends TypeProp<infer U> ? GetNode<U> : Node => matchQuery(node)
