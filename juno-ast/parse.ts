@@ -11,7 +11,9 @@ type Nodes =
   | t.VariableDeclarator
   | t.JSXOpeningElement
   | t.JSXAttribute
-  | t.JSXExpressionContainer;
+  | t.JSXExpressionContainer
+  | t.Param
+  | t.Pattern;
 
 export type Node<T = string> = T extends NodeType ? Extract<Nodes, { type: T }> : Nodes;
 

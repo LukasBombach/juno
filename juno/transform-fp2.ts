@@ -4,15 +4,17 @@ import { findFirst, findAll } from "juno-ast/find";
 import { matches } from "lodash";
 
 import type * as t from "@swc/types";
-import type { Node, NodeType, GetNode, TypeProp, Option, Ancestors } from "juno/node";
-import type { PipeApi } from "juno/pipe";
+import type { Node, NodeType } from "juno-ast/parse";
+import type { PipeApi, Option, Ancestors } from "juno-ast/pipe";
+
+type Query<T extends NodeType> = { type: T } & Record<string, unknown>;
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
 
-  for (const { node: fn } of module.find("FunctionExpression")) {
+  pipe(module)(module, findAll({ type: "FunctionExpression" }), (fn, { pipe }) => {
     console.log(
-      pipe(module)(
+      pipe(
         fn,
         findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
         get("pat"),
@@ -21,24 +23,23 @@ export async function transformToClientCode(src: string): Promise<string> {
         parent({ type: "CallExpression" })
       )
     );
-  }
+  });
 
   return src;
 }
 
-function parent<Q extends TypeProp<NodeType>>(
+function parent<Q extends Query<NodeType>>(
   q: Q
-): (nodes: Node[], api: PipeApi) => (Q extends TypeProp<infer T> ? GetNode<T> : undefined)[] {
+): (nodes: Node[], api: PipeApi) => (Q extends Query<infer T> ? Node<T> : undefined)[] {
   const { index: queryIndex, ...query } = q;
   const matchQuery = matches(query);
-  const isMatchingNode: (node: Node, index: number) => node is Q extends TypeProp<infer U> ? GetNode<U> : Node =
+  const isMatchingNode: (node: Node, index: number) => node is Q extends Query<infer U> ? Node<U> : Node =
     queryIndex === undefined
-      ? (node, _): node is Q extends TypeProp<infer U> ? GetNode<U> : Node => matchQuery(node)
-      : (node, index): node is Q extends TypeProp<infer U> ? GetNode<U> : Node =>
-          index === queryIndex && matchQuery(node);
+      ? (node, _): node is Q extends Query<infer U> ? Node<U> : Node => matchQuery(node)
+      : (node, index): node is Q extends Query<infer U> ? Node<U> : Node => index === queryIndex && matchQuery(node);
 
-  return (nodes: Node[], { ancestors }: PipeApi): (Q extends TypeProp<infer T> ? GetNode<T> : undefined)[] => {
-    return nodes.map((node): Q extends TypeProp<infer T> ? GetNode<T> : undefined => {
+  return (nodes: Node[], { ancestors }: PipeApi): (Q extends Query<infer T> ? Node<T> : undefined)[] => {
+    return nodes.map((node): Q extends Query<infer T> ? Node<T> : undefined => {
       for (const child of ancestors(node)) {
         // 💀 todo passing -1 as index is wrong here and could lead to errors
         if (isMatchingNode(child, -1)) {
@@ -82,8 +83,8 @@ function* scopes<T = t.FunctionExpression | t.Module>(node: Node, ancestors: Anc
   }
 }
 
-function is<T extends NodeType>(type: T): (node: Option<Node>) => Option<GetNode<T>> {
-  return (node): Option<GetNode<T>> => (node?.type === type ? (node as GetNode<T>) : undefined);
+function is<T extends NodeType>(type: T): (node: Option<Node>) => Option<Node<T>> {
+  return (node): Option<Node<T>> => (node?.type === type ? (node as Node<T>) : undefined);
 }
 
 function get<N extends Node, P extends keyof N>(name: P): (node: Option<N>) => Option<N[P]> {
