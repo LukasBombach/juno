@@ -2,10 +2,8 @@ import { pipe } from "juno-ast/pipe";
 import { parse } from "juno-ast/parse";
 import { findFirst, findAll } from "juno-ast/find";
 import { getReferences } from "juno-ast/refs";
+import { get } from "juno-ast/props";
 import { parent } from "juno-ast/parent";
-
-import type { Node } from "juno-ast/parse";
-import type { Option } from "juno-ast/pipe";
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
@@ -24,8 +22,4 @@ export async function transformToClientCode(src: string): Promise<string> {
   });
 
   return src;
-}
-
-function get<N extends Node, P extends keyof N>(name: P): (node: Option<N>) => Option<N[P]> {
-  return (node) => node?.[name];
 }
