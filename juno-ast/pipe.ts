@@ -1,9 +1,10 @@
-import { mapAncestors } from "juno/transform-fp2";
+import { traverse } from "juno-ast/traverse";
 
 import type * as t from "@swc/types";
 import type { Ancestors, Node } from "juno/node";
 
-type PipableValue<T> = undefined | T | T[];
+export type PipableValue<T> = Option<T> | Array<T>;
+export type Option<T> = T | undefined;
 
 export type Pipable<T> = (a: PipableValue<T>, api: PipeApi) => PipableValue<T>;
 
@@ -32,6 +33,12 @@ export function pipe(module: t.Module): typeof _pipe {
   }
 
   return _pipe;
+}
+
+function mapAncestors(module: t.Module): Map<Node, Node> {
+  const ancestors = new Map<Node, Node>();
+  for (const [child, parent] of traverse(module)) ancestors.set(child, parent);
+  return ancestors;
 }
 
 function _pipe<A>(a: A): A;

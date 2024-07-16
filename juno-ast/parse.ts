@@ -13,10 +13,14 @@ type Nodes =
   | t.JSXAttribute
   | t.JSXExpressionContainer;
 
-export type Node<T> = T extends NodeType ? Extract<Nodes, { type: T }> : Nodes;
+export type Node<T = string> = T extends NodeType ? Extract<Nodes, { type: T }> : Nodes;
 
 export type NodeType = Nodes["type"];
 
 export async function parse(src: string, options?: ParseOptions): Promise<t.Module> {
   return await swcparse(src, options);
+}
+
+export function isNode(value: unknown): value is Node {
+  return typeof value === "object" && value !== null && "type" in value;
 }
