@@ -12,7 +12,8 @@ export interface PipeApi {
 }
 
 export function pipe(module: Node<"Module">): typeof _pipe {
-  const ancestorMap = mapAncestors(module);
+  const ancestorMap = new Map<Node, Node>();
+  for (const [child, parent] of traverse(module)) ancestorMap.set(child, parent);
 
   function* ancestors(node: Node): Generator<Node> {
     let current: Node | undefined = ancestorMap.get(node);
@@ -31,12 +32,6 @@ export function pipe(module: Node<"Module">): typeof _pipe {
   }
 
   return _pipe;
-}
-
-function mapAncestors(module: Node<"Module">): Map<Node, Node> {
-  const ancestors = new Map<Node, Node>();
-  for (const [child, parent] of traverse(module)) ancestors.set(child, parent);
-  return ancestors;
 }
 
 function _pipe<A>(a: A): A;

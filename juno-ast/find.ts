@@ -1,9 +1,9 @@
 import { matches } from "lodash";
 import { traverse } from "juno-ast/traverse";
+
+import type { Query } from "juno-ast/query";
 import type { Option } from "juno-ast/pipe";
 import type { Node, NodeType } from "juno-ast/parse";
-
-export type Query<T extends NodeType> = { type: T } & Record<string, unknown>;
 
 export function findAll<Q extends Query<NodeType>>(
   q: Q
