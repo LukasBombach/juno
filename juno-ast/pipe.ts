@@ -16,10 +16,10 @@ export function pipe(module: t.Module): typeof _pipe {
   const ancestorMap = mapAncestors(module);
 
   function* ancestors(node: Node): Generator<Node> {
-    let current: Node | undefined = node;
+    let current: Node | undefined = ancestorMap.get(node);
     while (current) {
+      yield current;
       current = ancestorMap.get(current);
-      if (current) yield current;
     }
   }
 
