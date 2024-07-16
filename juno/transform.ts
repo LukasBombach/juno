@@ -298,10 +298,6 @@ function isSameIdentifier(a: t.Identifier, b: t.Identifier): boolean {
   return a.value === b.value && a.span.ctxt === b.span.ctxt;
 }
 
-function nonNullable<T>(value: T | null | undefined): value is T {
-  return value !== null && value !== undefined;
-}
-
 function* find<T extends NodeType>(parent: Node, type: T): Generator<NodeOfType<T>> {
   for (const node of traverse(parent)) {
     if (is(type)(node)) {
