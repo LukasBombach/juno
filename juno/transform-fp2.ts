@@ -1,8 +1,8 @@
 import { pipe } from "juno-ast/pipe";
 import { parse } from "juno-ast/parse";
-import { getReferences } from "juno-ast/refs";
 import { findFirst, findAll } from "juno-ast/find";
 import { parent } from "juno-ast/parent";
+import { getReferences } from "juno-ast/refs";
 
 import type { Node } from "juno-ast/parse";
 import type { Option } from "juno-ast/pipe";
