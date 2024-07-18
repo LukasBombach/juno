@@ -4,9 +4,9 @@ import { is, exclude } from "juno-ast/filter";
 
 import type * as t from "@swc/types";
 import type { Node } from "juno-ast/parse";
-import type { PipeApi, Option } from "juno-ast/pipe";
+import type { PipeApi, Option, PipableValue } from "juno-ast/pipe";
 
-export function getReferences(): (node: Option<Node>, api: PipeApi) => t.Identifier[] {
+export function getReferences(): (node: PipableValue<Node>, api: PipeApi) => t.Identifier[] {
   return (node, { pipe }) =>
     pipe(
       node,
