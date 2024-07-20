@@ -1,10 +1,18 @@
 import type { Node, NodeType } from "juno-ast/parse";
 
-type QueryObject<T = any> = {
-  [K in keyof T]: T[K] extends { type: string } ? QueryObject<T[K]> : T[K];
+/* type Query<T extends NodeType> = {
+  [K in keyof T]: T[K] extends { type: T } ? Query<T[K]> : T[K];
 } & {
   type?: string;
-};
+}; */
+
+type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
+    }
+  : T;
+
+type Query = DeepPartial<Node>;
 
 type DeepestType<T> = T extends { type: infer U }
   ? U extends string
@@ -14,6 +22,6 @@ type DeepestType<T> = T extends { type: infer U }
   ? DeepestType<T[keyof T]>
   : never;
 
-function findFirst<T extends QueryObject>(data: any, query: T): DeepestType<T> {}
+function findFirst<Q extends Query>(data: any, query: Q): DeepestType<Q> {}
 
-const x = findFirst({ type: "FunctionExpression" }, { type: "FunctionExpression" });
+const x = findFirst({}, { type: "Parameter", index: 0, pat: { type: "Identifier" } });
