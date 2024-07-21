@@ -9,7 +9,7 @@ export function findFirst<Q extends Query<NodeType>>(query: Q) {
 }
 
 export function findAll<Q extends Query<NodeType>>(query: Q) {
-  return map<Node, QueryResult<Q>>((node) => {});
+  return map<Node, QueryResult<Q>[]>((node) => {});
 }
 
 export function parent<Q extends Query<NodeType>>(query: Q) {
