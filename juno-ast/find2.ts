@@ -1,27 +1,17 @@
+import { map } from "juno-ast/map";
 import type { Node, NodeType } from "juno-ast/parse";
 
-/* type Query<T extends NodeType> = {
-  [K in keyof T]: T[K] extends { type: T } ? Query<T[K]> : T[K];
-} & {
-  type?: string;
-}; */
+export type Query<T extends NodeType> = { type: T } & Record<string, unknown>;
+type QueryResult<Q> = Q extends Query<infer T> ? Node<T> : undefined;
 
-type DeepPartial<T> = T extends object
-  ? {
-      [P in keyof T]?: DeepPartial<T[P]>;
-    }
-  : T;
+export function findFirst<Q extends Query<NodeType>>(query: Q) {
+  return map<Node, QueryResult<Q>>((node) => {});
+}
 
-type Query = DeepPartial<Node>;
+export function findAll<Q extends Query<NodeType>>(query: Q) {
+  return map<Node, QueryResult<Q>>((node) => {});
+}
 
-type DeepestType<T> = T extends { type: infer U }
-  ? U extends string
-    ? T
-    : never
-  : T extends object
-  ? DeepestType<T[keyof T]>
-  : never;
-
-function findFirst<Q extends Query>(data: any, query: Q): DeepestType<Q> {}
-
-const x = findFirst({}, { type: "Parameter", index: 0, pat: { type: "Identifier" } });
+export function parent<Q extends Query<NodeType>>(query: Q) {
+  return map<Node, QueryResult<Q>>((node) => {});
+}

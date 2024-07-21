@@ -1,10 +1,8 @@
 import { pipe } from "juno-ast/pipe";
 import { parse } from "juno-ast/parse";
-import { findFirst, findAll } from "juno-ast/find";
-import { getReferences } from "juno-ast/refs";
-import { get } from "juno-ast/props";
-import { parent } from "juno-ast/parent";
-// import { replace } from "juno-ast/todo";
+import { findFirst, findAll, parent } from "juno-ast/find2";
+import { getReferences } from "juno-ast/refs2";
+import { get } from "juno-ast/get";
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
