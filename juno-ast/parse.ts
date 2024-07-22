@@ -15,7 +15,7 @@ type AnyNode =
   | t.Param
   | t.Pattern;
 
-export type Node<T = string> = T extends NodeType ? Extract<AnyNode, { type: T }> : AnyNode;
+export type Node<T = void> = T extends NodeType ? Extract<AnyNode, { type: T }> : AnyNode;
 
 export type NodeType = AnyNode["type"];
 
