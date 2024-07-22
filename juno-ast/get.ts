@@ -1,8 +1,10 @@
 import { map } from "juno-ast/map";
 import type { Node } from "juno-ast/parse";
 
-export function get<N extends Node, P extends keyof N, V extends N | N[]>(
+type UnArray<T> = T extends (infer U)[] ? U : T;
+
+export function get<N extends Node | Node[] | undefined, P extends keyof UnArray<N>>(
   name: P
-): (node: V) => V extends N[] ? N[P][] : N[P] {
+): (node: N) => N extends Node[] ? UnArray<N>[P][] : N extends Node ? UnArray<N>[P] : undefined {
   return map((val: N) => val[name]);
 }
