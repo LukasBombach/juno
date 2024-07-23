@@ -10,20 +10,27 @@ export function get<N extends Node | Node[] | undefined, P extends keyof UnArray
 }
  */
 
-type PropertyAccessor<N extends Node, K extends keyof N> = {
-  (obj: N): N[K];
-  (obj: N[]): N[K][];
-  (obj: undefined): undefined;
+type PropertyAccessor<T> = {
+  <K extends keyof T>(obj: T): T[K];
+  <K extends keyof T>(obj: T[]): T[K][];
+  <K extends keyof T>(obj: undefined): undefined;
+  <K extends keyof T>(obj: T | T[] | undefined): T[K] | T[K][] | undefined;
 };
 
-export function get<N extends Node, K extends keyof N>(propertyName: K): PropertyAccessor<N, K> {
-  return ((obj: N | N[] | undefined) => {
-    if (obj === undefined) {
-      return undefined;
-    }
-    if (Array.isArray(obj)) {
-      return obj.map((item) => item[propertyName]);
-    }
-    return obj[propertyName];
-  }) as PropertyAccessor<N, K>;
+function createPropertyAccessor<T>(): <K extends keyof T>(propertyName: K) => PropertyAccessor<T> {
+  return <K extends keyof T>(propertyName: K) => {
+    const accessor = (obj: T | T[] | undefined): T[K] | T[K][] | undefined => {
+      if (obj === undefined) {
+        return undefined;
+      }
+      if (Array.isArray(obj)) {
+        return obj.map((item) => item[propertyName]);
+      }
+      return obj[propertyName];
+    };
+
+    return accessor as PropertyAccessor<T>;
+  };
 }
+
+export const get = createPropertyAccessor;
