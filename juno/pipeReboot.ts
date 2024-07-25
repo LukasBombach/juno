@@ -15,15 +15,30 @@ export function findFirst<T extends NodeType>(
 ) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
   throw new Error("todo");
 }
+
 export function findAll<T extends NodeType>(
   query: { type: T } & Record<string, unknown>
 ): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
   throw new Error("todo");
 }
 
+export function parent<T extends NodeType>(
+  query: { type: T } & Record<string, unknown>
+): <Input extends Node | Node[]>(
+  input?: Input
+) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
+  throw new Error("todo");
+}
+
 export function get<Input extends Node | Node[], K extends keyof UnArray<Input>>(
   key: K
 ): (input?: Input) => Input extends Node[] ? UnArray<Input>[K][] : UnArray<Input>[K] {
+  throw new Error("todo");
+}
+
+export function getReferences(): <Input extends Node | Node[]>(
+  input?: Input
+) => Input extends Node[] ? Node<"Identifier">[][] : Node<"Identifier">[] {
   throw new Error("todo");
 }
 
