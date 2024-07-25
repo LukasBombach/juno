@@ -1,6 +1,8 @@
 import { traverse } from "juno-ast/traverse";
 import type { Node, NodeType, NodeTypeMap } from "juno-ast/parse";
 
+type UnArray<T> = T extends (infer U)[] ? U : T;
+
 export interface PipeApi {
   pipe: typeof pipe;
   ancestors: (from: Node) => Generator<Node>;
@@ -8,12 +10,20 @@ export interface PipeApi {
 
 export function findFirst<T extends NodeType>(
   query: { type: T } & Record<string, unknown>
-): <In extends Node | Node[]>(input?: In) => In extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] {
+): <Input extends Node | Node[]>(
+  input?: Input
+) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
   throw new Error("todo");
 }
 export function findAll<T extends NodeType>(
   query: { type: T } & Record<string, unknown>
-): <In extends Node | Node[]>(input?: In) => In extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
+): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
+  throw new Error("todo");
+}
+
+export function get<Input extends Node | Node[], K extends keyof UnArray<Input>>(
+  key: K
+): (input?: Input) => Input extends Node[] ? UnArray<Input>[K][] : UnArray<Input>[K] {
   throw new Error("todo");
 }
 
