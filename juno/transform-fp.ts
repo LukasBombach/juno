@@ -1,6 +1,6 @@
-import { pipe } from "./pipeReboot";
+import { pipe, findFirst, findAll } from "./pipeReboot";
 import { parse } from "juno-ast/parse";
-import { findFirst, findAll, parent } from "juno-ast/find2";
+// import { findFirst, findAll, parent } from "juno-ast/find2";
 // import { getReferences } from "juno-ast/refs2";
 // import { get, get2 } from "juno-ast/get";
 import type { PipeApi } from "juno-ast/pipe";

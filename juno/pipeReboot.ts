@@ -1,9 +1,20 @@
 import { traverse } from "juno-ast/traverse";
-import type { Node } from "juno-ast/parse";
+import type { Node, NodeType, NodeTypeMap } from "juno-ast/parse";
 
 export interface PipeApi {
   pipe: typeof pipe;
   ancestors: (from: Node) => Generator<Node>;
+}
+
+export function findFirst<T extends NodeType>(
+  query: { type: T } & Record<string, unknown>
+): <In extends Node | Node[]>(input?: In) => In extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] {
+  throw new Error("todo");
+}
+export function findAll<T extends NodeType>(
+  query: { type: T } & Record<string, unknown>
+): <In extends Node | Node[]>(input?: In) => In extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
+  throw new Error("todo");
 }
 
 export function pipe<A>(a: A): A;

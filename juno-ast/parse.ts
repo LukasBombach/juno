@@ -19,6 +19,10 @@ export type Node<T = void> = T extends NodeType ? Extract<AnyNode, { type: T }> 
 
 export type NodeType = AnyNode["type"];
 
+export type NodeTypeMap = {
+  [K in NodeType]: Extract<Node, { type: K }>;
+};
+
 export async function parse(src: string, options?: ParseOptions): Promise<t.Module> {
   return await swcparse(src, options);
 }
