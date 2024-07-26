@@ -30,15 +30,21 @@ export function parent<T extends NodeType>(
   throw new Error("todo");
 }
 
+export function getReferences(): <Input extends Node | Node[]>(
+  input?: Input
+) => Input extends Node[] ? Node<"Identifier">[][] : Node<"Identifier">[] {
+  throw new Error("todo");
+}
+
 export function get<Input extends Node | Node[], K extends keyof UnArray<Input>>(
   key: K
 ): (input?: Input) => Input extends Node[] ? UnArray<Input>[K][] : UnArray<Input>[K] {
   throw new Error("todo");
 }
 
-export function getReferences(): <Input extends Node | Node[]>(
-  input?: Input
-) => Input extends Node[] ? Node<"Identifier">[][] : Node<"Identifier">[] {
+export function first(): <T, Input extends T[][] | T[]>(
+  input: Input
+) => Input extends (infer T)[][] ? T[] : Input extends (infer T)[] ? T | undefined : never {
   throw new Error("todo");
 }
 
