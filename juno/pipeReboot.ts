@@ -54,6 +54,10 @@ export function first(): <T, Input extends T[][] | T[]>(
   throw new Error("todo");
 }
 
+export function replace(input: string, fn: (index: number) => Record<string, unknown>): (input: unknown) => void {
+  throw new Error("todo");
+}
+
 export function pipe<A>(a: A): A;
 export function pipe<A, B>(a: A, ab: (a: A, api: PipeApi) => B): B;
 export function pipe<A, B, C>(a: A, ab: (a: A, api: PipeApi) => B, bc: (b: B, api: PipeApi) => C): C;
