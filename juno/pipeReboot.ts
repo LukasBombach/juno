@@ -8,18 +8,18 @@ export interface PipeApi {
   ancestors: (from: Node) => Generator<Node>;
 }
 
+export function findAll<T extends NodeType>(
+  query: { type: T } & Record<string, unknown>
+): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
+  throw new Error("todo findAll");
+}
+
 export function findFirst<T extends NodeType>(
   query: { type: T } & Record<string, unknown>
 ): <Input extends Node | Node[]>(
   input?: Input
 ) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
   throw new Error("todo findFirst");
-}
-
-export function findAll<T extends NodeType>(
-  query: { type: T } & Record<string, unknown>
-): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
-  throw new Error("todo findAll");
 }
 
 export function parent<T extends NodeType>(
@@ -54,7 +54,10 @@ export function first(): <T, Input extends T[][] | T[]>(
   throw new Error("todo first");
 }
 
-export function replace(input: string, fn: (index: number) => Record<string, unknown>): (input: unknown) => void {
+export function replace(
+  input: string,
+  fn: (index: number) => Record<string, string | number>
+): (input: unknown) => void {
   throw new Error("todo replace");
 }
 
