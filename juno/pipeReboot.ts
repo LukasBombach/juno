@@ -42,6 +42,12 @@ export function get<Input extends Node | Node[], K extends keyof UnArray<Input>>
   throw new Error("todo");
 }
 
+export function is<Input extends Node, T extends NodeType>(
+  type: T
+): (input: Input) => Input extends Node[] ? Node<T>[] : Node<T> | undefined {
+  throw new Error("todo");
+}
+
 export function first(): <T, Input extends T[][] | T[]>(
   input: Input
 ) => Input extends (infer T)[][] ? T[] : Input extends (infer T)[] ? T | undefined : never {
