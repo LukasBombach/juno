@@ -12,23 +12,15 @@ export async function transformToClientCode(src: string): Promise<string> {
       is("Identifier")
     );
 
-    if (contextParam) {
-      const ctx = contextParam.value;
-
-      const initialSignalValues = pipe(
-        contextParam,
-        getReferences(),
-        parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
-        parent({ type: "CallExpression" }),
-        get("arguments"),
-        first()
-      );
-
-      pipe(
-        initialSignalValues,
-        replace("ctx.ssrData[i]", i => ({ ctx, i }))
-      );
-    }
+    pipe(
+      contextParam,
+      getReferences(),
+      parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
+      parent({ type: "CallExpression" }),
+      get("arguments"),
+      first(),
+      replace("ctx.ssrData[i]", (i) => ({ ctx: contextParam?.value, i }))
+    );
 
     const eventHandlers = pipe(
       func,

@@ -63,7 +63,7 @@ export function first(): <T, Input extends T[][] | T[]>(
 
 export function replace(
   input: string,
-  fn: (index: number) => Record<string, string | number>
+  fn: (index: number) => Record<string, string | number | undefined>
 ): (input: unknown) => void {
   throw new Error("todo replace");
 }
@@ -71,7 +71,7 @@ export function replace(
 export function flatten(): <T>(arr: T[]) => T;
 export function flatten(): <T>(arr: T[][]) => T[];
 export function flatten(): <T>(arr: T[][]) => T[] {
-  return arr => arr.flat();
+  return (arr) => arr.flat();
 }
 
 export function pipe<A>(a: A): A;
