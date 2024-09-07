@@ -1,4 +1,4 @@
-import { pipe, findFirst, findAll, parent, getReferences, get, is, first, replace } from "./pipeReboot";
+import { pipe, findFirst, findAll, parent, getReferences, get, is, has, first, flatten, replace } from "./pipeReboot";
 import { parse } from "juno-ast/parse";
 
 export async function transformToClientCode(src: string): Promise<string> {
@@ -30,7 +30,12 @@ export async function transformToClientCode(src: string): Promise<string> {
       );
     }
 
-    const jsxReturnStatements = pipe(func, findAll({ type: "ReturnStatement" }), get("argument"), is("JSXElement"));
+    const eventHandlers = pipe(
+      func,
+      findAll({ type: "ReturnStatement" }),
+      findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
+      flatten()
+    );
   }
 
   return src;

@@ -49,6 +49,12 @@ export function is<Input extends Node | Node[], T extends NodeType>(
   throw new Error("todo is");
 }
 
+export function has(
+  query: Record<string, unknown>
+): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? Input : Input | undefined {
+  throw new Error("todo has");
+}
+
 export function first(): <T, Input extends T[][] | T[]>(
   input: Input
 ) => Input extends (infer T)[][] ? T[] : Input extends (infer T)[] ? T | undefined : never {
@@ -60,6 +66,12 @@ export function replace(
   fn: (index: number) => Record<string, string | number>
 ): (input: unknown) => void {
   throw new Error("todo replace");
+}
+
+export function flatten(): <T>(arr: T[]) => T;
+export function flatten(): <T>(arr: T[][]) => T[];
+export function flatten(): <T>(arr: T[][]) => T[] {
+  return arr => arr.flat();
 }
 
 export function pipe<A>(a: A): A;
