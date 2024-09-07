@@ -1,4 +1,16 @@
-import { pipe, findFirst, findAll, parent, getReferences, get, is, has, first, flatten, replace } from "./pipeReboot";
+import {
+  pipe,
+  findFirst,
+  findAll,
+  parent,
+  getReferences,
+  getUsages,
+  getProp,
+  is,
+  first,
+  flatten,
+  replace,
+} from "./pipeReboot";
 import { parse } from "juno-ast/parse";
 
 export async function transformToClientCode(src: string): Promise<string> {
@@ -8,7 +20,7 @@ export async function transformToClientCode(src: string): Promise<string> {
     const contextParam = pipe(
       func,
       findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
-      get("pat"),
+      getProp("pat"),
       is("Identifier")
     );
 
@@ -17,7 +29,7 @@ export async function transformToClientCode(src: string): Promise<string> {
       getReferences(),
       parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       parent({ type: "CallExpression" }),
-      get("arguments"),
+      getProp("arguments"),
       first(),
       replace("ctx.ssrData[i]", (i) => ({ ctx: contextParam?.value, i }))
     );
@@ -28,6 +40,8 @@ export async function transformToClientCode(src: string): Promise<string> {
       findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
       flatten()
     );
+
+    const variables = pipe(eventHandlers, findAll({ type: "Identifier" }), flatten(), getUsages(), flatten());
   }
 
   return src;

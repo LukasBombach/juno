@@ -1,5 +1,6 @@
 import { traverse } from "juno-ast/traverse";
 import type { Node, NodeType, NodeTypeMap } from "juno-ast/parse";
+import type * as t from "@swc/types";
 
 type UnArray<T> = T extends (infer U)[] ? U : T;
 type NonNull<T> = T extends undefined ? never : T;
@@ -31,13 +32,21 @@ export function parent<T extends NodeType>(
   throw new Error("todo parent");
 }
 
+// todo Node<"Identifier"> will yield t.Identifier| t.BindingIdentifier because Extract<AnyNode, { type: "Identifier" }> catches both
 export function getReferences(): <Input extends Node | Node[]>(
   input?: Input
-) => Input extends Node[] ? Node<"Identifier">[][] : Node<"Identifier">[] {
+) => Input extends Node[] ? t.Identifier[][] : t.Identifier[] {
   throw new Error("todo getReferences");
 }
 
-export function get<Input extends Node | Node[], K extends keyof UnArray<Input>>(
+// todo Node<"Identifier"> will yield t.Identifier| t.BindingIdentifier because Extract<AnyNode, { type: "Identifier" }> catches both
+export function getUsages(): <Input extends Node | Node[]>(
+  input?: Input
+) => Input extends Node[] ? t.Identifier[][] : t.Identifier[] {
+  throw new Error("todo getReferences");
+}
+
+export function getProp<Input extends Node | Node[], K extends keyof UnArray<Input>>(
   key: K
 ): (input?: Input) => Input extends Node[] ? NonNull<UnArray<Input>[K]>[] : UnArray<Input>[K] {
   throw new Error("todo get");
