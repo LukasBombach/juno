@@ -26,9 +26,11 @@ export async function transformToClientCode(src: string): Promise<string> {
 
       pipe(
         initialSignalValues,
-        replace("ctx.ssrData[i]", (i) => ({ ctx, i }))
+        replace("ctx.ssrData[i]", i => ({ ctx, i }))
       );
     }
+
+    const jsxReturnStatements = pipe(func, findAll({ type: "ReturnStatement" }), get("argument"), is("JSXElement"));
   }
 
   return src;

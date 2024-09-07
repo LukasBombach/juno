@@ -2,6 +2,7 @@ import { traverse } from "juno-ast/traverse";
 import type { Node, NodeType, NodeTypeMap } from "juno-ast/parse";
 
 type UnArray<T> = T extends (infer U)[] ? U : T;
+type NonNull<T> = T extends undefined ? never : T;
 
 export interface PipeApi {
   pipe: typeof pipe;
@@ -38,13 +39,13 @@ export function getReferences(): <Input extends Node | Node[]>(
 
 export function get<Input extends Node | Node[], K extends keyof UnArray<Input>>(
   key: K
-): (input?: Input) => Input extends Node[] ? UnArray<Input>[K][] : UnArray<Input>[K] {
+): (input?: Input) => Input extends Node[] ? NonNull<UnArray<Input>[K]>[] : UnArray<Input>[K] {
   throw new Error("todo get");
 }
 
-export function is<Input extends Node, T extends NodeType>(
+export function is<Input extends Node | Node[], T extends NodeType>(
   type: T
-): (input: Input) => Input extends Node[] ? Node<T>[] : Node<T> | undefined {
+): (input?: Input) => Input extends Node[] ? Node<T>[] : Node<T> | undefined {
   throw new Error("todo is");
 }
 
