@@ -8,6 +8,7 @@ import {
   getProp,
   is,
   first,
+  unique,
   flatten,
   replace,
 } from "./pipeReboot";
@@ -31,7 +32,7 @@ export async function transformToClientCode(src: string): Promise<string> {
       parent({ type: "CallExpression" }),
       getProp("arguments"),
       first(),
-      replace("ctx.ssrData[i]", (i) => ({ ctx: contextParam?.value, i }))
+      replace("ctx.ssrData[i]", i => ({ ctx: contextParam?.value, i }))
     );
 
     const eventHandlers = pipe(
@@ -41,7 +42,15 @@ export async function transformToClientCode(src: string): Promise<string> {
       flatten()
     );
 
-    const variables = pipe(eventHandlers, findAll({ type: "Identifier" }), flatten(), getUsages(), flatten());
+    const keepJsxElements = pipe(
+      eventHandlers,
+      findAll({ type: "Identifier" }),
+      flatten(),
+      getUsages(),
+      flatten(),
+      parent({ type: "JSXElement" }),
+      unique()
+    );
   }
 
   return src;

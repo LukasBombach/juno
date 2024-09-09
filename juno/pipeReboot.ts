@@ -70,6 +70,10 @@ export function first(): <T, Input extends T[][] | T[]>(
   throw new Error("todo first");
 }
 
+export function unique(): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? Input : Input {
+  throw new Error("todo unique");
+}
+
 export function replace(
   input: string,
   fn: (index: number) => Record<string, string | number | undefined>
@@ -80,7 +84,7 @@ export function replace(
 export function flatten(): <T>(arr: T[]) => T;
 export function flatten(): <T>(arr: T[][]) => T[];
 export function flatten(): <T>(arr: T[][]) => T[] {
-  return (arr) => arr.flat();
+  return arr => arr.flat();
 }
 
 export function pipe<A>(a: A): A;
