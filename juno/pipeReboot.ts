@@ -76,7 +76,7 @@ export function unique(): <Input extends Node | Node[]>(input?: Input) => Input 
 
 export function replace(
   input: string,
-  fn: (index: number) => Record<string, string | number | undefined>
+  fn?: (index: number) => Record<string, string | number | undefined>
 ): (input: unknown) => void {
   throw new Error("todo replace");
 }

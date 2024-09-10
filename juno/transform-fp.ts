@@ -38,42 +38,33 @@ export async function transformToClientCode(src: string): Promise<string> {
       replace("ctx.ssrData[i]", i => ({ ctx: contextParam?.value, i }))
     );
 
-    const eventHandlers = pipe(
-      func,
-      findAll({ type: "ReturnStatement" }),
-      findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
-      flat()
-    );
-
-    const keepJsxElements = pipe(
-      eventHandlers,
-      findAll({ type: "Identifier" }),
-      flat(),
-      getUsages(),
-      flat(),
-      parent({ type: "JSXElement" }),
-      unique()
-    );
-
     pipe(
       func,
       findAll({ type: "ReturnStatement" }),
       forEach(returnStatement => {
-        const jsxElements = pipe(
+        pipe(
           returnStatement,
-          findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
-          findAll({ type: "Identifier" }),
-          flat(),
-          getUsages(),
-          flat(),
-          parent({ type: "JSXElement" }),
-          unique()
+          getProp("argument"),
+          replace(
+            createReactiveInstructions(
+              pipe(
+                returnStatement,
+                findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
+                findAll({ type: "Identifier" }),
+                flat(),
+                getUsages(),
+                flat(),
+                parent({ type: "JSXElement" }),
+                unique()
+              )
+            )
+          )
         );
-
-        pipe(returnStatement, getProp("argument"), replace());
       })
     );
   }
 
   return src;
 }
+
+function createReactiveInstructions(jsxElements: Node<"JSXElement">[]): string {}
