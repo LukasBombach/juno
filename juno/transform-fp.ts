@@ -58,8 +58,8 @@ export async function transformToClientCode(src: string): Promise<string> {
     pipe(
       func,
       findAll({ type: "ReturnStatement" }),
-      forEach((returnStatement: Node<"ReturnStatement">) =>
-        pipe(
+      forEach(returnStatement => {
+        const jsxElements = pipe(
           returnStatement,
           findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
           findAll({ type: "Identifier" }),
@@ -68,8 +68,10 @@ export async function transformToClientCode(src: string): Promise<string> {
           flat(),
           parent({ type: "JSXElement" }),
           unique()
-        )
-      )
+        );
+
+        pipe(returnStatement, getProp("argument"), replace());
+      })
     );
   }
 
