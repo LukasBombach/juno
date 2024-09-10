@@ -81,6 +81,12 @@ export function replace(
   throw new Error("todo replace");
 }
 
+export function forEach<Input extends Node[], Iterator = UnArray<Input>>(
+  fn: (input: Iterator) => void
+): (input: Input) => void {
+  throw new Error("todo forEach");
+}
+
 export function flat(): <T>(arr: T[]) => T;
 export function flat(): <T>(arr: T[][]) => T[];
 export function flat(): <T>(arr: T[][]) => T[] {
