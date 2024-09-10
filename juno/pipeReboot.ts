@@ -81,9 +81,9 @@ export function replace(
   throw new Error("todo replace");
 }
 
-export function flatten(): <T>(arr: T[]) => T;
-export function flatten(): <T>(arr: T[][]) => T[];
-export function flatten(): <T>(arr: T[][]) => T[] {
+export function flat(): <T>(arr: T[]) => T;
+export function flat(): <T>(arr: T[][]) => T[];
+export function flat(): <T>(arr: T[][]) => T[] {
   return arr => arr.flat();
 }
 

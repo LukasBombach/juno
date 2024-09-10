@@ -9,10 +9,13 @@ import {
   is,
   first,
   unique,
-  flatten,
+  flat,
   replace,
+  forEach,
 } from "./pipeReboot";
 import { parse } from "juno-ast/parse";
+
+import type { Node } from "juno-ast/parse";
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
@@ -39,17 +42,34 @@ export async function transformToClientCode(src: string): Promise<string> {
       func,
       findAll({ type: "ReturnStatement" }),
       findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
-      flatten()
+      flat()
     );
 
     const keepJsxElements = pipe(
       eventHandlers,
       findAll({ type: "Identifier" }),
-      flatten(),
+      flat(),
       getUsages(),
-      flatten(),
+      flat(),
       parent({ type: "JSXElement" }),
       unique()
+    );
+
+    pipe(
+      func,
+      findAll({ type: "ReturnStatement" }),
+      forEach((returnStatement: Node<"ReturnStatement">) =>
+        pipe(
+          returnStatement,
+          findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
+          findAll({ type: "Identifier" }),
+          flat(),
+          getUsages(),
+          flat(),
+          parent({ type: "JSXElement" }),
+          unique()
+        )
+      )
     );
   }
 
