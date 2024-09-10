@@ -23,7 +23,7 @@ export async function transformToClientCode(src: string): Promise<string> {
   pipe(
     module,
     findAll({ type: "FunctionExpression" }),
-    forEach(fn => {
+    forEach((fn) => {
       const contextParam = pipe(
         fn,
         findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
@@ -31,20 +31,33 @@ export async function transformToClientCode(src: string): Promise<string> {
         is("Identifier")
       );
 
-      pipe(
+      const x = pipe(
         contextParam,
         getReferences(),
         parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
         parent({ type: "CallExpression" }),
         getProp("arguments"),
         first(),
-        replace("ctx.ssrData[i]", i => ({ ctx: contextParam?.value, i }))
+        replace("ctx.ssrData[i]", (i) => ({ ctx: contextParam?.value, i }))
+      );
+
+      const x = pipe(
+        fn,
+        findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
+        getProp("pat"),
+        is("Identifier"),
+        getReferences(),
+        parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
+        parent({ type: "CallExpression" }),
+        getProp("arguments"),
+        first(),
+        replace("ctx.ssrData[i]", (i) => ({ ctx: contextParam?.value, i }))
       );
 
       pipe(
         fn,
         findAll({ type: "ReturnStatement" }),
-        forEach(returnStatement => {
+        forEach((returnStatement) => {
           pipe(
             returnStatement,
             getProp("argument"),

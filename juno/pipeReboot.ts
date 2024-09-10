@@ -74,10 +74,10 @@ export function unique(): <Input extends Node | Node[]>(input?: Input) => Input 
   throw new Error("todo unique");
 }
 
-export function replace(
+export function replace<Input extends undefined | Node | Node[]>(
   input: string,
   fn?: (index: number) => Record<string, string | number | undefined>
-): (input: unknown) => void {
+): (input: Input) => void {
   throw new Error("todo replace");
 }
 
@@ -90,7 +90,7 @@ export function forEach<Input extends Node[], Iterator = UnArray<Input>>(
 export function flat(): <T>(arr: T[]) => T;
 export function flat(): <T>(arr: T[][]) => T[];
 export function flat(): <T>(arr: T[][]) => T[] {
-  return arr => arr.flat();
+  return (arr) => arr.flat();
 }
 
 export function pipe<A>(a: A): A;
