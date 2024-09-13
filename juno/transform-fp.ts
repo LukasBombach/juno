@@ -24,6 +24,7 @@ export async function transformToClientCode(src: string): Promise<string> {
     module,
     findAll({ type: "FunctionExpression" }),
     forEach(fn => {
+      // get component context paramenter === first parameter of the function && is an identifier
       const contextParam = pipe(
         fn,
         findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
@@ -31,6 +32,8 @@ export async function transformToClientCode(src: string): Promise<string> {
         is("Identifier")
       );
 
+      // get the first argument of the first call expression that has a parent member expression with property "signal"
+      // and replace its argement with ctx.ssrData[i]
       pipe(
         contextParam,
         getReferences(),
@@ -41,6 +44,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         replace("ctx.ssrData[i]", i => ({ ctx: contextParam?.value, i }))
       );
 
+      // find all return statements and replace the argument with reactive instructions
       pipe(
         fn,
         findAll({ type: "ReturnStatement" }),
