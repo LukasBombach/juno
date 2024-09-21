@@ -74,10 +74,10 @@ export function unique(): <Input extends Node | Node[]>(input?: Input) => Input 
   throw new Error("todo unique");
 }
 
-export function replace(
+export function replace<Input extends undefined | Node | Node[]>(
   input: string,
   fn?: (index: number) => Record<string, string | number | undefined>
-): (input: unknown) => void {
+): (input: Input) => void {
   throw new Error("todo replace");
 }
 
@@ -90,7 +90,7 @@ export function forEach<Input extends Node[], Iterator = UnArray<Input>>(
 export function flat(): <T>(arr: T[]) => T;
 export function flat(): <T>(arr: T[][]) => T[];
 export function flat(): <T>(arr: T[][]) => T[] {
-  return arr => arr.flat();
+  return (arr) => arr.flat();
 }
 
 export function pipe<A>(a: A): A;
@@ -147,6 +147,31 @@ export function pipe<A, B, C, D, E, F, G, H, I>(
   gh: (g: G, api: PipeApi) => H,
   hi: (h: H, api: PipeApi) => I
 ): I;
+export function pipe<A, B, C, D, E, F, G, H, I, J>(
+  a: A,
+  ab: (a: A, api: PipeApi) => B,
+  bc: (b: B, api: PipeApi) => C,
+  cd: (c: C, api: PipeApi) => D,
+  de: (d: D, api: PipeApi) => E,
+  ef: (e: E, api: PipeApi) => F,
+  fg: (f: F, api: PipeApi) => G,
+  gh: (g: G, api: PipeApi) => H,
+  hi: (h: H, api: PipeApi) => I,
+  ij: (i: I, api: PipeApi) => J
+): J;
+export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
+  a: A,
+  ab: (a: A, api: PipeApi) => B,
+  bc: (b: B, api: PipeApi) => C,
+  cd: (c: C, api: PipeApi) => D,
+  de: (d: D, api: PipeApi) => E,
+  ef: (e: E, api: PipeApi) => F,
+  fg: (f: F, api: PipeApi) => G,
+  gh: (g: G, api: PipeApi) => H,
+  hi: (h: H, api: PipeApi) => I,
+  ij: (i: I, api: PipeApi) => J,
+  jk: (j: J, api: PipeApi) => K
+): K;
 export function pipe(a: Node<"Module">, ...fns: ((val: any, api: PipeApi) => any)[]): unknown {
   let val = a;
   let module = a;
