@@ -10,6 +10,7 @@ import {
   first,
   unique,
   flat,
+  addToContext,
   replace,
   forEach,
 } from "./pipeReboot";
@@ -46,6 +47,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
         getProp("pat"),
         is("Identifier"),
+        addToContext("ctxParam"),
         getReferences(),
         parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
         parent({ type: "CallExpression" }),
@@ -85,4 +87,6 @@ export async function transformToClientCode(src: string): Promise<string> {
   return src;
 }
 
-function createReactiveInstructions(jsxElements: Node<"JSXElement">[]): string {}
+function createReactiveInstructions(jsxElements: Node<"JSXElement">[]): string {
+  throw new Error("todo createReactiveInstructions");
+}
