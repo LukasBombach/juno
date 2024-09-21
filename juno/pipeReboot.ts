@@ -147,6 +147,31 @@ export function pipe<A, B, C, D, E, F, G, H, I>(
   gh: (g: G, api: PipeApi) => H,
   hi: (h: H, api: PipeApi) => I
 ): I;
+export function pipe<A, B, C, D, E, F, G, H, I, J>(
+  a: A,
+  ab: (a: A, api: PipeApi) => B,
+  bc: (b: B, api: PipeApi) => C,
+  cd: (c: C, api: PipeApi) => D,
+  de: (d: D, api: PipeApi) => E,
+  ef: (e: E, api: PipeApi) => F,
+  fg: (f: F, api: PipeApi) => G,
+  gh: (g: G, api: PipeApi) => H,
+  hi: (h: H, api: PipeApi) => I,
+  ij: (i: I, api: PipeApi) => J
+): J;
+export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
+  a: A,
+  ab: (a: A, api: PipeApi) => B,
+  bc: (b: B, api: PipeApi) => C,
+  cd: (c: C, api: PipeApi) => D,
+  de: (d: D, api: PipeApi) => E,
+  ef: (e: E, api: PipeApi) => F,
+  fg: (f: F, api: PipeApi) => G,
+  gh: (g: G, api: PipeApi) => H,
+  hi: (h: H, api: PipeApi) => I,
+  ij: (i: I, api: PipeApi) => J,
+  jk: (j: J, api: PipeApi) => K
+): K;
 export function pipe(a: Node<"Module">, ...fns: ((val: any, api: PipeApi) => any)[]): unknown {
   let val = a;
   let module = a;

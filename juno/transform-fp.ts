@@ -24,7 +24,7 @@ export async function transformToClientCode(src: string): Promise<string> {
     module,
     findAll({ type: "FunctionExpression" }),
     forEach((fn) => {
-      const contextParam = pipe(
+      /* const contextParam = pipe(
         fn,
         findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
         getProp("pat"),
@@ -39,7 +39,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         getProp("arguments"),
         first(),
         replace("ctx.ssrData[i]", (i) => ({ ctx: contextParam?.value, i }))
-      );
+      ); */
 
       const x = pipe(
         fn,
@@ -51,7 +51,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         parent({ type: "CallExpression" }),
         getProp("arguments"),
         first(),
-        replace("ctx.ssrData[i]", (i) => ({ ctx: contextParam?.value, i }))
+        replace("ctx.ssrData[i]", (i) => ({ /* ctx: contextParam?.value, */ i }))
       );
 
       pipe(
