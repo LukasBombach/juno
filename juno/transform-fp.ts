@@ -10,7 +10,6 @@ import {
   first,
   unique,
   flat,
-  addToContext,
   replace,
   forEach,
 } from "./pipeReboot";
@@ -24,43 +23,31 @@ export async function transformToClientCode(src: string): Promise<string> {
   pipe(
     module,
     findAll({ type: "FunctionExpression" }),
-    forEach(fn => {
-      /* const contextParam = pipe(
-        fn,
-        findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
-        getProp("pat"),
-        is("Identifier")
-      );
-
-      const x = pipe(
-        contextParam,
-        getReferences(),
-        parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
-        parent({ type: "CallExpression" }),
-        getProp("arguments"),
-        first(),
-        replace("ctx.ssrData[i]", (i) => ({ ctx: contextParam?.value, i }))
-      ); */
-
-      const x = pipe(
+    forEach((fn) => {
+      // replace all `ctx.signal(xxx)` with `ctx.signal(ctx.ssrData[i])`
+      pipe(
         fn,
         findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
         getProp("pat"),
         is("Identifier"),
-        addToContext("ctxParam"),
-        getReferences(),
-        parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
-        parent({ type: "CallExpression" }),
-        getProp("arguments"),
-        first(),
-        replace("ctx.ssrData[i]", i => ({ /* ctx: contextParam?.value, */ i }))
+        forEach((ctxParam) => {
+          pipe(
+            ctxParam,
+            getReferences(),
+            parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
+            parent({ type: "CallExpression" }),
+            getProp("arguments"),
+            first(),
+            replace("ctx.ssrData[i]", (i) => ({ ctx: ctxParam?.value, i }))
+          );
+        })
       );
 
       // find all return statements and replace the argument with reactive instructions
       pipe(
         fn,
         findAll({ type: "ReturnStatement" }),
-        forEach(returnStatement => {
+        forEach((returnStatement) => {
           pipe(
             returnStatement,
             getProp("argument"),

@@ -74,10 +74,6 @@ export function unique(): <Input extends Node | Node[]>(input?: Input) => Input 
   throw new Error("todo unique");
 }
 
-export function addToContext<Input extends undefined | Node | Node[]>(key: string): (input: Input) => Input {
-  throw new Error("todo addToContext");
-}
-
 export function replace<Input extends undefined | Node | Node[]>(
   input: string,
   fn?: (index: number) => Record<string, string | number | undefined>
@@ -85,7 +81,7 @@ export function replace<Input extends undefined | Node | Node[]>(
   throw new Error("todo replace");
 }
 
-export function forEach<Input extends Node[], Iterator = UnArray<Input>>(
+export function forEach<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
   fn: (input: Iterator) => void
 ): (input: Input) => void {
   throw new Error("todo forEach");
@@ -94,7 +90,7 @@ export function forEach<Input extends Node[], Iterator = UnArray<Input>>(
 export function flat(): <T>(arr: T[]) => T;
 export function flat(): <T>(arr: T[][]) => T[];
 export function flat(): <T>(arr: T[][]) => T[] {
-  return arr => arr.flat();
+  return (arr) => arr.flat();
 }
 
 export function pipe<A>(a: A): A;
