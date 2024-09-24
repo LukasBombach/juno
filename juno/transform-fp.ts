@@ -24,28 +24,41 @@ export async function transformToClientCode(src: string): Promise<string> {
     findAll({ type: "FunctionExpression" }),
     forEach((fn) => {
       /**
-       * replace all `ctx.signal(xxx)` with `ctx.signal(ctx.ssrData[i])`
+       * Find all signal() initializations and replace their initial values with the SSR data
+       *
+       * ctx.signal(xxx)
+       *
+       *    ↓ ↓ ↓ ↓
+       *
+       * ctx.signal(ctx.ssrData[i])
        */
       pipe(
         fn,
         findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
         getProp("pat"),
         is("Identifier"),
-        replace((ctxParam) =>
+        replace((ctx) =>
           pipe(
-            ctxParam,
+            ctx,
             getReferences(),
             parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
             parent({ type: "CallExpression" }),
             getProp("arguments"),
             first(),
-            map((_, i) => `${ctxParam?.value}.ssrData[${i}]`)
+            map((_, i) => `${ctx?.value}.ssrData[${i}]`)
           )
         )
       );
 
       /**
-       * find all return statements and replace the argument with reactive instructions
+       * Find all return statements in the function and replace the returned JSX elements with an array
+       * of extracted info that is relevant for hydration
+       *
+       * return <div onClick={increment}>Count: {count}</div>
+       *
+       *    ↓ ↓ ↓ ↓
+       *
+       * return [ { path: [1], onClick: increment, children: [7, count] } ]
        */
       pipe(
         fn,
