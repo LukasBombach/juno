@@ -74,20 +74,20 @@ export function unique(): <Input extends Node | Node[]>(input?: Input) => Input 
   throw new Error("todo unique");
 }
 
-export function replace<Input extends undefined | Node | Node[], CallbackParameter = UnArray<Input>>(
-  fn: (input: CallbackParameter) => string
+export function replace<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
+  fn: (iterator: Iterator) => typeof pipe
 ): (input: Input) => void {
   throw new Error("todo replace");
 }
 
 export function forEach<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
-  fn: (input: Iterator) => any
+  fn: (iterator: Iterator) => any
 ): (input: Input) => void {
   throw new Error("todo forEach");
 }
 
 export function map<Input extends undefined | Node | Node[], Output, Iterator = UnArray<Input>, Return = Output>(
-  fn: (input: Iterator, index: number) => Output
+  fn: (iterator: Iterator, index: number) => Output
 ): (input: Input) => Return {
   throw new Error("todo forEach");
 }
