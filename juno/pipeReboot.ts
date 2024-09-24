@@ -75,7 +75,7 @@ export function unique(): <Input extends Node | Node[]>(input?: Input) => Input 
 }
 
 export function replace<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
-  fn: (iterator: Iterator) => typeof pipe
+  fn: (iterator: Iterator, index: number) => string
 ): (input: Input) => void {
   throw new Error("todo replace");
 }

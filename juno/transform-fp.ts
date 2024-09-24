@@ -37,7 +37,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
         getProp("pat"),
         is("Identifier"),
-        replace((ctx) =>
+        forEach((ctx) =>
           pipe(
             ctx,
             getReferences(),
@@ -45,7 +45,7 @@ export async function transformToClientCode(src: string): Promise<string> {
             parent({ type: "CallExpression" }),
             getProp("arguments"),
             first(),
-            map((_, i) => `${ctx?.value}.ssrData[${i}]`)
+            replace((_, i) => `${ctx?.value}.ssrData[${i}]`)
           )
         )
       );
