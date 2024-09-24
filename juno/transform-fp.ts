@@ -10,12 +10,11 @@ import {
   first,
   unique,
   flat,
-  replace,
+  map,
   forEach,
+  replace,
 } from "./pipeReboot";
 import { parse } from "juno-ast/parse";
-
-import type { Node } from "juno-ast/parse";
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
@@ -24,13 +23,15 @@ export async function transformToClientCode(src: string): Promise<string> {
     module,
     findAll({ type: "FunctionExpression" }),
     forEach((fn) => {
-      // replace all `ctx.signal(xxx)` with `ctx.signal(ctx.ssrData[i])`
+      /**
+       * replace all `ctx.signal(xxx)` with `ctx.signal(ctx.ssrData[i])`
+       */
       pipe(
         fn,
         findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
         getProp("pat"),
         is("Identifier"),
-        forEach((ctxParam) => {
+        replace((ctxParam) =>
           pipe(
             ctxParam,
             getReferences(),
@@ -38,42 +39,42 @@ export async function transformToClientCode(src: string): Promise<string> {
             parent({ type: "CallExpression" }),
             getProp("arguments"),
             first(),
-            replace("ctx.ssrData[i]", (i) => ({ ctx: ctxParam?.value, i }))
-          );
-        })
+            map((_, i) => `${ctxParam?.value}.ssrData[${i}]`)
+          )
+        )
       );
 
-      // find all return statements and replace the argument with reactive instructions
+      /**
+       * find all return statements and replace the argument with reactive instructions
+       */
       pipe(
         fn,
         findAll({ type: "ReturnStatement" }),
-        forEach((returnStatement) => {
+        replace((returnStatement) =>
           pipe(
             returnStatement,
-            getProp("argument"),
-            replace(
-              createReactiveInstructions(
-                pipe(
-                  returnStatement,
-                  findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
-                  findAll({ type: "Identifier" }),
-                  flat(),
-                  getUsages(),
-                  flat(),
-                  parent({ type: "JSXElement" }),
-                  unique()
-                )
-              )
-            )
-          );
-        })
+            findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
+            findAll({ type: "Identifier" }),
+            flat(),
+            getUsages(),
+            flat(),
+            parent({ type: "JSXElement" }),
+            unique(),
+            getProp("opening"),
+            map((opening) => {
+              const template = `
+                [
+                  { path: [1, 1], children: [count] },
+                  { path: [1, 2], onClick: () => count.set(count() + 1) },
+                ]
+              `;
+              return "";
+            })
+          )
+        )
       );
     })
   );
 
   return src;
-}
-
-function createReactiveInstructions(jsxElements: Node<"JSXElement">[]): string {
-  throw new Error("todo createReactiveInstructions");
 }

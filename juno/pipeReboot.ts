@@ -74,16 +74,21 @@ export function unique(): <Input extends Node | Node[]>(input?: Input) => Input 
   throw new Error("todo unique");
 }
 
-export function replace<Input extends undefined | Node | Node[]>(
-  input: string,
-  fn?: (index: number) => Record<string, string | number | undefined>
+export function replace<Input extends undefined | Node | Node[], CallbackParameter = UnArray<Input>>(
+  fn: (input: CallbackParameter) => string
 ): (input: Input) => void {
   throw new Error("todo replace");
 }
 
 export function forEach<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
-  fn: (input: Iterator) => void
+  fn: (input: Iterator) => any
 ): (input: Input) => void {
+  throw new Error("todo forEach");
+}
+
+export function map<Input extends undefined | Node | Node[], Output, Iterator = UnArray<Input>, Return = Output>(
+  fn: (input: Iterator, index: number) => Output
+): (input: Input) => Return {
   throw new Error("todo forEach");
 }
 
