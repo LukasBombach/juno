@@ -75,7 +75,7 @@ export function unique(): <Input extends Node | Node[]>(input?: Input) => Input 
 }
 
 export function replace<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
-  fn: (iterator: Iterator, index: number) => string
+  fn: (iterator: Iterator, index: number) => string | Node
 ): (input: Input) => void {
   throw new Error("todo replace");
 }
@@ -95,7 +95,7 @@ export function map<Input extends undefined | Node | Node[], Output, Iterator = 
 export function flat(): <T>(arr: T[]) => T;
 export function flat(): <T>(arr: T[][]) => T[];
 export function flat(): <T>(arr: T[][]) => T[] {
-  return (arr) => arr.flat();
+  return arr => arr.flat();
 }
 
 export function pipe<A>(a: A): A;

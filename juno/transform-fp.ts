@@ -95,6 +95,8 @@ export async function transformToClientCode(src: string): Promise<string> {
             const jsxElement = parent({ type: "JSXElement" })(identifier);
             const attr = parent({ type: "JSXAttribute" })(identifier);
 
+            // todo: childen
+
             if (jsxElement) {
               if (!elementAttrs.has(jsxElement)) {
                 elementAttrs.set(jsxElement, new Set());
@@ -107,7 +109,39 @@ export async function transformToClientCode(src: string): Promise<string> {
             }
           }
 
-          return "";
+          const span = { start: 0, end: 0, ctxt: 0 };
+
+          const newReturn: Node<"ArrayExpression"> = {
+            type: "ArrayExpression",
+            span,
+            elements: [...elementAttrs.entries()].map(([jsxElement, attrs]) => {
+              return {
+                expression: {
+                  type: "ObjectExpression",
+                  span,
+                  properties: [
+                    {
+                      type: "KeyValueProperty",
+                      key: {
+                        type: "Identifier",
+                        span,
+                        value: "path",
+                        optional: false,
+                      },
+                      value: {
+                        type: "ArrayExpression",
+                        span,
+                        elements: getParentPath(parentMap, el),
+                      },
+                    },
+                    ...getClientProperties(el, reactiveIdentifiers, parentMap),
+                  ],
+                },
+              };
+            }),
+          };
+
+          return newReturn;
         })
       );
     })
