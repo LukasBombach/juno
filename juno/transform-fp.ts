@@ -63,18 +63,20 @@ export async function transformToClientCode(src: string): Promise<string> {
       pipe(
         fn,
         findAll({ type: "ReturnStatement" }),
-        replace((returnStatement) =>
-          pipe(
+        replace((returnStatement) => {
+          const identifiers = pipe(
             returnStatement,
             findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
             findAll({ type: "Identifier" }),
             flat(),
             getUsages(),
-            flat(),
-            parent({ type: "JSXElement" }),
+            flat()
+            /* parent({ type: "JSXElement" }),
             unique(),
             getProp("opening"),
             map((opening) => {
+              const attrs = opening.attributes.filter((attr) => pipe(attr));
+
               const template = `
                 [
                   { path: [1, 1], children: [count] },
@@ -82,9 +84,11 @@ export async function transformToClientCode(src: string): Promise<string> {
                 ]
               `;
               return "";
-            })
-          )
-        )
+            }) */
+          );
+
+          return "";
+        })
       );
     })
   );
