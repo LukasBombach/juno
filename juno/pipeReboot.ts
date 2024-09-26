@@ -13,7 +13,17 @@ export interface PipeApi {
 export function findAll<T extends NodeType>(
   query: { type: T } & Record<string, unknown>
 ): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
-  throw new Error("todo findAll");
+  return (input) => {
+    if (typeof input === "undefined") {
+      return [];
+    }
+
+    if (Array.isArray(input)) {
+      return input.map((node) => {
+        const result: NodeTypeMap[T];
+      });
+    }
+  };
 }
 
 export function findFirst<T extends NodeType>(
@@ -95,7 +105,7 @@ export function map<Input extends undefined | Node | Node[], Output, Iterator = 
 export function flat(): <T>(arr: T[]) => T;
 export function flat(): <T>(arr: T[][]) => T[];
 export function flat(): <T>(arr: T[][]) => T[] {
-  return arr => arr.flat();
+  return (arr) => arr.flat();
 }
 
 export function pipe<A>(a: A): A;
