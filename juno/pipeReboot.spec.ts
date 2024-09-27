@@ -1,56 +1,41 @@
-import { describe, it, expect } from "vitest";
+import { describe, test, expect } from "vitest";
 import { parse } from "juno-ast/parse";
 import { findAll } from "./pipeReboot";
 
+import type { Node } from "juno-ast/parse";
+
 describe("pipeReboot", () => {
-  describe("findAll", () => {
-    it("should find all nodes matching the query in a single node", async () => {
-      const module = await parse(`const a = 1; const b = 2; let c = 3;`);
+  describe("findAll", async () => {
+    const module = await parse(`const a = 1; const b = 2; let c = 3;`);
 
-      expect(findAll({ type: "VariableDeclaration" })(module)).toHaveLength(3);
-
-      expect(findAll({ type: "VariableDeclaration", kind: "const" })(module)).toHaveLength(2);
-
-      expect(findAll({ type: "VariableDeclaration", declarations: [{ id: { value: "a" } }] })(module)).toHaveLength(1);
-
-      expect(findAll({ type: "VariableDeclaration", declarations: [{ id: { value: /[a-z]/ } }] })(module)).toHaveLength(
-        3
-      );
+    test("returns an empty array if the input is undefined", async () => {
+      expect(findAll({ type: "VariableDeclaration" })(undefined)).toEqual([]);
     });
 
-    /* it("should find all nodes matching the query in an array of nodes", () => {
-      const nodes: Node[] = [
-        {
-          type: "Module",
-          body: [
-            { type: "Identifier", name: "a" },
-            { type: "Identifier", name: "b" },
-          ],
-        },
-        {
-          type: "Module",
-          body: [
-            { type: "Identifier", name: "c" },
-            { type: "Identifier", name: "a" },
-          ],
-        },
-      ];
-
-      const result = findAll({ type: "Identifier", name: "a" })(nodes);
-      expect(result).toEqual([[{ type: "Identifier", name: "a" }], [{ type: "Identifier", name: "a" }]]);
+    test.each`
+      query                                                                          | input     | expectedLength
+      ${{ type: "FunctionDeclaration" }}                                             | ${module} | ${0}
+      ${{ type: "VariableDeclaration" }}                                             | ${module} | ${3}
+      ${{ type: "VariableDeclaration", kind: "const" }}                              | ${module} | ${2}
+      ${{ type: "VariableDeclaration", declarations: [{ id: { value: "a" } }] }}     | ${module} | ${1}
+      ${{ type: "VariableDeclaration", declarations: [{ id: { value: /[a-z]/ } }] }} | ${module} | ${3}
+      ${{ type: "VariableDeclaration", declarations: [{ id: { value: "d" } }] }}     | ${module} | ${0}
+      ${{ type: "VariableDeclaration", declarations: [{ id: { value: /[A-Z]/ } }] }} | ${module} | ${0}
+    `("returns all nodes matching the query in a single node", async ({ query, input, expectedLength }) => {
+      expect(findAll(query)(input)).toHaveLength(expectedLength);
     });
 
-    it("should return an empty array if no nodes match the query", () => {
-      const node: Node = {
-        type: "Module",
-        body: [
-          { type: "Identifier", name: "a" },
-          { type: "Identifier", name: "b" },
-        ],
-      };
-
-      const result = findAll({ type: "Identifier", name: "c" })(node);
-      expect(result).toEqual([]);
-    }); */
+    test.each`
+      query                                                                          | input               | expectedLengths
+      ${{ type: "FunctionDeclaration" }}                                             | ${[module, module]} | ${[0, 0]}
+      ${{ type: "VariableDeclaration" }}                                             | ${[module, module]} | ${[3, 3]}
+      ${{ type: "VariableDeclaration", kind: "const" }}                              | ${[module, module]} | ${[2, 2]}
+      ${{ type: "VariableDeclaration", declarations: [{ id: { value: "a" } }] }}     | ${[module, module]} | ${[1, 1]}
+      ${{ type: "VariableDeclaration", declarations: [{ id: { value: /[a-z]/ } }] }} | ${[module, module]} | ${[3, 3]}
+      ${{ type: "VariableDeclaration", declarations: [{ id: { value: "d" } }] }}     | ${[module, module]} | ${[0, 0]}
+      ${{ type: "VariableDeclaration", declarations: [{ id: { value: /[A-Z]/ } }] }} | ${[module, module]} | ${[0, 0]}
+    `("returns all nodes matching the query in an array of nodes", async ({ query, input, expectedLengths }) => {
+      expect(findAll(query)(input as Node[]).map((r) => r.length)).toEqual(expectedLengths);
+    });
   });
 });
