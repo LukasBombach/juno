@@ -57,7 +57,37 @@ export function findFirst<T extends NodeType>(
 ): <Input extends Node | Node[]>(
   input?: Input
 ) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
-  throw new Error("todo findFirst");
+  // todo fix types
+  // @ts-expect-error i believe that ts is dumb here
+  return (input) => {
+    if (typeof input === "undefined") {
+      return undefined;
+    }
+
+    const regexCustomizer = (objValue: unknown, srcValue: unknown) => {
+      if (srcValue instanceof RegExp) {
+        return srcValue.test(String(objValue));
+      }
+    };
+
+    const { index, ...props } = query;
+
+    if (Array.isArray(input)) {
+      return input.map((node) => {
+        for (const [child, , , i] of traverse(node)) {
+          if (isMatchWith(child, props, regexCustomizer) && (index === undefined || index === i)) {
+            return child as NodeTypeMap[T]; // todo typecast
+          }
+        }
+      });
+    }
+
+    for (const [child, , , i] of traverse(input)) {
+      if (isMatchWith(child, props, regexCustomizer) && (index === undefined || index === i)) {
+        return child as NodeTypeMap[T]; // todo typecast
+      }
+    }
+  };
 }
 
 export function parent<T extends NodeType>(
