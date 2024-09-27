@@ -1,5 +1,7 @@
+import { isMatch } from "lodash";
 import { traverse } from "juno-ast/traverse";
 import type { Node, NodeType, NodeTypeMap } from "juno-ast/parse";
+
 import type * as t from "@swc/types";
 
 type UnArray<T> = T extends (infer U)[] ? U : T;
@@ -13,16 +15,34 @@ export interface PipeApi {
 export function findAll<T extends NodeType>(
   query: { type: T } & Record<string, unknown>
 ): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
+  // todo fix types
+  // @ts-expect-error i believe that ts is dumb here
   return (input) => {
     if (typeof input === "undefined") {
       return [];
     }
 
+    const { index, ...props } = query;
+
     if (Array.isArray(input)) {
       return input.map((node) => {
-        const result: NodeTypeMap[T];
+        const result: NodeTypeMap[T][] = [];
+        for (const [child, , , i] of traverse(node)) {
+          if (isMatch(child, props) && (index === undefined || index === i)) {
+            result.push(child as NodeTypeMap[T]); // todo typecast
+          }
+        }
+        return result;
       });
     }
+
+    const result: NodeTypeMap[T][] = [];
+    for (const [child, , , i] of traverse(input)) {
+      if (isMatch(child, props) && (index === undefined || index === i)) {
+        result.push(child as NodeTypeMap[T]); // todo typecast
+      }
+    }
+    return result;
   };
 }
 
