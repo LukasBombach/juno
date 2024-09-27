@@ -22,7 +22,7 @@ export async function transformToClientCode(src: string): Promise<string> {
     forEach((fn) => {
       /**
        * Find all signal() initializations and replace their initial values with the SSR data
-       * ctx.signal(xxx) → → → ctx.signal(ctx.ssrData[i])
+       * ctx.signal(xxx)   →   ctx.signal(ctx.ssrData[i])
        */
       pipe(
         fn,
@@ -45,7 +45,7 @@ export async function transformToClientCode(src: string): Promise<string> {
       /**
        * Find all return statements in the function and replace the returned JSX elements with an array
        * of extracted info that is relevant for hydration
-       * return <div onClick={increment}>Count: {count}</div> → → → return [ { path: [1], onClick: increment, children: [7, count] } ]
+       * return <div onClick={increment}>Count: {count}</div>   →   return [ { path: [1], onClick: increment, children: [7, count] } ]
        */
       pipe(
         fn,
