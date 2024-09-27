@@ -12,6 +12,10 @@ describe("pipeReboot", () => {
       expect(findAll({ type: "VariableDeclaration", kind: "const" })(module)).toHaveLength(2);
 
       expect(findAll({ type: "VariableDeclaration", declarations: [{ id: { value: "a" } }] })(module)).toHaveLength(1);
+
+      expect(findAll({ type: "VariableDeclaration", declarations: [{ id: { value: /[a-z]/ } }] })(module)).toHaveLength(
+        3
+      );
     });
 
     /* it("should find all nodes matching the query in an array of nodes", () => {

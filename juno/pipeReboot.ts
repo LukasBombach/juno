@@ -1,4 +1,4 @@
-import { isMatch } from "lodash";
+import { isMatchWith } from "lodash";
 import { traverse } from "juno-ast/traverse";
 import type { Node, NodeType, NodeTypeMap } from "juno-ast/parse";
 
@@ -22,13 +22,19 @@ export function findAll<T extends NodeType>(
       return [];
     }
 
+    const regexCustomizer = (objValue: unknown, srcValue: unknown) => {
+      if (srcValue instanceof RegExp) {
+        return srcValue.test(String(objValue));
+      }
+    };
+
     const { index, ...props } = query;
 
     if (Array.isArray(input)) {
       return input.map((node) => {
         const result: NodeTypeMap[T][] = [];
         for (const [child, , , i] of traverse(node)) {
-          if (isMatch(child, props) && (index === undefined || index === i)) {
+          if (isMatchWith(child, props, regexCustomizer) && (index === undefined || index === i)) {
             result.push(child as NodeTypeMap[T]); // todo typecast
           }
         }
@@ -38,7 +44,7 @@ export function findAll<T extends NodeType>(
 
     const result: NodeTypeMap[T][] = [];
     for (const [child, , , i] of traverse(input)) {
-      if (isMatch(child, props) && (index === undefined || index === i)) {
+      if (isMatchWith(child, props, regexCustomizer) && (index === undefined || index === i)) {
         result.push(child as NodeTypeMap[T]); // todo typecast
       }
     }
