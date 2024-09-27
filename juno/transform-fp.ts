@@ -1,27 +1,17 @@
 import { parse } from "juno-ast/parse";
-import {
-  pipe,
-  findFirst,
-  findAll,
-  parent,
-  getReferences,
-  getUsages,
-  getProp,
-  is,
-  first,
-  flat,
-  forEach,
-  replace,
-} from "./pipeReboot";
+import { pipe, first, findFirst, findAll, parent } from "./pipeReboot";
+import { getReferences, getUsages, getProp } from "./pipeReboot";
+import { is, flat } from "./pipeReboot";
+import { forEach, replace } from "./pipeReboot";
 
-/*
-const template = `
-  [
-    { path: [1, 1], children: [count] },
-    { path: [1, 2], onClick: () => count.set(count() + 1) },
-  ]
-`;
-*/
+/**
+ * const template = `
+ *   [
+ *     { path: [1, 1], children: [count] },
+ *     { path: [1, 2], onClick: () => count.set(count() + 1) },
+ *   ]
+ * `;
+ */
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
