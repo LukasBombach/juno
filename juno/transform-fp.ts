@@ -1,3 +1,4 @@
+import { parse } from "juno-ast/parse";
 import {
   pipe,
   findFirst,
@@ -14,7 +15,6 @@ import {
   forEach,
   replace,
 } from "./pipeReboot";
-import { parse } from "juno-ast/parse";
 
 import type { Node } from "juno-ast/parse";
 
@@ -24,7 +24,7 @@ export async function transformToClientCode(src: string): Promise<string> {
   pipe(
     module,
     findAll({ type: "FunctionExpression" }),
-    forEach(fn => {
+    forEach((fn) => {
       /**
        * Find all signal() initializations and replace their initial values with the SSR data
        *
@@ -39,7 +39,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         findFirst({ type: "Parameter", index: 0, pat: { type: "Identifier" } }),
         getProp("pat"),
         is("Identifier"),
-        forEach(ctx =>
+        forEach((ctx) =>
           pipe(
             ctx,
             getReferences(),
@@ -65,7 +65,7 @@ export async function transformToClientCode(src: string): Promise<string> {
       pipe(
         fn,
         findAll({ type: "ReturnStatement" }),
-        replace(returnStatement => {
+        replace((returnStatement) => {
           const identifiers = pipe(
             returnStatement,
             findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
