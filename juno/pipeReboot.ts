@@ -16,7 +16,7 @@ export function findAll<T extends NodeType>(
   query: { type: T } & Record<string, unknown>
 ): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
   // @ts-expect-error todo fix types
-  return input => {
+  return (input) => {
     if (typeof input === "undefined") {
       return [];
     }
@@ -30,7 +30,7 @@ export function findAll<T extends NodeType>(
     const { index, ...props } = query;
 
     if (Array.isArray(input)) {
-      return input.map(node => {
+      return input.map((node) => {
         const result: NodeTypeMap[T][] = [];
         for (const [child, , , i] of traverse(node)) {
           if (isMatchWith(child, props, regexCustomizer) && (index === undefined || index === i)) {
@@ -57,7 +57,7 @@ export function findFirst<T extends NodeType>(
   input?: Input
 ) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
   // @ts-expect-error todo fix types
-  return input => {
+  return (input) => {
     if (typeof input === "undefined") {
       return undefined;
     }
@@ -71,7 +71,7 @@ export function findFirst<T extends NodeType>(
     const { index, ...props } = query;
 
     if (Array.isArray(input)) {
-      return input.map(node => {
+      return input.map((node) => {
         for (const [child, , , i] of traverse(node)) {
           if (isMatchWith(child, props, regexCustomizer) && (index === undefined || index === i)) {
             return child as NodeTypeMap[T]; // todo typecast
@@ -180,13 +180,10 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
   throw new Error("todo replace");
 }
 
-/**
- * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
- */
 export function forEach<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
   fn: (iterator: Iterator) => any
 ): (input: Input) => void {
-  return input => {
+  return (input) => {
     if (typeof input === "undefined") {
       return;
     }
@@ -215,7 +212,7 @@ export function map<Input extends undefined | Node | Node[], Output, Iterator = 
 export function flat(): <T>(arr: T[]) => T;
 export function flat(): <T>(arr: T[][]) => T[];
 export function flat(): <T>(arr: T[][]) => T[] {
-  return arr => arr.flat();
+  return (arr) => arr.flat();
 }
 
 export function pipe<A>(a: A): A;

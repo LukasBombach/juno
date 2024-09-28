@@ -43,7 +43,7 @@ describe("pipeReboot", async () => {
   });
 
   describe("findFirst", () => {
-    test("returns an empty array if the input is undefined", async () => {
+    test("returns undefined if the input is undefined", async () => {
       expect(findFirst({ type: "VariableDeclaration" })(undefined)).toBe(undefined);
     });
 
@@ -76,27 +76,16 @@ describe("pipeReboot", async () => {
     });
   });
 
-  describe("forEach", () => {
-    test("doesn't call the iterator if the input is undefined", () => {
+  describe("forEach", async () => {
+    test.each`
+      input        | expected
+      ${undefined} | ${[]}
+      ${a}         | ${[[a]]}
+      ${[a, b, c]} | ${[[a], [b], [c]]}
+    `("calls the iterator for each value", async ({ input, expected }) => {
       const fn = vi.fn();
-      forEach(fn)(undefined);
-      expect(fn).not.toHaveBeenCalled();
-    });
-
-    test("calls the iterator for a single value", async () => {
-      const fn = vi.fn();
-      const module = await parse(`const a = 1; const b = 2; let c = 3;`);
-      forEach(fn)(module);
-      expect(fn).toHaveBeenCalledWith(module);
-    });
-
-    test("calls the iterator once for each value when the input is an array", async () => {
-      const fn = vi.fn();
-      const module = await parse(`const a = 1; const b = 2; let c = 3;`);
-      forEach(fn)(module.body as any);
-      expect(fn).toHaveBeenNthCalledWith(1, module.body[0]);
-      expect(fn).toHaveBeenNthCalledWith(2, module.body[1]);
-      expect(fn).toHaveBeenNthCalledWith(3, module.body[2]);
+      forEach(fn)(input);
+      expect(fn.mock.calls).toEqual(expected);
     });
   });
 });
