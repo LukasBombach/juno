@@ -137,13 +137,23 @@ export function getProp<Input extends Node | Node[], K extends keyof UnArray<Inp
   };
 }
 
-/**
- * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
- */
 export function is<Input extends Node | Node[], T extends NodeType>(
   type: T
-): (input?: Input) => Input extends Node[] ? Node<T>[] : Node<T> | undefined {
-  throw new Error("todo is");
+): (input?: Input) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
+  // @ts-expect-error todo fix types
+  return (input) => {
+    if (typeof input === "undefined") {
+      return undefined;
+    }
+
+    if (Array.isArray(input)) {
+      // todo bad types: we need to test if "type" in input only because input is typed as AnyNode | t.Argument
+      return input.filter((node) => "type" in node && node.type === type) as NodeTypeMap[T][];
+    }
+
+    // todo bad types: we need to test if "type" in input only because input is typed as AnyNode | t.Argument
+    return "type" in input && input.type === type ? input : undefined;
+  };
 }
 
 /**

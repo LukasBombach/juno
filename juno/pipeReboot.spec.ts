@@ -1,7 +1,8 @@
 import { describe, test, expect, vi } from "vitest";
 import { parse } from "juno-ast/parse";
-import { findAll, findFirst } from "./pipeReboot";
+import { findFirst, findAll } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
+import { is, flat } from "./pipeReboot";
 import { forEach } from "./pipeReboot";
 
 describe("pipeReboot", async () => {
@@ -90,7 +91,7 @@ describe("pipeReboot", async () => {
     });
   });
 
-  describe("getProp", async () => {
+  describe("getProp", () => {
     test.each`
       prop      | input               | expected
       ${"body"} | ${undefined}        | ${undefined}
@@ -99,6 +100,32 @@ describe("pipeReboot", async () => {
     `("returns the property of the input by its name", async ({ prop, input, expected }) => {
       // @ts-expect-error too annoying to type the test here, but the types work in prod
       expect(getProp(prop)(input)).toEqual(expected);
+    });
+  });
+
+  describe("is", () => {
+    test.each`
+      type                     | input          | expected
+      ${"VariableDeclaration"} | ${undefined}   | ${undefined}
+      ${"VariableDeclaration"} | ${a}           | ${a}
+      ${"FunctionDeclaration"} | ${a}           | ${undefined}
+      ${"VariableDeclaration"} | ${[a, b]}      | ${[a, b]}
+      ${"FunctionDeclaration"} | ${[a, b]}      | ${[]}
+      ${"VariableDeclaration"} | ${[a, module]} | ${[a]}
+    `("returns the input if the type matches", async ({ type, input, expected }) => {
+      expect(is(type)(input)).toEqual(expected);
+    });
+  });
+
+  describe("flat", () => {
+    test.each`
+      input              | expected
+      ${[a, b, c]}       | ${[a, b, c]}
+      ${[[a], [b], [c]]} | ${[a, b, c]}
+      ${[[a, b], [c]]}   | ${[a, b, c]}
+      ${[[a], b, c]}     | ${[a, b, c]}
+    `("flattens the input", async ({ input, expected }) => {
+      expect(flat()(input)).toEqual(expected);
     });
   });
 });
