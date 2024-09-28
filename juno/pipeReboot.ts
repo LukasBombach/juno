@@ -90,6 +90,9 @@ export function findFirst<T extends NodeType>(
   };
 }
 
+/**
+ * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ */
 export function parent<T extends NodeType>(
   query: { type: T } & Record<string, unknown>
 ): <Input extends Node | Node[]>(
@@ -98,14 +101,20 @@ export function parent<T extends NodeType>(
   throw new Error("todo parent");
 }
 
-// todo Node<"Identifier"> will yield t.Identifier| t.BindingIdentifier because Extract<AnyNode, { type: "Identifier" }> catches both
+/**
+ // todo Node<"Identifier"> will yield t.Identifier| t.BindingIdentifier because Extract<AnyNode, { type: "Identifier" }> catches both
+ * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ */
 export function getReferences(): <Input extends Node | Node[]>(
   input?: Input
 ) => Input extends Node[] ? t.Identifier[][] : t.Identifier[] {
   throw new Error("todo getReferences");
 }
 
-// todo Node<"Identifier"> will yield t.Identifier| t.BindingIdentifier because Extract<AnyNode, { type: "Identifier" }> catches both
+/**
+ // todo Node<"Identifier"> will yield t.Identifier| t.BindingIdentifier because Extract<AnyNode, { type: "Identifier" }> catches both
+ * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ */
 export function getUsages(): <Input extends Node | Node[]>(
   input?: Input
 ) => Input extends Node[] ? t.Identifier[][] : t.Identifier[] {
@@ -115,43 +124,76 @@ export function getUsages(): <Input extends Node | Node[]>(
 export function getProp<Input extends Node | Node[], K extends keyof UnArray<Input>>(
   key: K
 ): (input?: Input) => Input extends Node[] ? NonNull<UnArray<Input>[K]>[] : UnArray<Input>[K] {
-  throw new Error("todo get");
+  return (input) => {
+    if (typeof input === "undefined") {
+      return undefined;
+    }
+
+    if (Array.isArray(input)) {
+      // todo typecast
+      return input.map((node) => (node as any)[key]);
+    }
+
+    // todo typecast
+    return (input as any)[key];
+  };
 }
 
+/**
+ * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ */
 export function is<Input extends Node | Node[], T extends NodeType>(
   type: T
 ): (input?: Input) => Input extends Node[] ? Node<T>[] : Node<T> | undefined {
   throw new Error("todo is");
 }
 
+/**
+ * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ */
 export function has(
   query: Record<string, unknown>
 ): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? Input : Input | undefined {
   throw new Error("todo has");
 }
 
+/**
+ * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ */
 export function first(): <T, Input extends T[][] | T[]>(
   input: Input
 ) => Input extends (infer T)[][] ? T[] : Input extends (infer T)[] ? T | undefined : never {
   throw new Error("todo first");
 }
 
+/**
+ * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ */
 export function unique(): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? Input : Input {
   throw new Error("todo unique");
 }
 
+/**
+ * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ */
 export function replace<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
   fn: (iterator: Iterator, index: number) => string | Node
 ): (input: Input) => void {
   throw new Error("todo replace");
 }
 
+/**
+ * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ */
 export function forEach<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
   fn: (iterator: Iterator) => any
 ): (input: Input) => void {
   throw new Error("todo forEach");
 }
 
+/**
+ * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ */
 export function map<Input extends undefined | Node | Node[], Output, Iterator = UnArray<Input>, Return = Output>(
   fn: (iterator: Iterator, index: number) => Output
 ): (input: Input) => Return {
