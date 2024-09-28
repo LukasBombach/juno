@@ -1,6 +1,7 @@
 import { describe, test, expect, vi } from "vitest";
 import { parse } from "juno-ast/parse";
 import { findAll, findFirst } from "./pipeReboot";
+import { getProp } from "./pipeReboot";
 import { forEach } from "./pipeReboot";
 
 describe("pipeReboot", async () => {
@@ -86,6 +87,18 @@ describe("pipeReboot", async () => {
       const fn = vi.fn();
       forEach(fn)(input);
       expect(fn.mock.calls).toEqual(expected);
+    });
+  });
+
+  describe("getProp", async () => {
+    test.each`
+      prop      | input               | expected
+      ${"body"} | ${undefined}        | ${undefined}
+      ${"body"} | ${module}           | ${module.body}
+      ${"body"} | ${[module, module]} | ${[module.body, module.body]}
+    `("returns the property of the input by its name", async ({ prop, input, expected }) => {
+      // @ts-expect-error too annoying to type the test here, but the types work in prod
+      expect(getProp(prop)(input)).toEqual(expected);
     });
   });
 });
