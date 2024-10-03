@@ -1,6 +1,6 @@
 import { parse } from "juno-ast/parse";
 import { pipe, first, findFirst, findAll, parent } from "./pipeReboot";
-import { getReferences, getUsages, getProp } from "./pipeReboot";
+import { getReferencesWithin, getUsages, getProp } from "./pipeReboot";
 import { is, flat } from "./pipeReboot";
 import { forEach, replace } from "./pipeReboot";
 
@@ -30,7 +30,7 @@ export async function transformToClientCode(src: string): Promise<string> {
       forEach((ctx) =>
         pipe(
           ctx,
-          getReferences(),
+          getReferencesWithin(module),
           parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
           parent({ type: "CallExpression" }),
           getProp("arguments"),

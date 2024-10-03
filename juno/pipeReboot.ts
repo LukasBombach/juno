@@ -103,9 +103,9 @@ export function parent<T extends NodeType>(
  // todo Node<"Identifier"> will yield t.Identifier| t.BindingIdentifier because Extract<AnyNode, { type: "Identifier" }> catches both
  * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
  */
-export function getReferences(): <Input extends Node | Node[]>(
-  input?: Input
-) => Input extends Node[] ? t.Identifier[][] : t.Identifier[] {
+export function getReferencesWithin(
+  container: Node
+): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? t.Identifier[][] : t.Identifier[] {
   throw new Error("todo getReferences");
 }
 
