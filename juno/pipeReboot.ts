@@ -136,15 +136,24 @@ function resolveBinding(
 }
 
 function getParents(container: Node): (node: Node) => Node[] {
+  const parentMap = createParentMap(container);
+
   return node => {
-    const result: Node[] = [];
-    for (const [child, parent] of traverse(container)) {
-      if (child === node) {
-        result.push(parent);
+    const parents: Node[] = [];
+    let current = node;
+    while (parentMap.has(current)) {
+      const parent = parentMap.get(current);
+      if (parent) {
+        parents.push(parent);
+        current = parent;
       }
     }
-    return result;
+    return parents;
   };
+}
+
+function isNode(value: unknown): value is Node {
+  return typeof value === "object" && value !== null && "type" in value;
 }
 
 type Child = Node;

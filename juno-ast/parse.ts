@@ -15,7 +15,7 @@ type AnyNode =
   | t.Param
   | t.Pattern;
 
-export type Node<T = void> = T extends NodeType ? NodeTypeMap[T] : AnyNode | t.Argument;
+export type Node<T = void> = T extends NodeType ? NodeTypeMap[T] : AnyNode /*  | t.Argument */;
 
 export type NodeType = AnyNode["type"];
 
