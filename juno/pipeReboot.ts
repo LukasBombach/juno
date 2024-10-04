@@ -125,11 +125,8 @@ function resolveBinding(
 
     if (Array.isArray(input)) {
       return input.map(node => {
-        for (const [child, parent] of traverse(container)) {
-          if (child === node && parent?.type === "VariableDeclaration") {
-            return parent;
-          }
-        }
+        const parents = getParents(container)(node);
+        const blocks = parents.filter(parent => parent.type === "BlockStatement");
       });
     }
   };
