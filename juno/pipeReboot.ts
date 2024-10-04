@@ -16,7 +16,7 @@ export function findAll<T extends NodeType>(
   query: { type: T } & Record<string, unknown>
 ): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
   // @ts-expect-error todo fix types
-  return (input) => {
+  return input => {
     if (typeof input === "undefined") {
       return [];
     }
@@ -30,7 +30,7 @@ export function findAll<T extends NodeType>(
     const { index, ...props } = query;
 
     if (Array.isArray(input)) {
-      return input.map((node) => {
+      return input.map(node => {
         const result: NodeTypeMap[T][] = [];
         for (const [child, , , i] of traverse(node)) {
           if (isMatchWith(child, props, regexCustomizer) && (index === undefined || index === i)) {
@@ -57,7 +57,7 @@ export function findFirst<T extends NodeType>(
   input?: Input
 ) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
   // @ts-expect-error todo fix types
-  return (input) => {
+  return input => {
     if (typeof input === "undefined") {
       return undefined;
     }
@@ -71,7 +71,7 @@ export function findFirst<T extends NodeType>(
     const { index, ...props } = query;
 
     if (Array.isArray(input)) {
-      return input.map((node) => {
+      return input.map(node => {
         for (const [child, , , i] of traverse(node)) {
           if (isMatchWith(child, props, regexCustomizer) && (index === undefined || index === i)) {
             return child as NodeTypeMap[T]; // todo typecast
@@ -109,6 +109,70 @@ export function getReferencesWithin(
   throw new Error("todo getReferences");
 }
 
+function resolveBinding(
+  container: Node
+): <Input extends Node | Node[]>(
+  input?: Input
+) => Input extends undefined
+  ? undefined
+  : Input extends Node[]
+  ? Node<"VariableDeclaration">[]
+  : Node<"VariableDeclaration"> | undefined {
+  return input => {
+    if (typeof input === "undefined") {
+      return undefined;
+    }
+
+    if (Array.isArray(input)) {
+      return input.map(node => {
+        for (const [child, parent] of traverse(container)) {
+          if (child === node && parent?.type === "VariableDeclaration") {
+            return parent;
+          }
+        }
+      });
+    }
+  };
+}
+
+function getParents(container: Node): (node: Node) => Node[] {
+  return node => {
+    const result: Node[] = [];
+    for (const [child, parent] of traverse(container)) {
+      if (child === node) {
+        result.push(parent);
+      }
+    }
+    return result;
+  };
+}
+
+type Child = Node;
+type Parent = Node;
+type ParentMap = Map<Child, Parent>;
+function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): ParentMap {
+  let parent = node;
+  let property: keyof typeof parent;
+
+  for (property in parent) {
+    const child = parent[property];
+    if (isNode(child)) {
+      parentMap.set(child, parent);
+      createParentMap(child, parentMap);
+    }
+    if (Array.isArray(child)) {
+      for (const nthChild of child) {
+        if (isNode(nthChild)) {
+          parentMap.set(nthChild, parent);
+          createParentMap(nthChild, parentMap);
+        }
+      }
+    }
+  }
+
+  return parentMap;
+}
+
 /**
  // todo Node<"Identifier"> will yield t.Identifier| t.BindingIdentifier because Extract<AnyNode, { type: "Identifier" }> catches both
  * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
@@ -122,14 +186,14 @@ export function getUsages(): <Input extends Node | Node[]>(
 export function getProp<Input extends Node | Node[], K extends keyof UnArray<Input>>(
   key: K
 ): (input?: Input) => Input extends Node[] ? NonNull<UnArray<Input>[K]>[] : UnArray<Input>[K] {
-  return (input) => {
+  return input => {
     if (typeof input === "undefined") {
       return undefined;
     }
 
     if (Array.isArray(input)) {
       // todo typecast
-      return input.map((node) => (node as any)[key]);
+      return input.map(node => (node as any)[key]);
     }
 
     // todo typecast
@@ -141,14 +205,14 @@ export function is<Input extends Node | Node[], T extends NodeType>(
   type: T
 ): (input?: Input) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
   // @ts-expect-error todo fix types
-  return (input) => {
+  return input => {
     if (typeof input === "undefined") {
       return undefined;
     }
 
     if (Array.isArray(input)) {
       // todo bad types: we need to test if "type" in input only because input is typed as AnyNode | t.Argument
-      return input.filter((node) => "type" in node && node.type === type) as NodeTypeMap[T][];
+      return input.filter(node => "type" in node && node.type === type) as NodeTypeMap[T][];
     }
 
     // todo bad types: we need to test if "type" in input only because input is typed as AnyNode | t.Argument
@@ -193,7 +257,7 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
 export function forEach<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
   fn: (iterator: Iterator) => any
 ): (input: Input) => void {
-  return (input) => {
+  return input => {
     if (typeof input === "undefined") {
       return;
     }
@@ -222,7 +286,7 @@ export function map<Input extends undefined | Node | Node[], Output, Iterator = 
 export function flat(): <T>(arr: T[]) => T;
 export function flat(): <T>(arr: T[][]) => T[];
 export function flat(): <T>(arr: T[][]) => T[] {
-  return (arr) => arr.flat();
+  return arr => arr.flat();
 }
 
 export function pipe<A>(a: A): A;
