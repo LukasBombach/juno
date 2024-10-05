@@ -49,17 +49,17 @@ export async function transformToClientCode(src: string): Promise<string> {
     pipe(
       fn,
       findAll({ type: "ReturnStatement" }),
-      replace(returnStatement => {
+      replace(returnStatement =>
         pipe(
           returnStatement,
           findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
           findAll({ type: "Identifier" }),
           flat(),
           getUsages(),
-          flat()
-        );
-        return "";
-      })
+          flat(),
+          () => ""
+        )
+      )
     );
   });
 
