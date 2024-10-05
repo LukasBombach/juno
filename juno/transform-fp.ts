@@ -31,10 +31,9 @@ export async function transformToClientCode(src: string): Promise<string> {
         pipe(
           fn,
           findAll({ type: "Identifier", value: ctx.value }),
-          parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
-          parent({ type: "CallExpression" }),
-          getProp("arguments"),
-          first(),
+          parent({ type: "MemberExpression", property: { type: "Identifier", value: "signal" } }, fn),
+          parent({ type: "CallExpression" }, fn),
+          calls => calls.map(call => call.arguments[0].expression), // todo custom function - or not todo, it's actually cool I can do custom stuff here
           replace((_, i) => `${ctx.value}.ssrData[${i}]`)
         )
       )

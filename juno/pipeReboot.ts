@@ -89,25 +89,48 @@ export function findFirst<T extends NodeType>(
 }
 
 /**
- * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
+ * todo tests
  */
 export function parent<T extends NodeType>(
-  query: { type: T } & Record<string, unknown>
+  query: { type: T } & Record<string, unknown>,
+  container: Node
 ): <Input extends Node | Node[]>(
   input?: Input
 ) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
-  throw new Error("todo parent");
+  // @ts-expect-error todo fix types
+  return input => {
+    if (typeof input === "undefined") {
+      return undefined;
+    }
+
+    const regexCustomizer = (objValue: unknown, srcValue: unknown) => {
+      if (srcValue instanceof RegExp) {
+        return srcValue.test(String(objValue));
+      }
+    };
+
+    if (Array.isArray(input)) {
+      return input.map(node => {
+        // todo performance, generatig the parents every time here
+        const parents = getParents(container)(node);
+        return parents.find(parent => isMatchWith(parent, query, regexCustomizer));
+      });
+    }
+
+    // todo performance, generatig the parents every time here
+    const parents = getParents(container)(input);
+    return parents.find(parent => isMatchWith(parent, query, regexCustomizer));
+  };
 }
 
 /**
  // todo Node<"Identifier"> will yield t.Identifier| t.BindingIdentifier because Extract<AnyNode, { type: "Identifier" }> catches both
- * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
- */
+
 export function getReferencesWithin(
   container: Node
 ): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? t.Identifier[][] : t.Identifier[] {
   throw new Error("todo getReferences");
-}
+} */
 
 /* function resolveBinding(
   container: Node
