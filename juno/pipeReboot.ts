@@ -109,7 +109,7 @@ export function getReferencesWithin(
   throw new Error("todo getReferences");
 }
 
-function resolveBinding(
+/* function resolveBinding(
   container: Node
 ): <Input extends Node | Node[]>(
   input?: Input
@@ -130,7 +130,7 @@ function resolveBinding(
       });
     }
   };
-}
+} */
 
 function getParents(container: Node): (node: Node) => Node[] {
   const parentMap = createParentMap(container);
@@ -260,7 +260,7 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
   throw new Error("todo replace");
 }
 
-export function forEach<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
+export function forEach<Input extends undefined | Node | Node[], Iterator = NonNullable<UnArray<Input>>>(
   fn: (iterator: Iterator) => any
 ): (input: Input) => void {
   return input => {
