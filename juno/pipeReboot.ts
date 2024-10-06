@@ -278,9 +278,6 @@ export function unique(): <Input extends Node | Node[]>(input?: Input) => Input 
   throw new Error("todo unique");
 }
 
-/**
- * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
- */
 export function replace<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
   container: Node,
   fn: (iterator: Iterator, index: number) => Node

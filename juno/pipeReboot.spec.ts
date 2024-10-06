@@ -179,5 +179,30 @@ describe("pipeReboot", async () => {
     });
   });
 
-  describe("replace", async () => {});
+  describe("replace", async () => {
+    const setup = async () => {
+      const module = await parse(`const a = 1;`);
+      const constValue = (module as any).body[0].declarations[0].init;
+
+      const replaceNode = {
+        type: "Identifier",
+        span: { start: 0, end: 0, ctxt: 0 },
+        value: "b",
+        optional: false,
+      } as const;
+
+      return { module, constValue, replaceNode };
+    };
+
+    test("does nothing if the input is undefined", async () => {
+      const { module, replaceNode } = await setup();
+      expect(replace(module, () => replaceNode)(undefined)).toBe(undefined);
+    });
+
+    test("replaces the node with the new node", async () => {
+      const { module, constValue, replaceNode } = await setup();
+      replace(module, () => replaceNode)(constValue);
+      expect((module as any).body[0].declarations[0].init).toEqual(replaceNode);
+    });
+  });
 });
