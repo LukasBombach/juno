@@ -139,11 +139,43 @@ describe("pipeReboot", async () => {
       }
     `);
 
+    const forStatement = (nestedModule as any).body[0].body.stmts[0];
+    const ifStatement = (nestedModule as any).body[0].body.stmts[0].body.stmts[0];
+    const ifBlock = (nestedModule as any).body[0].body.stmts[0].body.stmts[0].consequent;
     const consoleLog = (nestedModule as any).body[0].body.stmts[0].body.stmts[0].consequent.stmts[0].expression;
+    const consoleLogDirectParent = (nestedModule as any).body[0].body.stmts[0].body.stmts[0].consequent.stmts[0];
 
     test("we got the right ast node for testing", async () => {
       expect(consoleLog.type).toBe("CallExpression");
       expect(consoleLog.callee.object.value).toBe("console");
+    });
+
+    test("returns undefined if the input is undefined", async () => {
+      expect(parent(nestedModule, { type: "BlockStatement" })(undefined)).toEqual(undefined);
+    });
+
+    test("returns the direct parent if the query is undefined", async () => {
+      expect(parent(nestedModule, undefined)(consoleLog)).toEqual(consoleLogDirectParent);
+    });
+
+    test.each`
+      query                         | input         | expected
+      ${{ type: "WhileStatement" }} | ${consoleLog} | ${undefined}
+      ${{ type: "BlockStatement" }} | ${consoleLog} | ${ifBlock}
+      ${{ type: "IfStatement" }}    | ${consoleLog} | ${ifStatement}
+      ${{ type: "ForStatement" }}   | ${consoleLog} | ${forStatement}
+    `("returns the first parent matching the query", async ({ query, input, expected }) => {
+      expect(parent(nestedModule, query)(input)).toBe(expected);
+    });
+
+    test.each`
+      query                         | input                       | expected
+      ${{ type: "WhileStatement" }} | ${[consoleLog, consoleLog]} | ${[undefined, undefined]}
+      ${{ type: "BlockStatement" }} | ${[consoleLog, consoleLog]} | ${[ifBlock, ifBlock]}
+      ${{ type: "IfStatement" }}    | ${[consoleLog, consoleLog]} | ${[ifStatement, ifStatement]}
+      ${{ type: "ForStatement" }}   | ${[consoleLog, consoleLog]} | ${[forStatement, forStatement]}
+    `("returns the all parents matching the query if the input is an array", async ({ query, input, expected }) => {
+      expect(parent(nestedModule, query)(input)).toEqual(expected);
     });
   });
 });
