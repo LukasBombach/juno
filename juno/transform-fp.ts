@@ -1,23 +1,14 @@
 import { parse } from "juno-ast/parse";
-import { pipe, first, findFirst, findAll, parent } from "./pipeReboot";
-import { getUsages, getProp } from "./pipeReboot";
-import { is, flat } from "./pipeReboot";
-import { forEach, replace } from "./pipeReboot";
+import { pipe, findFirst, findAll, parent } from "./pipeReboot";
+import { getProp } from "./pipeReboot";
+import { is } from "./pipeReboot";
+import { replace } from "./pipeReboot";
 
 const span = {
   start: 0,
   end: 0,
   ctxt: 0,
 };
-
-/**
- * const template = `
- *   [
- *     { path: [1, 1], children: [count] },
- *     { path: [1, 2], onClick: () => count.set(count() + 1) },
- *   ]
- * `;
- */
 
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
@@ -82,6 +73,14 @@ export async function transformToClientCode(src: string): Promise<string> {
   /**
    * Find all return statements in the function and replace the returned JSX elements with an array
    * of extracted info that is relevant for hydration
+   *
+   * const template = `
+   *   [
+   *     { path: [1, 1], children: [count] },
+   *     { path: [1, 2], onClick: () => count.set(count() + 1) },
+   *   ]
+   * `;
+   *
    * return <div onClick={increment}>Count: {count}</div>   →   return [ { path: [1], onClick: increment, children: [7, count] } ]
    */
   /* functions.forEach(fn => {
