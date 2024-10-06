@@ -1,5 +1,5 @@
-import { parse as swcparse } from "@swc/core";
-import type { ParseOptions } from "@swc/core";
+import { parse as swcparse, print as swcprint } from "@swc/core";
+import type { ParseOptions, Options as PrintOptions } from "@swc/core";
 import type * as t from "@swc/types";
 
 type AnyNode =
@@ -25,6 +25,10 @@ export type NodeTypeMap = {
 
 export async function parse(src: string, options?: ParseOptions): Promise<t.Module> {
   return await swcparse(src, options);
+}
+
+export async function print(program: t.Program, options?: PrintOptions): Promise<string> {
+  return (await swcprint(program, options)).code;
 }
 
 export function isNode(value: unknown): value is Node {

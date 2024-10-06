@@ -1,4 +1,4 @@
-import { parse } from "juno-ast/parse";
+import { parse, print } from "juno-ast/parse";
 import { pipe, findFirst, findAll, parent } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
 import { is } from "./pipeReboot";
@@ -101,5 +101,5 @@ export async function transformToClientCode(src: string): Promise<string> {
     );
   }); */
 
-  return src;
+  return await print(module);
 }
