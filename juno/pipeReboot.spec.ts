@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from "vitest";
 import { parse } from "juno-ast/parse";
-import { findFirst, findAll } from "./pipeReboot";
+import { findFirst, findAll, parent } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
 import { is, flat } from "./pipeReboot";
 import { forEach } from "./pipeReboot";
@@ -125,6 +125,26 @@ describe("pipeReboot", async () => {
       ${[[a], b, c]}     | ${[a, b, c]}
     `("flattens the input", async ({ input, expected }) => {
       expect(flat()(input)).toEqual(expected);
+    });
+  });
+
+  describe("parent", async () => {
+    test("x", async () => {
+      const nestedModule = await parse(`
+        function foo() {
+          for (let i = 0; i < 10; i++) {
+            if (i % 2 === 0) {
+              console.log(i);
+            }
+          }
+        }
+        `);
+
+      const consoleLog = (nestedModule as any).body[0].body.stmts[0].body.stmts[0].consequent.stmts[0].expression;
+
+      // to make sure we got the right node
+      expect(consoleLog.type).toBe("CallExpression");
+      expect(consoleLog.callee.object.value).toBe("console");
     });
   });
 });
