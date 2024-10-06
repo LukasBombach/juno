@@ -98,7 +98,6 @@ describe("pipeReboot", async () => {
       ${"body"} | ${module}           | ${module.body}
       ${"body"} | ${[module, module]} | ${[module.body, module.body]}
     `("returns the property of the input by its name", async ({ prop, input, expected }) => {
-      // @ts-expect-error too annoying to type the test here, but the types work in prod
       expect(getProp(prop)(input)).toEqual(expected);
     });
   });
