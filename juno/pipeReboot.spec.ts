@@ -3,7 +3,7 @@ import { parse } from "juno-ast/parse";
 import { findFirst, findAll, parent } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
 import { is, flat } from "./pipeReboot";
-import { forEach } from "./pipeReboot";
+import { forEach, replace } from "./pipeReboot";
 
 describe("pipeReboot", async () => {
   const module = await parse(`const a = 1; const b = 2; let c = 3;`);
@@ -178,4 +178,6 @@ describe("pipeReboot", async () => {
       expect(parent(nestedModule, query)(input)).toEqual(expected);
     });
   });
+
+  describe("replace", async () => {});
 });
