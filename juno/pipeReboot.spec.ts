@@ -129,20 +129,19 @@ describe("pipeReboot", async () => {
   });
 
   describe("parent", async () => {
-    test("x", async () => {
-      const nestedModule = await parse(`
-        function foo() {
-          for (let i = 0; i < 10; i++) {
-            if (i % 2 === 0) {
-              console.log(i);
-            }
+    const nestedModule = await parse(`
+      function foo() {
+        for (let i = 0; i < 10; i++) {
+          if (i % 2 === 0) {
+            console.log(i);
           }
         }
-        `);
+      }
+    `);
 
-      const consoleLog = (nestedModule as any).body[0].body.stmts[0].body.stmts[0].consequent.stmts[0].expression;
+    const consoleLog = (nestedModule as any).body[0].body.stmts[0].body.stmts[0].consequent.stmts[0].expression;
 
-      // to make sure we got the right node
+    test("we got the right ast node for testing", async () => {
       expect(consoleLog.type).toBe("CallExpression");
       expect(consoleLog.callee.object.value).toBe("console");
     });
