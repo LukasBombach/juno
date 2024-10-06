@@ -84,7 +84,7 @@ export async function transformToClientCode(src: string): Promise<string> {
    * of extracted info that is relevant for hydration
    * return <div onClick={increment}>Count: {count}</div>   →   return [ { path: [1], onClick: increment, children: [7, count] } ]
    */
-  functions.forEach(fn => {
+  /* functions.forEach(fn => {
     pipe(
       fn,
       findAll({ type: "ReturnStatement" }),
@@ -100,7 +100,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         )
       )
     );
-  });
+  }); */
 
   return src;
 }

@@ -295,7 +295,8 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
         const parent = createParentMap(container).get(node);
 
         if (!parent) {
-          return;
+          // @ts-expect-error it's actually not allowed to pass data to the error
+          throw new Error("Could not find a parent for the node", { node });
         }
 
         const property = Object.entries(parent).find(([, value]) =>
@@ -303,15 +304,44 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
         )?.[0] as keyof typeof parent | undefined;
 
         if (!property) {
-          return;
+          // @ts-expect-error it's actually not allowed to pass data to the error
+          throw new Error("Could not node in any property of the given parent", { node, parent });
         }
 
         if (Array.isArray(parent[property])) {
-          parent[property] = parent[property].map((child: Node) => (child === node ? fn(child, 0) : child));
+          // @ts-expect-error todo fix types
+          parent[property] = parent[property].map((child: Node) => (child === node ? fn(child as Iterator, 0) : child));
         } else {
+          // @ts-expect-error todo fix types
           parent[property] = fn(parent[property], 0);
         }
       });
+    }
+
+    const node = input;
+    // @ts-expect-error what's happening here?
+    const parent = createParentMap(container).get(node);
+
+    if (!parent) {
+      // @ts-expect-error it's actually not allowed to pass data to the error
+      throw new Error("Could not find a parent for the node", { node });
+    }
+
+    const property = Object.entries(parent).find(([, value]) =>
+      Array.isArray(value) ? value.includes(node) : value === node
+    )?.[0] as keyof typeof parent | undefined;
+
+    if (!property) {
+      // @ts-expect-error it's actually not allowed to pass data to the error
+      throw new Error("Could not node in any property of the given parent", { node, parent });
+    }
+
+    if (Array.isArray(parent[property])) {
+      // @ts-expect-error todo fix types
+      parent[property] = parent[property].map((child: Node) => (child === node ? fn(child as Iterator, 0) : child));
+    } else {
+      // @ts-expect-error todo fix types
+      parent[property] = fn(parent[property], 0);
     }
   };
 }
