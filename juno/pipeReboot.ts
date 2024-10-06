@@ -283,9 +283,37 @@ export function unique(): <Input extends Node | Node[]>(input?: Input) => Input 
  */
 export function replace<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
   container: Node,
-  fn: (iterator: Iterator, index: number) => string | Node
+  fn: (iterator: Iterator, index: number) => Node
 ): (input: Input) => void {
-  throw new Error("todo replace");
+  return input => {
+    if (typeof input === "undefined") {
+      return;
+    }
+
+    if (Array.isArray(input)) {
+      return input.map(node => {
+        const parent = createParentMap(container).get(node);
+
+        if (!parent) {
+          return;
+        }
+
+        const property = Object.entries(parent).find(([, value]) =>
+          Array.isArray(value) ? value.includes(node) : value === node
+        )?.[0] as keyof typeof parent | undefined;
+
+        if (!property) {
+          return;
+        }
+
+        if (Array.isArray(parent[property])) {
+          parent[property] = parent[property].map((child: Node) => (child === node ? fn(child, 0) : child));
+        } else {
+          parent[property] = fn(parent[property], 0);
+        }
+      });
+    }
+  };
 }
 
 export function forEach<Input extends undefined | Node | Node[], Iterator = NonNullable<UnArray<Input>>>(

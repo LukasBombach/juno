@@ -4,6 +4,12 @@ import { getUsages, getProp } from "./pipeReboot";
 import { is, flat } from "./pipeReboot";
 import { forEach, replace } from "./pipeReboot";
 
+const span = {
+  start: 0,
+  end: 0,
+  ctxt: 0,
+};
+
 /**
  * const template = `
  *   [
@@ -37,7 +43,39 @@ export async function transformToClientCode(src: string): Promise<string> {
       parent(fn, { type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       parent(fn, { type: "CallExpression" }),
       calls => calls.map(call => call.arguments[0].expression), // todo custom function - or not todo, it's actually cool I can do custom stuff here
-      replace(fn, (_, i) => `${ctxParam.value}.ssrData[${i}]`)
+      replace(fn, (_, i) => ({
+        type: "ExpressionStatement",
+        span,
+        expression: {
+          type: "MemberExpression",
+          span,
+          object: {
+            type: "MemberExpression",
+            span,
+            object: {
+              type: "Identifier",
+              span,
+              value: ctxParam.value,
+              optional: false,
+            },
+            property: {
+              type: "Identifier",
+              span,
+              value: "ssrData",
+              optional: false,
+            },
+          },
+          property: {
+            type: "Computed",
+            span,
+            expression: {
+              type: "NumericLiteral",
+              span,
+              value: i,
+            },
+          },
+        },
+      }))
     );
   });
 
