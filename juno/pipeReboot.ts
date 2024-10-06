@@ -7,10 +7,13 @@ import type * as t from "@swc/types";
 type UnArray<T> = T extends (infer U)[] ? U : T;
 type NonNull<T> = T extends undefined ? never : T;
 
-export interface PipeApi {
-  pipe: typeof pipe;
-  ancestors: (from: Node) => Generator<Node>;
-}
+// export interface PipeApi {
+//   pipe: typeof pipe;
+//   ancestors: (from: Node) => Generator<Node>;
+// }
+
+// todo
+type PipeApi = undefined;
 
 export function findAll<T extends NodeType>(
   query: { type: T } & Record<string, unknown>
@@ -292,8 +295,7 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
         const parent = createParentMap(container).get(node);
 
         if (!parent) {
-          // @ts-expect-error it's actually not allowed to pass data to the error
-          throw new Error("Could not find a parent for the node", { node });
+          throw new Error("Could not find a parent for the node " + node.type);
         }
 
         const property = Object.entries(parent).find(([, value]) =>
@@ -459,7 +461,7 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
 ): K;
 export function pipe(a: Node<"Module">, ...fns: ((val: any, api: PipeApi) => any)[]): unknown {
   let val = a;
-  let module = a;
+  /* let module = a;
   const api = { pipe, ancestors };
 
   const ancestorMap = new Map<Node, Node>();
@@ -470,7 +472,9 @@ export function pipe(a: Node<"Module">, ...fns: ((val: any, api: PipeApi) => any
       yield current;
       current = ancestorMap.get(current);
     }
-  }
+  } */
+
+  const api = undefined;
 
   for (let i = 0; i < fns.length; i++) {
     val = fns[i](val, api);
