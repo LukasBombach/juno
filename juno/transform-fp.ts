@@ -18,7 +18,7 @@ export async function transformToClientCode(src: string): Promise<string> {
    * Find all signal() initializations and replace their initial values with the SSR data
    * ctx.signal(xxx)   →   ctx.signal(ctx.ssrData[i])
    */
-  functions.forEach(fn => {
+  functions.forEach((fn) => {
     const ctxParam = pipe(fn, findFirst({ type: "Parameter", index: 0 }), getProp("pat"), is("Identifier"));
 
     if (!ctxParam) return;
@@ -28,40 +28,43 @@ export async function transformToClientCode(src: string): Promise<string> {
       findAll({ type: "Identifier", value: ctxParam.value }),
       parent(fn, { type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       parent(fn, { type: "CallExpression" }),
-      calls => calls.map(call => call?.arguments[0].expression).filter(Boolean), // todo custom function - or not todo, it's actually cool I can do custom stuff here
-      replace(fn, (_, i) => ({
-        type: "ExpressionStatement",
-        span,
-        expression: {
-          type: "MemberExpression",
+      (calls) => calls.map((call) => call?.arguments[0].expression).filter(Boolean), // todo custom function - or not todo, it's actually cool I can do custom stuff here
+      replace(fn, (node, i) => {
+        console.log(node);
+        return {
+          type: "ExpressionStatement",
           span,
-          object: {
+          expression: {
             type: "MemberExpression",
             span,
             object: {
-              type: "Identifier",
+              type: "MemberExpression",
               span,
-              value: ctxParam.value,
-              optional: false,
+              object: {
+                type: "Identifier",
+                span,
+                value: ctxParam.value,
+                optional: false,
+              },
+              property: {
+                type: "Identifier",
+                span,
+                value: "ssrData",
+                optional: false,
+              },
             },
             property: {
-              type: "Identifier",
+              type: "Computed",
               span,
-              value: "ssrData",
-              optional: false,
+              expression: {
+                type: "NumericLiteral",
+                span,
+                value: i,
+              },
             },
           },
-          property: {
-            type: "Computed",
-            span,
-            expression: {
-              type: "NumericLiteral",
-              span,
-              value: i,
-            },
-          },
-        },
-      }))
+        };
+      })
     );
   });
 
