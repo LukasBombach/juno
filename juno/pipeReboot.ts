@@ -115,13 +115,13 @@ export function parent<T extends NodeType>(
     // console.log("input asd", input);
 
     if (Array.isArray(input)) {
-      console.log(">>>> PARENTS");
+      // console.log(">>>> PARENTS");
 
-      const parentMap = createParentMap(container);
-      parentMap.forEach((parent, child) => {
-        console.log(child.type.padStart(20), "˿", parent.type);
-      });
-      console.log("<<<< PARENTS");
+      // const parentMap = createParentMap(container);
+      // parentMap.forEach((parent, child) => {
+      //   console.log(child.type.padStart(20), "˿", parent.type);
+      // });
+      // console.log("<<<< PARENTS");
 
       return input
         .map(node => {
@@ -219,6 +219,9 @@ function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): Pare
         }
       }
     }
+    if (typeof child === "object" && child !== null) {
+      createParentMap(child, parentMap);
+    }
   }
 
   return parentMap;
@@ -306,12 +309,12 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
     }
 
     if (Array.isArray(input)) {
-      return input.map(node => {
-        const parentMap = createParentMap(container);
+      return input.map((node, i) => {
+        // const parentMap = createParentMap(container);
 
-        parentMap.forEach((parent, child) => {
-          console.log(child.type.padStart(20), "˿", parent.type);
-        });
+        // parentMap.forEach((parent, child) => {
+        //   console.log(child.type.padStart(20), "˿", parent.type);
+        // });
 
         // const parent = getParents(container)(node)[0];
 
@@ -332,10 +335,10 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
 
         if (Array.isArray(parent[property])) {
           const index = parent[property].indexOf(node);
-          parent[property][index] = fn(parent[property][index], index);
+          parent[property][index] = fn(parent[property][index], i);
         } else {
           // @ts-expect-error todo fix types
-          parent[property] = fn(parent[property], 0);
+          parent[property] = fn(parent[property], i);
         }
       });
     }

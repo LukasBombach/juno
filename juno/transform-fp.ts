@@ -36,39 +36,33 @@ export async function transformToClientCode(src: string): Promise<string> {
       parent(fn, { type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       parent(fn, { type: "CallExpression" }),
       calls => calls.map(call => call?.arguments[0].expression).filter(Boolean), // todo custom function - or not todo, it's actually cool I can do custom stuff here
-      log("args"),
       replace(fn, (node, i) => {
-        console.log(node);
         return {
-          type: "ExpressionStatement",
+          type: "MemberExpression",
           span,
-          expression: {
+          object: {
             type: "MemberExpression",
             span,
             object: {
-              type: "MemberExpression",
+              type: "Identifier",
               span,
-              object: {
-                type: "Identifier",
-                span,
-                value: ctxParam.value,
-                optional: false,
-              },
-              property: {
-                type: "Identifier",
-                span,
-                value: "ssrData",
-                optional: false,
-              },
+              value: ctxParam.value,
+              optional: false,
             },
             property: {
-              type: "Computed",
+              type: "Identifier",
               span,
-              expression: {
-                type: "NumericLiteral",
-                span,
-                value: i,
-              },
+              value: "ssrData",
+              optional: false,
+            },
+          },
+          property: {
+            type: "Computed",
+            span,
+            expression: {
+              type: "NumericLiteral",
+              span,
+              value: i,
             },
           },
         };
