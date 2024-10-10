@@ -10,6 +10,13 @@ const span = {
   ctxt: 0,
 };
 
+function debug(id: string) {
+  return <T>(input: T): T => {
+    console.log(id, input);
+    return input;
+  };
+}
+
 export async function transformToClientCode(src: string): Promise<string> {
   const module = await parse(src, { syntax: "typescript", tsx: true });
   const functions = pipe(module, findAll({ type: "FunctionDeclaration" }));
@@ -18,7 +25,7 @@ export async function transformToClientCode(src: string): Promise<string> {
    * Find all signal() initializations and replace their initial values with the SSR data
    * ctx.signal(xxx)   →   ctx.signal(ctx.ssrData[i])
    */
-  functions.forEach((fn) => {
+  functions.forEach(fn => {
     const ctxParam = pipe(fn, findFirst({ type: "Parameter", index: 0 }), getProp("pat"), is("Identifier"));
 
     if (!ctxParam) return;
@@ -26,9 +33,11 @@ export async function transformToClientCode(src: string): Promise<string> {
     pipe(
       fn.body,
       findAll({ type: "Identifier", value: ctxParam.value }),
+      debug("indentifiers"),
       parent(fn, { type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
+      debug("parents"),
       parent(fn, { type: "CallExpression" }),
-      (calls) => calls.map((call) => call?.arguments[0].expression).filter(Boolean), // todo custom function - or not todo, it's actually cool I can do custom stuff here
+      calls => calls.map(call => call?.arguments[0].expression).filter(Boolean), // todo custom function - or not todo, it's actually cool I can do custom stuff here
       replace(fn, (node, i) => {
         console.log(node);
         return {
