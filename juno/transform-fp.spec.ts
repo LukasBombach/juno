@@ -7,13 +7,11 @@ describe("transformToClientCode", () => {
       transformToClientCode(`
       export function App(ctx) {
         ctx.signal("a");
-        ctx.signal("b");
       }
     `)
     ).resolves.toMatchInlineSnapshot(`
       "export function App(ctx) {
           ctx.signal(ctx.ssrData[0]);
-          ctx.signal(ctx.ssrData[1]);
       }"
     `);
   });

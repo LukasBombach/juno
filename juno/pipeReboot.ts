@@ -115,10 +115,13 @@ export function parent<T extends NodeType>(
     // console.log("input asd", input);
 
     if (Array.isArray(input)) {
-      // const parentMap = createParentMap(container);
-      // parentMap.forEach((child, parent) => {
-      //   console.log(child.type.padStart(20), "˿", parent.type);
-      // });
+      console.log(">>>> PARENTS");
+
+      const parentMap = createParentMap(container);
+      parentMap.forEach((parent, child) => {
+        console.log(child.type.padStart(20), "˿", parent.type);
+      });
+      console.log("<<<< PARENTS");
 
       return input
         .map(node => {
@@ -304,6 +307,14 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
 
     if (Array.isArray(input)) {
       return input.map(node => {
+        const parentMap = createParentMap(container);
+
+        parentMap.forEach((parent, child) => {
+          console.log(child.type.padStart(20), "˿", parent.type);
+        });
+
+        // const parent = getParents(container)(node)[0];
+
         const parent = createParentMap(container).get(node);
 
         if (!parent) {
@@ -329,7 +340,9 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
       });
     }
 
-    const node = input;
+    throw new Error("not implemented: replace for a single element");
+
+    /* const node = input;
     // @ts-expect-error what's happening here?
     const parent = createParentMap(container).get(node);
 
@@ -353,7 +366,7 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
     } else {
       // @ts-expect-error todo fix types
       parent[property] = fn(parent[property], 0);
-    }
+    } */
   };
 }
 

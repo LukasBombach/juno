@@ -36,8 +36,8 @@ export async function transformToClientCode(src: string): Promise<string> {
       parent(fn, { type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       parent(fn, { type: "CallExpression" }),
       calls => calls.map(call => call?.arguments[0].expression).filter(Boolean), // todo custom function - or not todo, it's actually cool I can do custom stuff here
-      log("ars")
-      /* replace(fn, (node, i) => {
+      log("args"),
+      replace(fn, (node, i) => {
         console.log(node);
         return {
           type: "ExpressionStatement",
@@ -72,7 +72,7 @@ export async function transformToClientCode(src: string): Promise<string> {
             },
           },
         };
-      }) */
+      })
     );
   });
 
