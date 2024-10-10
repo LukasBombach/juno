@@ -31,14 +31,13 @@ export async function transformToClientCode(src: string): Promise<string> {
     if (!ctxParam) return;
 
     pipe(
-      fn.body,
+      fn,
       findAll({ type: "Identifier", value: ctxParam.value }),
-      log("indentifiers"),
       parent(fn, { type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
-      log("parents"),
       parent(fn, { type: "CallExpression" }),
       calls => calls.map(call => call?.arguments[0].expression).filter(Boolean), // todo custom function - or not todo, it's actually cool I can do custom stuff here
-      replace(fn, (node, i) => {
+      log("ars")
+      /* replace(fn, (node, i) => {
         console.log(node);
         return {
           type: "ExpressionStatement",
@@ -73,7 +72,7 @@ export async function transformToClientCode(src: string): Promise<string> {
             },
           },
         };
-      })
+      }) */
     );
   });
 
