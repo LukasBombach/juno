@@ -10,9 +10,9 @@ const span = {
   ctxt: 0,
 };
 
-function debug(id: string) {
+function log(prefix: string) {
   return <T>(input: T): T => {
-    console.log(id, input);
+    console.log(prefix, input);
     return input;
   };
 }
@@ -33,9 +33,9 @@ export async function transformToClientCode(src: string): Promise<string> {
     pipe(
       fn.body,
       findAll({ type: "Identifier", value: ctxParam.value }),
-      debug("indentifiers"),
+      log("indentifiers"),
       parent(fn, { type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
-      debug("parents"),
+      log("parents"),
       parent(fn, { type: "CallExpression" }),
       calls => calls.map(call => call?.arguments[0].expression).filter(Boolean), // todo custom function - or not todo, it's actually cool I can do custom stuff here
       replace(fn, (node, i) => {
