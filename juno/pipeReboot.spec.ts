@@ -2,7 +2,7 @@ import { describe, test, expect, vi } from "vitest";
 import { parse } from "juno-ast/parse";
 import { findFirst, findAll, parent } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
-import { is, flat } from "./pipeReboot";
+import { is, flat, unique } from "./pipeReboot";
 import { forEach, replace } from "./pipeReboot";
 
 describe("pipeReboot", async () => {
@@ -203,6 +203,19 @@ describe("pipeReboot", async () => {
       const { module, constValue, replaceNode } = await setup();
       replace(module, () => replaceNode)(constValue);
       expect((module as any).body[0].declarations[0].init).toEqual(replaceNode);
+    });
+  });
+
+  describe.only("unique", async () => {
+    test.each`
+      input              | expected
+      ${undefined}       | ${undefined}
+      ${a}               | ${a}
+      ${[a, b, c]}       | ${[a, b, c]}
+      ${[a, a, b, c, c]} | ${[a, b, c]}
+      ${[a, b, c, a]}    | ${[a, b, c]}
+    `("returns the unique values", async ({ input, expected }) => {
+      expect(unique()(input)).toEqual(expected);
     });
   });
 });

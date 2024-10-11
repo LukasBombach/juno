@@ -1,7 +1,7 @@
 import { parse, print } from "juno-ast/parse";
 import { pipe, findFirst, findAll, parent } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
-import { is } from "./pipeReboot";
+import { is, flat, unique } from "./pipeReboot";
 import { replace } from "./pipeReboot";
 
 const span = {
@@ -36,7 +36,7 @@ export async function transformToClientCode(src: string): Promise<string> {
       parent(fn, { type: "MemberExpression", property: { type: "Identifier", value: "signal" } }),
       parent(fn, { type: "CallExpression" }),
       calls => calls.map(call => call?.arguments[0].expression).filter(Boolean), // todo custom function - or not todo, it's actually cool I can do custom stuff here
-      replace(fn, (node, i) => {
+      replace(fn, (_, i) => {
         return {
           type: "MemberExpression",
           span,
@@ -83,23 +83,31 @@ export async function transformToClientCode(src: string): Promise<string> {
    *
    * return <div onClick={increment}>Count: {count}</div>   →   return [ { path: [1], onClick: increment, children: [7, count] } ]
    */
-  /* functions.forEach(fn => {
+  functions.forEach(fn => {
     pipe(
       fn,
       findAll({ type: "ReturnStatement" }),
-      replace(fn, returnStatement =>
-        pipe(
+      replace(fn, returnStatement => {
+        const identifiers = pipe(
           returnStatement,
           findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
           findAll({ type: "Identifier" }),
           flat(),
-          getUsages(),
-          flat(),
-          () => ""
-        )
-      )
+          unique()
+        );
+
+        return {
+          type: "ReturnStatement",
+          span,
+          argument: {
+            type: "ArrayExpression",
+            span,
+            elements: [],
+          },
+        };
+      })
     );
-  }); */
+  });
 
   return await print(module);
 }

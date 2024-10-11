@@ -292,11 +292,19 @@ export function first(): <T, Input extends T[][] | T[]>(
   throw new Error("todo first");
 }
 
-/**
- * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
- */
-export function unique(): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? Input : Input {
-  throw new Error("todo unique");
+export function unique<Input extends Node | Node[]>(): (input?: Input) => Input {
+  // @ts-expect-error todo fix types
+  return input => {
+    if (typeof input === "undefined") {
+      return undefined;
+    }
+
+    if (Array.isArray(input)) {
+      return Array.from(new Set(input)) as Input;
+    }
+
+    return input;
+  };
 }
 
 export function replace<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
