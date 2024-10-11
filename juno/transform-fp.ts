@@ -88,20 +88,25 @@ export async function transformToClientCode(src: string): Promise<string> {
       fn,
       findAll({ type: "ReturnStatement" }),
       replace(fn, returnStatement => {
-        pipe(
+        const identifierNames = pipe(
           returnStatement,
-          findAll({
-            type: "Identifier",
-            value: pipe(
-              returnStatement,
-              findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
-              findAll({ type: "Identifier" }),
-              flat(),
-              unique(),
-              identifiers => identifiers.map(id => id.value),
-              values => new RegExp(values.join("|"))
-            ),
-          })
+          findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
+          findAll({ type: "Identifier" }),
+          flat(),
+          unique(),
+          identifiers => identifiers.map(id => id.value),
+          values => new RegExp(values.join("|"))
+        );
+
+        console.log(
+          pipe(
+            returnStatement,
+            findAll({
+              type: "Identifier",
+              value: identifierNames,
+            }),
+            parent(fn, { type: "JSXElement" })
+          )
         );
 
         return {
