@@ -22,10 +22,12 @@ describe("transformToClientCode", () => {
     await expect(
       transformToClientCode(`
       export function App(ctx) {
-        return <div />;
+        const message = "Hello";
+        return <button onClick={() => console.log(message)}></button>;
       }`),
     ).resolves.toMatchInlineSnapshot(`
       "export function App(ctx) {
+          const message = "Hello";
           return [];
       }
       "
