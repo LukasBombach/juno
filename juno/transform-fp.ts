@@ -91,12 +91,13 @@ export async function transformToClientCode(src: string): Promise<string> {
         const identifierNames = pipe(
           returnStatement,
           findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
+          getProp("value"),
           findAll({ type: "Identifier" }),
           flat(),
           unique(),
           identifiers => identifiers.map(id => id.value),
           values => values.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
-          values => (values.length ? new RegExp(`^(${values.join("|")})$`) : new RegExp("^$a")),
+          values => (values.length ? new RegExp(`^(${values.join("|")})$`) : new RegExp("$cannot-match-anything")),
         );
 
         console.log(
@@ -106,7 +107,6 @@ export async function transformToClientCode(src: string): Promise<string> {
               type: "Identifier",
               value: identifierNames,
             }),
-            parent(fn, { type: "JSXElement" }),
           ),
         );
 
