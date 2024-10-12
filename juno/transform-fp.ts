@@ -66,7 +66,7 @@ export async function transformToClientCode(src: string): Promise<string> {
             },
           },
         };
-      })
+      }),
     );
   });
 
@@ -95,7 +95,8 @@ export async function transformToClientCode(src: string): Promise<string> {
           flat(),
           unique(),
           identifiers => identifiers.map(id => id.value),
-          values => new RegExp(values.join("|"))
+          values => values.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+          values => (values.length ? new RegExp(`^(${values.join("|")})$`) : new RegExp("^$a")),
         );
 
         console.log(
@@ -105,8 +106,8 @@ export async function transformToClientCode(src: string): Promise<string> {
               type: "Identifier",
               value: identifierNames,
             }),
-            parent(fn, { type: "JSXElement" })
-          )
+            parent(fn, { type: "JSXElement" }),
+          ),
         );
 
         return {
@@ -118,7 +119,7 @@ export async function transformToClientCode(src: string): Promise<string> {
             elements: [],
           },
         };
-      })
+      }),
     );
   });
 

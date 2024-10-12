@@ -8,11 +8,25 @@ describe("transformToClientCode", () => {
       export function App(ctx) {
         ctx.signal("a");
         ctx.signal("b");
-      }`)
+      }`),
     ).resolves.toMatchInlineSnapshot(`
       "export function App(ctx) {
           ctx.signal(ctx.ssrData[0]);
           ctx.signal(ctx.ssrData[1]);
+      }
+      "
+    `);
+  });
+
+  test("transforms return statements", async () => {
+    await expect(
+      transformToClientCode(`
+      export function App(ctx) {
+        return <div />;
+      }`),
+    ).resolves.toMatchInlineSnapshot(`
+      "export function App(ctx) {
+          return [];
       }
       "
     `);
