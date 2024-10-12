@@ -28,7 +28,7 @@ describe("transformToClientCode", () => {
     ).resolves.toMatchInlineSnapshot(`
       "function App(ctx) {
           const message = "Hello";
-          return [];
+          return [{ path: [0], onClick: () => console.log(message) }];
       }
       "
     `);
