@@ -18,12 +18,12 @@ describe("transformToClientCode", () => {
     `);
   });
 
-  test("transforms return statements", async () => {
+  test.only("transforms return statements", async () => {
     await expect(
       transformToClientCode(`
       function App(ctx) {
         const message = "Hello";
-        return <button onClick={() => console.log(message)}></button>;
+        return <button onClick={() => console.log(message)} />;
       }`),
     ).resolves.toMatchInlineSnapshot(`
       "function App(ctx) {

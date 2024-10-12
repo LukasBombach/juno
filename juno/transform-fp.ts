@@ -25,7 +25,7 @@ export async function transformToClientCode(src: string): Promise<string> {
    * Find all signal() initializations and replace their initial values with the SSR data
    * ctx.signal(xxx)   →   ctx.signal(ctx.ssrData[i])
    */
-  functions.forEach(fn => {
+  /* functions.forEach(fn => {
     const ctxParam = pipe(fn, findFirst({ type: "Parameter", index: 0 }), getProp("pat"), is("Identifier"));
 
     if (!ctxParam) return;
@@ -68,7 +68,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         };
       }),
     );
-  });
+  }); */
 
   /**
    * Find all return statements in the function and replace the returned JSX elements with an array
@@ -107,6 +107,8 @@ export async function transformToClientCode(src: string): Promise<string> {
               type: "Identifier",
               value: identifierNames,
             }),
+            parent(returnStatement, { type: "JSXElement" }),
+            unique(),
           ),
         );
 

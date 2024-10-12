@@ -16,7 +16,7 @@ type NonNull<T> = T extends undefined ? never : T;
 type PipeApi = undefined;
 
 export function findAll<T extends NodeType>(
-  query: { type: T } & Record<string, unknown>
+  query: { type: T } & Record<string, unknown>,
 ): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? NodeTypeMap[T][][] : NodeTypeMap[T][] {
   // @ts-expect-error todo fix types
   return input => {
@@ -55,9 +55,9 @@ export function findAll<T extends NodeType>(
 }
 
 export function findFirst<T extends NodeType>(
-  query: { type: T } & Record<string, unknown>
+  query: { type: T } & Record<string, unknown>,
 ): <Input extends Node | Node[]>(
-  input?: Input
+  input?: Input,
 ) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
   // @ts-expect-error todo fix types
   return input => {
@@ -96,9 +96,9 @@ export function findFirst<T extends NodeType>(
  */
 export function parent<T extends NodeType>(
   container: Node,
-  query?: { type: T } & Record<string, unknown>
+  query?: { type: T } & Record<string, unknown>,
 ): <Input extends Node | Node[]>(
-  input?: Input
+  input?: Input,
 ) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
   // @ts-expect-error todo fix types
   return input => {
@@ -116,10 +116,9 @@ export function parent<T extends NodeType>(
 
     if (Array.isArray(input)) {
       // console.log(">>>> PARENTS");
-
       // const parentMap = createParentMap(container);
       // parentMap.forEach((parent, child) => {
-      //   console.log(child.type.padStart(20), "˿", parent.type);
+      //   console.log(parent.type.padStart(24), "➡", child.type);
       // });
       // console.log("<<<< PARENTS");
 
@@ -210,16 +209,17 @@ function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): Pare
     if (isNode(child)) {
       parentMap.set(child, parent);
       createParentMap(child, parentMap);
-    }
-    if (Array.isArray(child)) {
+    } else if (Array.isArray(child)) {
       for (const nthChild of child) {
         if (isNode(nthChild)) {
           parentMap.set(nthChild, parent);
           createParentMap(nthChild, parentMap);
         }
+        if (typeof nthChild === "object" && nthChild !== null) {
+          createParentMap(nthChild, parentMap);
+        }
       }
-    }
-    if (typeof child === "object" && child !== null) {
+    } else if (typeof child === "object" && child !== null) {
       createParentMap(child, parentMap);
     }
   }
@@ -232,13 +232,13 @@ function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): Pare
  * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
  */
 export function getUsages(): <Input extends Node | Node[]>(
-  input?: Input
+  input?: Input,
 ) => Input extends Node[] ? t.Identifier[][] : t.Identifier[] {
   throw new Error("todo getReferences");
 }
 
 export function getProp<Input extends Node | Node[], K extends keyof UnArray<Input>>(
-  key: K
+  key: K,
 ): (input?: Input) => Input extends Node[] ? NonNull<UnArray<Input>[K]>[] : UnArray<Input>[K] {
   return input => {
     if (typeof input === "undefined") {
@@ -256,7 +256,7 @@ export function getProp<Input extends Node | Node[], K extends keyof UnArray<Inp
 }
 
 export function is<Input extends Node | Node[], T extends NodeType>(
-  type: T
+  type: T,
 ): (input?: Input) => Input extends Node[] ? NodeTypeMap[T][] : NodeTypeMap[T] | undefined {
   // @ts-expect-error todo fix types
   return input => {
@@ -278,7 +278,7 @@ export function is<Input extends Node | Node[], T extends NodeType>(
  * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
  */
 export function has(
-  query: Record<string, unknown>
+  query: Record<string, unknown>,
 ): <Input extends Node | Node[]>(input?: Input) => Input extends Node[] ? Input : Input | undefined {
   throw new Error("todo has");
 }
@@ -287,7 +287,7 @@ export function has(
  * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
  */
 export function first(): <T, Input extends T[][] | T[]>(
-  input: Input
+  input: Input,
 ) => Input extends (infer T)[][] ? T[] : Input extends (infer T)[] ? T | undefined : never {
   throw new Error("todo first");
 }
@@ -309,7 +309,7 @@ export function unique<Input extends Node | Node[]>(): (input?: Input) => Input 
 
 export function replace<Input extends undefined | Node | Node[], Iterator = UnArray<Input>>(
   container: Node,
-  fn: (iterator: Iterator, index: number) => Node
+  fn: (iterator: Iterator, index: number) => Node,
 ): (input: Input) => void {
   return input => {
     if (typeof input === "undefined") {
@@ -333,7 +333,7 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
         }
 
         const property = Object.entries(parent).find(([, value]) =>
-          Array.isArray(value) ? value.includes(node) : value === node
+          Array.isArray(value) ? value.includes(node) : value === node,
         )?.[0] as keyof typeof parent | undefined;
 
         if (!property) {
@@ -382,7 +382,7 @@ export function replace<Input extends undefined | Node | Node[], Iterator = UnAr
 }
 
 export function forEach<Input extends undefined | Node | Node[], Iterator = NonNullable<UnArray<Input>>>(
-  fn: (iterator: Iterator) => any
+  fn: (iterator: Iterator) => any,
 ): (input: Input) => void {
   return input => {
     if (typeof input === "undefined") {
@@ -405,7 +405,7 @@ export function forEach<Input extends undefined | Node | Node[], Iterator = NonN
  * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
  */
 export function map<Input extends undefined | Node | Node[], Output, Iterator = UnArray<Input>, Return = Output>(
-  fn: (iterator: Iterator, index: number) => Output
+  fn: (iterator: Iterator, index: number) => Output,
 ): (input: Input) => Return {
   throw new Error("todo forEach");
 }
@@ -423,14 +423,14 @@ export function pipe<A, B, C, D>(
   a: A,
   ab: (a: A, api: PipeApi) => B,
   bc: (b: B, api: PipeApi) => C,
-  cd: (c: C, api: PipeApi) => D
+  cd: (c: C, api: PipeApi) => D,
 ): D;
 export function pipe<A, B, C, D, E>(
   a: A,
   ab: (a: A, api: PipeApi) => B,
   bc: (b: B, api: PipeApi) => C,
   cd: (c: C, api: PipeApi) => D,
-  de: (d: D, api: PipeApi) => E
+  de: (d: D, api: PipeApi) => E,
 ): E;
 export function pipe<A, B, C, D, E, F>(
   a: A,
@@ -438,7 +438,7 @@ export function pipe<A, B, C, D, E, F>(
   bc: (b: B, api: PipeApi) => C,
   cd: (c: C, api: PipeApi) => D,
   de: (d: D, api: PipeApi) => E,
-  ef: (e: E, api: PipeApi) => F
+  ef: (e: E, api: PipeApi) => F,
 ): F;
 export function pipe<A, B, C, D, E, F, G>(
   a: A,
@@ -447,7 +447,7 @@ export function pipe<A, B, C, D, E, F, G>(
   cd: (c: C, api: PipeApi) => D,
   de: (d: D, api: PipeApi) => E,
   ef: (e: E, api: PipeApi) => F,
-  fg: (f: F, api: PipeApi) => G
+  fg: (f: F, api: PipeApi) => G,
 ): G;
 export function pipe<A, B, C, D, E, F, G, H>(
   a: A,
@@ -457,7 +457,7 @@ export function pipe<A, B, C, D, E, F, G, H>(
   de: (d: D, api: PipeApi) => E,
   ef: (e: E, api: PipeApi) => F,
   fg: (f: F, api: PipeApi) => G,
-  gh: (g: G, api: PipeApi) => H
+  gh: (g: G, api: PipeApi) => H,
 ): H;
 export function pipe<A, B, C, D, E, F, G, H, I>(
   a: A,
@@ -468,7 +468,7 @@ export function pipe<A, B, C, D, E, F, G, H, I>(
   ef: (e: E, api: PipeApi) => F,
   fg: (f: F, api: PipeApi) => G,
   gh: (g: G, api: PipeApi) => H,
-  hi: (h: H, api: PipeApi) => I
+  hi: (h: H, api: PipeApi) => I,
 ): I;
 export function pipe<A, B, C, D, E, F, G, H, I, J>(
   a: A,
@@ -480,7 +480,7 @@ export function pipe<A, B, C, D, E, F, G, H, I, J>(
   fg: (f: F, api: PipeApi) => G,
   gh: (g: G, api: PipeApi) => H,
   hi: (h: H, api: PipeApi) => I,
-  ij: (i: I, api: PipeApi) => J
+  ij: (i: I, api: PipeApi) => J,
 ): J;
 export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
   a: A,
@@ -493,7 +493,7 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
   gh: (g: G, api: PipeApi) => H,
   hi: (h: H, api: PipeApi) => I,
   ij: (i: I, api: PipeApi) => J,
-  jk: (j: J, api: PipeApi) => K
+  jk: (j: J, api: PipeApi) => K,
 ): K;
 export function pipe(a: Node<"Module">, ...fns: ((val: any, api: PipeApi) => any)[]): unknown {
   let val = a;
