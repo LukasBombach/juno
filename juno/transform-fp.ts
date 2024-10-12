@@ -103,10 +103,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         console.log(
           pipe(
             returnStatement,
-            findAll({
-              type: "Identifier",
-              value: identifierNames,
-            }),
+            findAll({ type: "Identifier", value: identifierNames }),
             parent(returnStatement, { type: "JSXElement" }),
             unique(),
           ),
