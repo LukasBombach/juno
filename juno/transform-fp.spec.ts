@@ -18,7 +18,7 @@ describe("transformToClientCode", () => {
     `);
   });
 
-  test.only("transforms return statements", async () => {
+  test("transforms return statements", async () => {
     await expect(
       transformToClientCode(`
       function App(ctx) {
