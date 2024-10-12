@@ -104,7 +104,7 @@ export async function transformToClientCode(src: string): Promise<string> {
           pipe(
             returnStatement,
             findAll({ type: "Identifier", value: identifierNames }),
-            parent(returnStatement, { type: "JSXElement" }),
+            parent(returnStatement, { type: "JSXAttribute" }),
             unique(),
           ),
         );
