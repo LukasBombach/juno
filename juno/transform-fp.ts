@@ -1,8 +1,11 @@
 import { parse, print } from "juno-ast/parse";
+import { traverse } from "juno-ast/traverse";
 import { pipe, findFirst, findAll, parent } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
 import { is, flat, unique } from "./pipeReboot";
 import { replace } from "./pipeReboot";
+
+import type { Node } from "juno-ast/parse";
 
 const span = {
   start: 0,
@@ -100,14 +103,34 @@ export async function transformToClientCode(src: string): Promise<string> {
           values => (values.length ? new RegExp(`^(${values.join("|")})$`) : new RegExp("$cannot-match-anything")),
         );
 
-        console.log(
-          pipe(
-            returnStatement,
-            findAll({ type: "Identifier", value: identifierNames }),
-            parent(returnStatement, { type: "JSXAttribute" }),
-            unique(),
-          ),
-        );
+        // console.log(
+        //   pipe(
+        //     returnStatement,
+        //     findAll({ type: "Identifier", value: identifierNames }),
+        //     parent(returnStatement, { type: "JSXAttribute" }),
+        //     unique(),
+        //   ),
+        // );
+
+        const jsxRoot = pipe(returnStatement, findFirst({ type: "JSXElement" }))!;
+
+        const parents: Node<"JSXElement">[] = [jsxRoot];
+
+        let currentPropertyName: string | undefined = undefined;
+
+        const returnedElements: Record<string, Node<"JSXExpression">>[] = [];
+
+        for (const [node, parent, property, index] of traverse(jsxRoot)) {
+          if (node.type === "JSXElement") {
+            parents.push(node);
+          }
+          if (node.type === "JSXAttribute") {
+            currentPropertyName = node.name.type === "Identifier" ? node.name.value : node.name.name.value;
+          }
+          if (property === "children") {
+            currentPropertyName = undefined;
+          }
+        }
 
         return {
           type: "ReturnStatement",
@@ -124,3 +147,8 @@ export async function transformToClientCode(src: string): Promise<string> {
 
   return await print(module);
 }
+
+/* function* traverseJsx(
+  root: Node<"JSXElement">,
+): Generator<[element: Node<"JSXElement">, parents: Node<"JSXElement">[]]>;
+ */
