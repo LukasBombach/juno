@@ -94,78 +94,6 @@ export async function transformToClientCode(src: string): Promise<string> {
       replace(fn, returnStatement => {
         const jsxRoot = pipe(returnStatement, findFirst({ type: "JSXElement" }))!;
 
-        for (const [node, parent, property, index] of traverse(jsxRoot)) {
-        }
-
-        const hydration: ({ path: number[] } & Record<string, Node<"JSXExpression">>)[] = [];
-
-        /* type PreInfo = { parents: Node<"JSXElement">[] } & Exclude<
-          Record<string, t.Identifier[]>,
-          { parents: Node<"JSXElement">[] }
-          >; */
-
-        interface PreInfo {
-          parents: Node<"JSXElement">[];
-          [key: string]: t.Identifier[] | Node<"JSXElement">[];
-        }
-
-        const hydrationPreInfo: PreInfo[] = [];
-
-        function getHydrationPreInfo(current: Node<"JSXElement">, parents: Node<"JSXElement">[] = []) {
-          // let parent = current;
-          // let property: keyof typeof parent;
-          // const preInfo: PreInfo = { parents };
-          // parents = [...parents, current];
-          // for (property in parent) {
-          // }
-
-          current.opening.attributes
-            .filter((attr): attr is Node<"JSXAttribute"> => attr.type === "JSXAttribute")
-            .map(({ name, value }) => {});
-        }
-
-        /* const identifierNames = pipe(
-          returnStatement,
-          findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
-          getProp("value"),
-          findAll({ type: "Identifier" }),
-          flat(),
-          unique(),
-          identifiers => identifiers.map(id => id.value),
-          values => values.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
-          values => (values.length ? new RegExp(`^(${values.join("|")})$`) : new RegExp("$cannot-match-anything")),
-        ); */
-
-        // console.log(
-        //   pipe(
-        //     returnStatement,
-        //     findAll({ type: "Identifier", value: identifierNames }),
-        //     parent(returnStatement, { type: "JSXAttribute" }),
-        //     unique(),
-        //   ),
-        // );
-
-        /*  const jsxRoot = pipe(returnStatement, findFirst({ type: "JSXElement" }))!;
-
-        const parents: Node<"JSXElement">[] = [jsxRoot];
-
-        let currentPropertyName: string | undefined = undefined;
-
-        const returnedElements: Record<string, Node<"JSXExpression">>[] = [];
-
-        for (const [node, parent, property, index] of traverse(jsxRoot)) {
-          if (node.type === "JSXElement") {
-            parents.push(node);
-          }
-          if (node.type === "JSXAttribute") {
-            currentPropertyName = node.name.type === "Identifier" ? node.name.value : node.name.name.value;
-          }
-          if (property === "children") {
-            currentPropertyName = undefined;
-          }
-        }
-           */
-
         return {
           type: "ReturnStatement",
           span,
@@ -181,8 +109,3 @@ export async function transformToClientCode(src: string): Promise<string> {
 
   return await print(module);
 }
-
-/* function* traverseJsx(
-  root: Node<"JSXElement">,
-): Generator<[element: Node<"JSXElement">, parents: Node<"JSXElement">[]]>;
- */
