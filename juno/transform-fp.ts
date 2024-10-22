@@ -102,6 +102,7 @@ export async function transformToClientCode(src: string): Promise<string> {
               map(attr => {
                 const key = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
                 const identifiers = pipe(attr.value, is("JSXExpressionContainer"), findAll({ type: "Identifier" }));
+                return [key, identifiers] as const;
               }),
             );
           }),
