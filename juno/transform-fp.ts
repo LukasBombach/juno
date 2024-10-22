@@ -112,15 +112,16 @@ export async function transformToClientCode(src: string): Promise<string> {
         const hydrationPreInfo: PreInfo[] = [];
 
         function getHydrationPreInfo(current: Node<"JSXElement">, parents: Node<"JSXElement">[] = []) {
-          let parent = current;
-          let property: keyof typeof parent;
+          // let parent = current;
+          // let property: keyof typeof parent;
+          // const preInfo: PreInfo = { parents };
+          // parents = [...parents, current];
+          // for (property in parent) {
+          // }
 
-          const preInfo: PreInfo = { parents };
-
-          // parents.push(parent);
-
-          for (property in parent) {
-          }
+          current.opening.attributes
+            .filter((attr): attr is Node<"JSXAttribute"> => attr.type === "JSXAttribute")
+            .map(({ name, value }) => {});
         }
 
         /* const identifierNames = pipe(
