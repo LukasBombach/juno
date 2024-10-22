@@ -6,6 +6,7 @@ import { is, flat, unique } from "./pipeReboot";
 import { replace } from "./pipeReboot";
 
 import type { Node } from "juno-ast/parse";
+import type * as t from "@swc/types";
 
 const span = {
   start: 0,
@@ -91,7 +92,38 @@ export async function transformToClientCode(src: string): Promise<string> {
       fn,
       findAll({ type: "ReturnStatement" }),
       replace(fn, returnStatement => {
-        const identifierNames = pipe(
+        const jsxRoot = pipe(returnStatement, findFirst({ type: "JSXElement" }))!;
+
+        for (const [node, parent, property, index] of traverse(jsxRoot)) {
+        }
+
+        const hydration: ({ path: number[] } & Record<string, Node<"JSXExpression">>)[] = [];
+
+        /* type PreInfo = { parents: Node<"JSXElement">[] } & Exclude<
+          Record<string, t.Identifier[]>,
+          { parents: Node<"JSXElement">[] }
+          >; */
+
+        interface PreInfo {
+          parents: Node<"JSXElement">[];
+          [key: string]: t.Identifier[] | Node<"JSXElement">[];
+        }
+
+        const hydrationPreInfo: PreInfo[] = [];
+
+        function getHydrationPreInfo(current: Node<"JSXElement">, parents: Node<"JSXElement">[] = []) {
+          let parent = current;
+          let property: keyof typeof parent;
+
+          const preInfo: PreInfo = { parents };
+
+          // parents.push(parent);
+
+          for (property in parent) {
+          }
+        }
+
+        /* const identifierNames = pipe(
           returnStatement,
           findAll({ type: "JSXAttribute", name: { value: /^on[A-Z]/ } }),
           getProp("value"),
@@ -101,7 +133,7 @@ export async function transformToClientCode(src: string): Promise<string> {
           identifiers => identifiers.map(id => id.value),
           values => values.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
           values => (values.length ? new RegExp(`^(${values.join("|")})$`) : new RegExp("$cannot-match-anything")),
-        );
+        ); */
 
         // console.log(
         //   pipe(
@@ -112,7 +144,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         //   ),
         // );
 
-        const jsxRoot = pipe(returnStatement, findFirst({ type: "JSXElement" }))!;
+        /*  const jsxRoot = pipe(returnStatement, findFirst({ type: "JSXElement" }))!;
 
         const parents: Node<"JSXElement">[] = [jsxRoot];
 
@@ -131,6 +163,7 @@ export async function transformToClientCode(src: string): Promise<string> {
             currentPropertyName = undefined;
           }
         }
+           */
 
         return {
           type: "ReturnStatement",
