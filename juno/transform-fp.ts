@@ -1,3 +1,4 @@
+import { inspect } from "util";
 import { parse, print } from "juno-ast/parse";
 import { traverse } from "juno-ast/traverse";
 import { pipe, findFirst, findAll, parent } from "./pipeReboot";
@@ -108,6 +109,8 @@ export async function transformToClientCode(src: string): Promise<string> {
             ),
           ),
         );
+
+        console.log(inspect(jsxElementsAsObjects, { depth: null, colors: true }));
 
         return {
           type: "ReturnStatement",
