@@ -402,6 +402,13 @@ export function forEach<Input extends undefined | Node | Node[], Iterator = NonN
 }
 
 /**
+ * pipable function that acts like Object.fromEntries()
+ */
+export function fromEntries(): <T = any>(entries: Iterable<readonly [PropertyKey, T]>) => { [k: string]: T } {
+  return entries => Object.fromEntries(entries);
+}
+
+/**
  * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
  */
 export function map<Return, Input extends undefined | Node | Node[]>(

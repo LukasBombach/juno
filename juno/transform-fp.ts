@@ -2,7 +2,7 @@ import { parse, print } from "juno-ast/parse";
 import { traverse } from "juno-ast/traverse";
 import { pipe, findFirst, findAll, parent } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
-import { is, flat, unique, map } from "./pipeReboot";
+import { is, flat, unique, map, fromEntries } from "./pipeReboot";
 import { replace } from "./pipeReboot";
 
 import type { Node } from "juno-ast/parse";
@@ -92,27 +92,21 @@ export async function transformToClientCode(src: string): Promise<string> {
       fn,
       findAll({ type: "ReturnStatement" }),
       replace(fn, returnStatement => {
-        const x = pipe(
+        const jsxElementsAsObjects = pipe(
           returnStatement,
           findAll({ type: "JSXElement" }),
-          map(el => {
-            const attrs = Object.fromEntries(
-              pipe(
-                el.opening.attributes,
-                is("JSXAttribute"),
-                map(attr => {
-                  const key = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
-                  const identifiers: t.Identifier[] = pipe(
-                    attr.value,
-                    is("JSXExpressionContainer"),
-                    findAll({ type: "Identifier" }),
-                  );
-                  return [key, identifiers] as const;
-                }),
-              ),
-            );
-            return attrs;
-          }),
+          map(el =>
+            pipe(
+              el.opening.attributes,
+              is("JSXAttribute"),
+              map(attr => {
+                const name = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
+                const identifiers = pipe(attr.value, findAll({ type: "Identifier" }));
+                return [name, identifiers] as [string, t.Identifier[]];
+              }),
+              fromEntries(),
+            ),
+          ),
         );
 
         return {
