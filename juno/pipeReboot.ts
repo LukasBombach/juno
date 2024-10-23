@@ -404,9 +404,9 @@ export function forEach<Input extends undefined | Node | Node[], Iterator = NonN
 /**
  * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
  */
-export function map<Input extends undefined | Node | Node[], Output, Iterator = UnArray<Input>, Return = Output>(
-  fn: (iterator: Iterator, index: number) => Output,
-): (input: Input) => Return {
+export function map<Return, Input extends undefined | Node | Node[]>(
+  fn: (iterator: UnArray<Input>, index: number) => Return,
+): (input: Input) => Input extends Node[] ? Return[] : Return {
   throw new Error("todo forEach");
 }
 

@@ -96,20 +96,21 @@ export async function transformToClientCode(src: string): Promise<string> {
           returnStatement,
           findAll({ type: "JSXElement" }),
           map(el => {
-            const attrs = pipe(
-              el.opening.attributes,
-              is("JSXAttribute"),
-              map(attr => {
-                const key = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
-                const identifiers: t.Identifier[] = pipe(
-                  attr.value,
-                  is("JSXExpressionContainer"),
-                  findAll({ type: "Identifier" }),
-                );
-                return [key, identifiers] as const;
-              }),
+            const attrs = Object.fromEntries(
+              pipe(
+                el.opening.attributes,
+                is("JSXAttribute"),
+                map(attr => {
+                  const key = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
+                  const identifiers: t.Identifier[] = pipe(
+                    attr.value,
+                    is("JSXExpressionContainer"),
+                    findAll({ type: "Identifier" }),
+                  );
+                  return [key, identifiers] as const;
+                }),
+              ),
             );
-
             return attrs;
           }),
         );
