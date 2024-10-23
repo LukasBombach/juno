@@ -408,13 +408,23 @@ export function fromEntries(): <T = any>(entries: Iterable<readonly [PropertyKey
   return entries => Object.fromEntries(entries);
 }
 
-/**
- * @deprecated Not actually deprecated, I just want the IDE to strike through this function to show this to me as a todo
- */
 export function map<Return, Input extends undefined | Node | Node[]>(
   fn: (iterator: UnArray<Input>, index: number) => Return,
 ): (input: Input) => Input extends Node[] ? Return[] : Return {
-  throw new Error("todo forEach");
+  // @ts-expect-error todo fix types
+  return input => {
+    if (typeof input === "undefined") {
+      return undefined;
+    }
+
+    if (Array.isArray(input)) {
+      // @ts-expect-error todo fix types
+      return input.map((node, i) => fn(node, i));
+    }
+
+    // @ts-expect-error todo fix types
+    return fn(input, -1);
+  };
 }
 
 export function flat(): <T>(arr: T[]) => T;
