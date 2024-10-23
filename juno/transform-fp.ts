@@ -99,9 +99,10 @@ export async function transformToClientCode(src: string): Promise<string> {
           returnStatement,
           findAll({ type: "JSXElement" }),
           map((el, i, allElements) => {
-            const path = allElements
-              .slice(0, i + 1)
-              .map((cur, i, all) => (i === 0 ? 1 : all[i - 1].children.indexOf(cur)));
+            const path = getParents(allElements[0])(el)
+              .filter(parent => parent.type === "JSXElement")
+              .map((cur, i, all) => (i === 0 ? 1 : all[i - 1].children.indexOf(cur)))
+              .filter(idx => idx !== -1);
 
             // if (!logged) {
             // console.log(inspect(allElements, { depth: 2, colors: true }));
