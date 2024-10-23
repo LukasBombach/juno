@@ -5,6 +5,7 @@ import { pipe, findFirst, findAll, parent } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
 import { is, flat, unique, map, fromEntries } from "./pipeReboot";
 import { replace } from "./pipeReboot";
+import { getParents } from "./pipeReboot";
 
 import type { Node } from "juno-ast/parse";
 import type * as t from "@swc/types";
@@ -88,6 +89,7 @@ export async function transformToClientCode(src: string): Promise<string> {
    *
    * return <div onClick={increment}>Count: {count}</div>   →   return [ { path: [1], onClick: increment, children: [7, count] } ]
    */
+  let logged = false;
   functions.forEach(fn => {
     pipe(
       fn,
@@ -96,8 +98,21 @@ export async function transformToClientCode(src: string): Promise<string> {
         const jsxElementsAsObjects = pipe(
           returnStatement,
           findAll({ type: "JSXElement" }),
-          map(el =>
-            pipe(
+          map((el, i, allElements) => {
+            const path = allElements
+              .slice(0, i + 1)
+              .map((cur, i, all) => (i === 0 ? 1 : all[i - 1].children.indexOf(cur)));
+
+            // if (!logged) {
+            // console.log(inspect(allElements, { depth: 2, colors: true }));
+            console.log({ path });
+            logged = true;
+            // }
+
+            // const parents = getParents(allElements[0])(el);
+            // const path = parents.filter(parent => parent.type === "JSXElement").map(el =>);
+
+            return pipe(
               el.opening.attributes,
               is("JSXAttribute"),
               map(attr => {
@@ -106,10 +121,14 @@ export async function transformToClientCode(src: string): Promise<string> {
                 return [name, identifiers] as [string, t.Identifier[]];
               }),
               fromEntries(),
-            ),
-          ),
+            );
+          }),
         );
 
+        console.log("");
+        console.log("");
+        console.log("jsxElementsAsObjects");
+        console.log("");
         console.log(inspect(jsxElementsAsObjects, { depth: null, colors: true }));
 
         return {

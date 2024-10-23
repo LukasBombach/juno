@@ -23,12 +23,17 @@ describe("transformToClientCode", () => {
       transformToClientCode(`
       function App(ctx) {
         const message = "Hello";
-        return <button onClick={() => console.log(message)} />;
+        return (
+          <main>
+            <p>{message}</p>
+            <button onClick={() => console.log(message)} />
+          </main>
+        );
       }`),
     ).resolves.toMatchInlineSnapshot(`
       "function App(ctx) {
           const message = "Hello";
-          return [{ path: [0], onClick: () => console.log(message) }];
+          return [{ path: [1, 1], onClick: () => console.log(message) }];
       }
       "
     `);

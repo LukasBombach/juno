@@ -176,7 +176,10 @@ export function getReferencesWithin(
   };
 } */
 
-function getParents(container: Node): (node: Node) => Node[] {
+/**
+ * todo do not export
+ */
+export function getParents(container: Node): (node: Node) => Node[] {
   const parentMap = createParentMap(container);
 
   return node => {
@@ -200,7 +203,10 @@ function isNode(value: unknown): value is Node {
 type Child = Node;
 type Parent = Node;
 type ParentMap = Map<Child, Parent>;
-function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): ParentMap {
+/**
+ * todo do not export
+ */
+export function createParentMap(node: Node, parentMap = new Map<Child, Parent>()): ParentMap {
   let parent = node;
   let property: keyof typeof parent;
 
@@ -409,7 +415,7 @@ export function fromEntries(): <T = any>(entries: Iterable<readonly [PropertyKey
 }
 
 export function map<Return, Input extends undefined | Node | Node[]>(
-  fn: (iterator: UnArray<Input>, index: number) => Return,
+  fn: (value: UnArray<Input>, index: number, array: Input) => Return,
 ): (input: Input) => Input extends Node[] ? Return[] : Return {
   // @ts-expect-error todo fix types
   return input => {
@@ -419,11 +425,11 @@ export function map<Return, Input extends undefined | Node | Node[]>(
 
     if (Array.isArray(input)) {
       // @ts-expect-error todo fix types
-      return input.map((node, i) => fn(node, i));
+      return input.map((node, i, input) => fn(node, i, input));
     }
 
     // @ts-expect-error todo fix types
-    return fn(input, -1);
+    return fn(input, -1, input);
   };
 }
 
