@@ -101,10 +101,16 @@ export async function transformToClientCode(src: string): Promise<string> {
               is("JSXAttribute"),
               map(attr => {
                 const key = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
-                const identifiers = pipe(attr.value, is("JSXExpressionContainer"), findAll({ type: "Identifier" }));
+                const identifiers: t.Identifier[] = pipe(
+                  attr.value,
+                  is("JSXExpressionContainer"),
+                  findAll({ type: "Identifier" }),
+                );
                 return [key, identifiers] as const;
               }),
             );
+
+            return attrs;
           }),
         );
 
