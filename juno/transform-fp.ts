@@ -112,10 +112,9 @@ export async function transformToClientCode(src: string): Promise<string> {
                 const identifiers = pipe(attr.value, findAll({ type: "Identifier" }));
                 return [name, identifiers] as [string, t.Identifier[]];
               }),
-              fromEntries(),
             );
 
-            return { path, ...attrs };
+            return [["path", path], ...attrs];
           }),
         );
 
