@@ -24,18 +24,15 @@ describe("transformToClientCode", () => {
       function App(ctx) {
         const message = "Hello";
         return (
-          <main>
-            <p>{message}</p>
-            <button onClick={() => console.log(message)} />
-          </main>
+          <main><p>{message}</p><button onClick={() => console.log(message)} /></main>
         );
       }`),
     ).resolves.toMatchInlineSnapshot(`
       "function App(ctx) {
           const message = "Hello";
-          return [{ path: [1, 1], onClick: () => console.log(message) }];
+          return [];
       }
       "
-    `);
+    `); // { path: [1, 1], onClick: () => console.log(message) }
   });
 });

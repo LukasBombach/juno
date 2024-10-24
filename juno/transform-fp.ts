@@ -5,7 +5,7 @@ import { pipe, findFirst, findAll, parent } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
 import { is, flat, unique, map, fromEntries } from "./pipeReboot";
 import { replace } from "./pipeReboot";
-import { getParents } from "./pipeReboot";
+import { getParents, createParentMap } from "./pipeReboot";
 
 import type { Node } from "juno-ast/parse";
 import type * as t from "@swc/types";
@@ -95,18 +95,31 @@ export async function transformToClientCode(src: string): Promise<string> {
       fn,
       findAll({ type: "ReturnStatement" }),
       replace(fn, returnStatement => {
+        const jsxRoot = pipe(returnStatement, findFirst({ type: "JSXElement" }))!;
+
+        const parentMap = createParentMap(jsxRoot);
+
         const jsxElementsAsObjects = pipe(
           returnStatement,
           findAll({ type: "JSXElement" }),
           map((el, i, allElements) => {
             const path = getParents(allElements[0])(el)
               .filter(parent => parent.type === "JSXElement")
-              .map((cur, i, all) => (i === 0 ? 1 : all[i - 1].children.indexOf(cur)))
-              .filter(idx => idx !== -1);
+              .concat(el)
+              .map((cur, i, all) => (i === 0 ? 1 : all[i - 1].children.indexOf(cur) + 1));
 
             // if (!logged) {
             // console.log(inspect(allElements, { depth: 2, colors: true }));
-            console.log({ path });
+            console.log(
+              (el.opening.name as t.Identifier).value.padStart(8, " "),
+              { path },
+              /* inspect(
+                getParents(allElements[0])(el)
+                  .filter(parent => parent.type === "JSXElement")
+                  .concat(el),
+                { depth: 3, colors: true },
+              ), */
+            );
             logged = true;
             // }
 
