@@ -89,44 +89,22 @@ export async function transformToClientCode(src: string): Promise<string> {
    *
    * return <div onClick={increment}>Count: {count}</div>   →   return [ { path: [1], onClick: increment, children: [7, count] } ]
    */
-  let logged = false;
+
   functions.forEach(fn => {
     pipe(
       fn,
       findAll({ type: "ReturnStatement" }),
       replace(fn, returnStatement => {
-        const jsxRoot = pipe(returnStatement, findFirst({ type: "JSXElement" }))!;
-
-        const parentMap = createParentMap(jsxRoot);
-
         const jsxElementsAsObjects = pipe(
           returnStatement,
           findAll({ type: "JSXElement" }),
-          map((el, i, allElements) => {
+          map((el, _, allElements) => {
             const path = getParents(allElements[0])(el)
               .filter(parent => parent.type === "JSXElement")
               .concat(el)
               .map((cur, i, all) => (i === 0 ? 1 : all[i - 1].children.indexOf(cur) + 1));
 
-            // if (!logged) {
-            // console.log(inspect(allElements, { depth: 2, colors: true }));
-            console.log(
-              (el.opening.name as t.Identifier).value.padStart(8, " "),
-              { path },
-              /* inspect(
-                getParents(allElements[0])(el)
-                  .filter(parent => parent.type === "JSXElement")
-                  .concat(el),
-                { depth: 3, colors: true },
-              ), */
-            );
-            logged = true;
-            // }
-
-            // const parents = getParents(allElements[0])(el);
-            // const path = parents.filter(parent => parent.type === "JSXElement").map(el =>);
-
-            return pipe(
+            const attrs = pipe(
               el.opening.attributes,
               is("JSXAttribute"),
               map(attr => {
@@ -136,6 +114,8 @@ export async function transformToClientCode(src: string): Promise<string> {
               }),
               fromEntries(),
             );
+
+            return { path, ...attrs };
           }),
         );
 
