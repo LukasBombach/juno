@@ -98,7 +98,7 @@ export async function transformToClientCode(src: string): Promise<string> {
         //
         //
         // gathering all JSX elements and their attributes
-        const jsxElementsAsObjects = pipe(
+        const attrsAndPaths = pipe(
           returnStatement,
           findAll({ type: "JSXElement" }),
           map((el, _, allElements) => {
@@ -121,17 +121,46 @@ export async function transformToClientCode(src: string): Promise<string> {
           }),
         );
 
-        const identifiersWithinEventHandlers = jsxElementsAsObjects
+        const identifiersWithinEventHandlers = attrsAndPaths
           .flat()
           .filter(([name]) => (name as string).match(/^on[A-Z]/))
           .map(([_, identifiers]) => identifiers)
           .flat();
 
+        const identifiersRegex = new RegExp(
+          identifiersWithinEventHandlers
+            .map(id => {
+              return typeof id === "string" ? id : typeof id === "number" ? id.toString() : id.value;
+            })
+            .join("|"),
+          "g",
+        );
+
+        const selectedProps = attrsAndPaths
+          .map(entries => {
+            return entries.filter(([name, identifiers]) => {
+              if ((name as string) === "path") {
+                return true;
+              }
+
+              if ((name as string).match(/^on[A-Z]/)) {
+                return true;
+              }
+
+              if ((identifiers as t.Identifier[]).some(id => id.value.match(identifiersRegex))) {
+                return true;
+              }
+
+              return false;
+            });
+          })
+          .filter(entries => entries.length > 1); // check check assuming there will always be a path
+
         console.log("");
         console.log("");
-        console.log("jsxElementsAsObjects");
+        console.log("attrsAndPaths");
         console.log("");
-        console.log(inspect(identifiersWithinEventHandlers, { depth: null, colors: true }));
+        console.log(inspect(selectedProps, { depth: null, colors: true }));
 
         return {
           type: "ReturnStatement",
