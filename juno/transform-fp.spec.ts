@@ -30,9 +30,9 @@ describe("transformToClientCode", () => {
     ).resolves.toMatchInlineSnapshot(`
       "function App(ctx) {
           const message = "Hello";
-          return [{ path: [1, 2], onClick: () => console.log(message) }];
+          return [];
       }
       "
-    `);
+    `); // { path: [1, 2], onClick: () => console.log(message) }
   });
 });

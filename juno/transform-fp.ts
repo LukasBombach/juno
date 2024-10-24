@@ -95,6 +95,9 @@ export async function transformToClientCode(src: string): Promise<string> {
       fn,
       findAll({ type: "ReturnStatement" }),
       replace(fn, returnStatement => {
+        //
+        //
+        // gathering all JSX elements and their attributes
         const jsxElementsAsObjects = pipe(
           returnStatement,
           findAll({ type: "JSXElement" }),
@@ -118,11 +121,17 @@ export async function transformToClientCode(src: string): Promise<string> {
           }),
         );
 
+        const identifiersWithinEventHandlers = jsxElementsAsObjects
+          .flat()
+          .filter(([name]) => (name as string).match(/^on[A-Z]/))
+          .map(([_, identifiers]) => identifiers)
+          .flat();
+
         console.log("");
         console.log("");
         console.log("jsxElementsAsObjects");
         console.log("");
-        console.log(inspect(jsxElementsAsObjects, { depth: null, colors: true }));
+        console.log(inspect(identifiersWithinEventHandlers, { depth: null, colors: true }));
 
         return {
           type: "ReturnStatement",
