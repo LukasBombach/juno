@@ -95,10 +95,30 @@ export async function transformToClientCode(src: string): Promise<string> {
       fn,
       findAll({ type: "ReturnStatement" }),
       replace(fn, returnStatement => {
-        //
-        //
-        // gathering all JSX elements and their attributes
-        const attrsAndPaths = pipe(
+        const flatPathedElementList = pipe(
+          returnStatement,
+          findAll({ type: "JSXElement" }),
+          map((el, _, allElements) => {
+            const path = getParents(allElements[0])(el)
+              .filter(parent => parent.type === "JSXElement")
+              .concat(el)
+              .map((cur, i, all) => (i === 0 ? 1 : all[i - 1].children.indexOf(cur) + 1));
+
+            const attrs = pipe(
+              el.opening.attributes,
+              is("JSXAttribute"),
+              map(attr => {
+                const name = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
+                const expression = pipe(attr.value, is("JSXExpressionContainer"), getProp("expression"));
+                return [name, expression];
+              }),
+            );
+
+            return [["path", path], ...attrs] as (["path", number[]] | [string, t.JSXExpression])[];
+          }),
+        );
+
+        /* const attrsAndPaths = pipe(
           returnStatement,
           findAll({ type: "JSXElement" }),
           map((el, _, allElements) => {
@@ -113,41 +133,43 @@ export async function transformToClientCode(src: string): Promise<string> {
               map(attr => {
                 const name = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
                 const identifiers = pipe(attr.value, findAll({ type: "Identifier" }));
+                const expression = pipe(attr.value, is("JSXExpressionContainer"), getProp("expression"));
                 return [name, identifiers] as [string, t.Identifier[]];
               }),
             );
 
             return [["path", path], ...attrs];
           }),
-        );
+        ); */
 
-        const identifiersWithinEventHandlers = attrsAndPaths
+        const allAttrs = flatPathedElementList
           .flat()
-          .filter(([name]) => (name as string).match(/^on[A-Z]/))
-          .map(([_, identifiers]) => identifiers)
-          .flat();
+          .filter((entry): entry is [string, t.JSXExpression] => entry[0] !== "path");
 
-        const identifiersRegex = new RegExp(
-          identifiersWithinEventHandlers
-            .map(id => {
-              return typeof id === "string" ? id : typeof id === "number" ? id.toString() : id.value;
-            })
-            .join("|"),
-          "g",
+        const identifiersWithinEventHandlers: t.Identifier[] = pipe(
+          allAttrs.filter(([name]) => name.match(/^on[A-Z]/)),
+          map(([_, expression]) => expression),
+          findAll({ type: "Identifier" }),
+          flat(),
+          /* .filter(([name]) => (name as string).match(/^on[A-Z]/))
+          .map(([_, identifiers]) => identifiers)
+          .flat(); */
         );
 
-        const selectedProps = attrsAndPaths
+        const identifiersRegex = new RegExp(identifiersWithinEventHandlers.map(id => id.value).join("|"), "g");
+
+        const selectedProps = flatPathedElementList
           .map(entries => {
             return entries.filter(([name, identifiers]) => {
-              if ((name as string) === "path") {
+              if (name === "path") {
                 return true;
               }
 
-              if ((name as string).match(/^on[A-Z]/)) {
+              if (name.match(/^on[A-Z]/)) {
                 return true;
               }
 
-              if ((identifiers as t.Identifier[]).some(id => id.value.match(identifiersRegex))) {
+              if ((identifiers as t.JSXExpression[]).some(id => id.value.match(identifiersRegex))) {
                 return true;
               }
 

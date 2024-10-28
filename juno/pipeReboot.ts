@@ -243,9 +243,14 @@ export function getUsages(): <Input extends Node | Node[]>(
   throw new Error("todo getReferences");
 }
 
-export function getProp<Input extends Node | Node[], K extends keyof UnArray<Input>>(
+/**
+ * todo if input is `something | undefined` the return type should be `prop | undefined`
+ */
+export function getProp<Input extends undefined | Node | Node[], K extends keyof UnArray<Input>>(
   key: K,
-): (input?: Input) => Input extends Node[] ? NonNull<UnArray<Input>[K]>[] : UnArray<Input>[K] {
+): (
+  input?: Input,
+) => Input extends Node[] ? NonNull<UnArray<Input>[K]>[] : Input extends undefined ? undefined : UnArray<Input>[K] {
   return input => {
     if (typeof input === "undefined") {
       return undefined;
@@ -414,9 +419,9 @@ export function fromEntries(): <T = any>(entries: Iterable<readonly [PropertyKey
   return entries => Object.fromEntries(entries);
 }
 
-export function map<Return, Input extends undefined | Node | Node[]>(
+export function map<Return, Input>(
   fn: (value: UnArray<Input>, index: number, array: Input) => Return,
-): (input: Input) => Input extends Node[] ? Return[] : Return {
+): (input: Input) => Input extends any[] ? Return[] : Return {
   // @ts-expect-error todo fix types
   return input => {
     if (typeof input === "undefined") {
