@@ -71,6 +71,22 @@ function transform(returnStatement: Node<"ReturnStatement">): Node<"ReturnStatem
     // the path
     // event handlers
     // include an identifier that is used in an event handler
+    const remainingAttributes = flatPathedElementList.map((entries) => { 
+      return entries.filter(([name, expression]) => { 
+        if (name === "path") {
+          return true;
+
+        }
+
+        if (name.match(/^on[A-Z]/)) {
+          return true;
+
+        }
+
+      });
+
+      
+    });
   );
 }
 
