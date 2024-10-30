@@ -10,6 +10,12 @@ import { getParents, createParentMap } from "./pipeReboot";
 import type { Node } from "juno-ast/parse";
 import type * as t from "@swc/types";
 
+const span = {
+  start: 0,
+  end: 0,
+  ctxt: 0,
+};
+
 /**
  * transforms
  *
@@ -28,10 +34,10 @@ import type * as t from "@swc/types";
  * ```
  * return [
  *   { path: [1,2], children: [count] },
- *   { path: [1,3]}, onClick: () => setCount(count + 1) },
+ *   { path: [1,3], onClick: () => setCount(count + 1) },
  * ]
  */
-function transform(returnStatement: Node<"ReturnStatement">): Node<"ReturnStatement"> {
+export function transformHydrations(returnStatement: Node<"ReturnStatement">): Node<"ReturnStatement"> {
   // get all identifiers used in event handlers
   const interactiveIds: t.Identifier[] = pipe(
     returnStatement,
@@ -66,28 +72,86 @@ function transform(returnStatement: Node<"ReturnStatement">): Node<"ReturnStatem
 
       return [["path", path], ...attrs] as (["path", number[]] | [string, t.JSXExpression])[];
     }),
+  );
 
-    // allow attributes that are
-    // the path
-    // event handlers
-    // include an identifier that is used in an event handler
-    const remainingAttributes = flatPathedElementList.map((entries) => { 
-      return entries.filter(([name, expression]) => { 
+  // allow attributes that are
+  // the path
+  // event handlers
+  // include an identifier that is used in an event handler
+  const remainingAttributes = flatPathedElementList
+    .map(entries => {
+      return entries.filter(([name, expression]) => {
         if (name === "path") {
           return true;
-
         }
 
         if (name.match(/^on[A-Z]/)) {
           return true;
-
         }
 
-      });
+        const identifiers = pipe(
+          expression as t.JSXExpression,
+          findAll({ type: "Identifier" }),
+          map(id => idToString(id)),
+        );
 
-      
-    });
-  );
+        const includesInteractiveId = identifiers.some(id => interactiveIdsNames?.test(id));
+
+        return includesInteractiveId;
+      });
+    })
+    // todo dumbest hack assuming there's always a path
+    // and if there are no attributes left, the length will be 1
+    .filter(entries => entries.length > 1);
+
+  return {
+    type: "ReturnStatement",
+    span,
+    argument: {
+      type: "ArrayExpression",
+      span,
+      elements: remainingAttributes.map(attrs => ({
+        expression: {
+          type: "ObjectExpression",
+          span,
+          properties: attrs.map(([name, expression]) => {
+            if (name === "path") {
+              return {
+                type: "KeyValueProperty",
+                key: {
+                  type: "Identifier",
+                  span,
+                  value: "path",
+                },
+                value: {
+                  type: "ArrayExpression",
+                  span,
+                  elements: (expression as number[]).map(num => ({
+                    expression: {
+                      type: "NumericLiteral",
+                      span,
+                      value: num,
+                      raw: num.toString(),
+                    },
+                  })),
+                },
+              };
+            } else {
+              return {
+                type: "KeyValueProperty",
+                key: {
+                  type: "Identifier",
+                  span,
+                  value: name,
+                },
+                value: expression as t.JSXExpression,
+              };
+            }
+          }),
+        },
+      })),
+    },
+  };
 }
 
 function getPath(el: t.JSXElement, allElements: t.JSXElement[]): number[] {
