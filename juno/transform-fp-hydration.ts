@@ -122,6 +122,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
                   type: "Identifier",
                   span,
                   value: "path",
+                  optional: false,
                 },
                 value: {
                   type: "ArrayExpression",
@@ -143,6 +144,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
                   type: "Identifier",
                   span,
                   value: name,
+                  optional: false,
                 },
                 value: expression as t.JSXExpression,
               };
