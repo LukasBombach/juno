@@ -1,11 +1,7 @@
-import { inspect } from "util";
-import { parse, print } from "juno-ast/parse";
-import { traverse } from "juno-ast/traverse";
-import { pipe, findFirst, findAll, parent } from "./pipeReboot";
+import { pipe, findAll } from "./pipeReboot";
 import { getProp } from "./pipeReboot";
-import { is, flat, unique, map, fromEntries } from "./pipeReboot";
-import { replace } from "./pipeReboot";
-import { getParents, createParentMap } from "./pipeReboot";
+import { is, flat, map } from "./pipeReboot";
+import { getParents } from "./pipeReboot";
 
 import type { Node } from "juno-ast/parse";
 import type * as t from "@swc/types";
