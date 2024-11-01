@@ -22,10 +22,10 @@ function Page(ctx: RenderContext) {
   );
 }
 
-export function server() {
-  return render(Page);
-}
-
-export function client() {
-  hydrate(Page);
-}
+export default () => {
+  if (process.env.server) {
+    return render(Page);
+  } else {
+    hydrate(Page);
+  }
+};

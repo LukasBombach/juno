@@ -1,10 +1,7 @@
-import { render } from "juno/server";
-import { hydrate } from "juno/client";
+import { signal } from "@maverick-js/signals";
 
-import type { RenderContext } from "juno/server";
-
-function Page(ctx: RenderContext) {
-  const count = ctx.signal(Math.floor(Math.random() * 100));
+export default function Page() {
+  const count = signal(Math.floor(Math.random() * 100));
 
   return (
     <html lang="en">
@@ -20,12 +17,4 @@ function Page(ctx: RenderContext) {
       </body>
     </html>
   );
-}
-
-export function server() {
-  return render(Page);
-}
-
-export function client() {
-  hydrate(Page);
 }
