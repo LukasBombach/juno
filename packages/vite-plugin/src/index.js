@@ -9,7 +9,7 @@ export function juno() {
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         console.log(req.url);
-        next();
+        res.end("hello world");
       });
     },
 
