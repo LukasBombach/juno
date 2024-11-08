@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import path from "path";
+
 /**
  * @returns {import('vite').Plugin}
  */
@@ -8,8 +11,15 @@ export function juno() {
 
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        console.log(req.url);
-        res.end("hello world");
+        const reqPath = req.url === "/" ? "/page.html" : req.url + ".html";
+        const filePath = path.resolve(path.join("src", reqPath));
+
+        if (fs.existsSync(filePath)) {
+          const fileContent = fs.readFileSync(filePath, "utf-8");
+          res.end(fileContent);
+        } else {
+          next();
+        }
       });
     },
 

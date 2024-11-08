@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@juno/vite-plugin-juno": "workspace:*",
     "typescript": "5.6.2",
-    "vite": "5.4.10",
-    "@juno/vite-plugin-juno": "workspace:*"
+    "vite": "5.4.10"
   }
 }
