@@ -10,6 +10,9 @@ importers:
 
   apps/spike_02:
     devDependencies:
+      '@juno/vite-plugin-juno':
+        specifier: workspace:*
+        version: link:../../packages/vite-plugin
       typescript:
         specifier: 5.6.2
         version: 5.6.2
