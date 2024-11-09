@@ -7,7 +7,10 @@ export default function Page() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>juno</title>
       </head>
-      <body>hello juno jsx</body>
+      <body>
+        hello juno jsx
+        <script type="module" src="/src/test.ts"></script>
+      </body>
     </html>
   );
 }
