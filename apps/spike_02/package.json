@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@juno/vite-plugin-juno": "workspace:*",
+    "@types/react": "18.3.12",
     "typescript": "5.6.2",
     "vite": "5.4.10"
   }
