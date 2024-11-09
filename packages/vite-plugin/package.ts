@@ -6,7 +6,7 @@ import type { Plugin } from "vite";
 
 export default function juno(): Plugin {
   return {
-    name: "vite-plugin-juno",
+    name: "vite-plugin-juno-ssr",
     enforce: "pre",
 
     configureServer(vite) {
@@ -22,6 +22,7 @@ export default function juno(): Plugin {
             res.end(viteHtml);
           } catch (e) {
             vite.ssrFixStacktrace(e instanceof Error ? e : new Error(String(e)));
+            console.error(e);
             next(e);
           }
         } else {
@@ -29,9 +30,8 @@ export default function juno(): Plugin {
         }
       });
     },
-
-    async resolveId(importee, importer, opts) {
-      // console.log("resolveId", { importee, importer, opts });
+    async resolveId(importee, _, opts) {
+      console.log(opts.ssr, importee);
     },
   };
 }
