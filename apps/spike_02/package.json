@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@juno/client": "workspace:*",
     "@juno/vite-plugin-juno": "workspace:*"
   }
 }

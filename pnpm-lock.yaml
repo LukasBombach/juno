@@ -29,9 +29,14 @@ importers:
 
   apps/spike_02:
     devDependencies:
+      '@juno/client':
+        specifier: workspace:*
+        version: link:../../packages/client
       '@juno/vite-plugin-juno':
         specifier: workspace:*
         version: link:../../packages/vite-plugin
+
+  packages/client: {}
 
   packages/ssr: {}
 
