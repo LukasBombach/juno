@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "path";
+import { renderToString } from "@juno/ssr";
 
 import type { Plugin } from "vite";
 
@@ -9,13 +10,14 @@ export function juno(): Plugin {
     enforce: "pre",
 
     configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        const reqPath = req.url === "/" ? "/page.html" : req.url + ".html";
-        const filePath = path.resolve(path.join("src", reqPath));
+      server.middlewares.use(async (req, res, next) => {
+        const page = !req.url ? "/page" : req.url === "/" ? "/page" : req.url;
+        const filePath = path.resolve(`src/${page}.tsx`);
 
         if (fs.existsSync(filePath)) {
-          const fileContent = fs.readFileSync(filePath, "utf-8");
-          res.end(fileContent);
+          const Page = await import(filePath);
+          const html = renderToString(Page.default);
+          res.end(html);
         } else {
           next();
         }

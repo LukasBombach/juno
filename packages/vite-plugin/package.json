@@ -2,5 +2,8 @@
   "name": "@juno/vite-plugin-juno",
   "version": "1.0.0",
   "type": "module",
-  "main": "package.ts"
+  "main": "package.ts",
+  "devDependencies": {
+    "@juno/ssr": "workspace:*"
+  }
 }
