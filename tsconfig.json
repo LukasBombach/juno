@@ -23,5 +23,5 @@
     /* JSX support */
     "jsx": "react-jsxdev"
   },
-  "include": ["src"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }
