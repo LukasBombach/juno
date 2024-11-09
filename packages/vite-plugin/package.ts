@@ -9,16 +9,21 @@ export function juno(): Plugin {
     name: "vite-plugin-juno",
     enforce: "pre",
 
-    configureServer(server) {
-      server.middlewares.use(async (req, res, next) => {
+    configureServer(vite) {
+      vite.middlewares.use(async (req, res, next) => {
         const page = !req.url ? "/page" : req.url === "/" ? "/page" : req.url;
         const filePath = path.resolve(`src/${page}.tsx`);
 
         if (fs.existsSync(filePath)) {
-          const page = await server.ssrLoadModule(filePath);
-          const html = renderToString(page.default);
-          const viteHtml = await server.transformIndexHtml(req.originalUrl!, html);
-          res.end(viteHtml);
+          try {
+            const page = await vite.ssrLoadModule(filePath);
+            const html = renderToString(page.default);
+            const viteHtml = await vite.transformIndexHtml(req.originalUrl!, html);
+            res.end(viteHtml);
+          } catch (e) {
+            vite.ssrFixStacktrace(e instanceof Error ? e : new Error(String(e)));
+            next(e);
+          }
         } else {
           next();
         }
