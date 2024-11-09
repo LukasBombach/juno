@@ -1,10 +1,9 @@
 import fs from "node:fs";
 import path from "path";
 
-/**
- * @returns {import('vite').Plugin}
- */
-export function juno() {
+import type { Plugin } from "vite";
+
+export function juno(): Plugin {
   return {
     name: "vite-plugin-juno",
     enforce: "pre",
