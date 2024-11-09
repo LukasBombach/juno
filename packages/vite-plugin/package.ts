@@ -17,7 +17,8 @@ export function juno(): Plugin {
         if (fs.existsSync(filePath)) {
           const page = await import(filePath);
           const html = renderToString(page.default);
-          res.end(html);
+          const viteHtml = await server.transformIndexHtml(req.originalUrl!, html);
+          res.end(viteHtml);
         } else {
           next();
         }
