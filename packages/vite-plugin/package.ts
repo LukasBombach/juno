@@ -15,8 +15,8 @@ export function juno(): Plugin {
         const filePath = path.resolve(`src/${page}.tsx`);
 
         if (fs.existsSync(filePath)) {
-          const Page = await import(filePath);
-          const html = renderToString(Page.default);
+          const page = await import(filePath);
+          const html = renderToString(page.default);
           res.end(html);
         } else {
           next();
