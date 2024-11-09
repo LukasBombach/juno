@@ -15,7 +15,7 @@ export function juno(): Plugin {
         const filePath = path.resolve(`src/${page}.tsx`);
 
         if (fs.existsSync(filePath)) {
-          const page = await import(filePath);
+          const page = await server.ssrLoadModule(filePath);
           const html = renderToString(page.default);
           const viteHtml = await server.transformIndexHtml(req.originalUrl!, html);
           res.end(viteHtml);

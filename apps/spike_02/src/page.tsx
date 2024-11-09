@@ -9,7 +9,7 @@ export default function Page() {
       </head>
       <body>
         hello juno jsx
-        <script type="module" src="/src/test.ts"></script>
+        <script type="module" src="/src/client.ts"></script>
       </body>
     </html>
   );
