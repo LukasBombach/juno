@@ -2,5 +2,5 @@
   "name": "@juno/vite-plugin-juno",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.ts"
+  "main": "package.ts"
 }
