@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@juno/client": "workspace:*",
-    "@juno/vite-plugin-juno": "workspace:*"
+    "@juno/vite-plugin-juno": "workspace:*",
+    "vite-plugin-inspect": "0.8.7"
   }
 }

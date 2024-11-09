@@ -4,7 +4,7 @@ import { renderToString } from "@juno/ssr";
 
 import type { Plugin } from "vite";
 
-export function juno(): Plugin {
+export default function juno(): Plugin {
   return {
     name: "vite-plugin-juno",
     enforce: "pre",

@@ -1,7 +1,8 @@
 import { defineConfig } from "vite";
-import { juno } from "@juno/vite-plugin-juno";
+import inspect from "vite-plugin-inspect";
+import juno from "@juno/vite-plugin-juno";
 
 export default defineConfig({
   clearScreen: false,
-  plugins: [juno()],
+  plugins: [inspect(), juno()],
 });
