@@ -8,7 +8,7 @@ export default function Page() {
         <title>juno</title>
       </head>
       <body>
-        hello juno jsx
+        hello juno
         <script type="module" src="/src/client.ts"></script>
       </body>
     </html>
