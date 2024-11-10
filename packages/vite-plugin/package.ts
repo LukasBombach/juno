@@ -6,7 +6,7 @@ import type { Plugin } from "vite";
 
 export default function juno(): Plugin {
   return {
-    name: "vite-plugin-juno-ssr",
+    name: "vite-plugin-juno",
     enforce: "pre",
 
     configureServer(vite) {
@@ -30,8 +30,22 @@ export default function juno(): Plugin {
         }
       });
     },
-    async resolveId(importee, _, opts) {
-      console.log(opts.ssr, importee);
+    async transform(code, id, options) {
+      if (options?.ssr) {
+        return null;
+      }
+
+      if (id.includes("node_modules")) {
+        return null;
+      }
+
+      if (!id.endsWith(".tsx")) {
+        return null;
+      }
+
+      console.log(id);
+
+      return code;
     },
   };
 }
