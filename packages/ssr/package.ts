@@ -1,6 +1,13 @@
-import type { ReactElement, ReactNode } from "react";
+import { signal } from "@maverick-js/signals";
 
-export function renderToString(node: ReactNode | (() => ReactNode)): string {
+import type { ReactElement, ReactNode } from "react";
+import type { WriteSignal } from "@maverick-js/signals";
+
+export interface RenderContext {
+  signal: <T>(value: T) => WriteSignal<T>;
+}
+
+export function renderToString(node: ReactNode | ((ctx: RenderContext) => ReactNode)): string {
   if (typeof node === "boolean") {
     return "";
   }
@@ -70,7 +77,7 @@ export function renderToString(node: ReactNode | (() => ReactNode)): string {
   }
 
   if (typeof node === "function") {
-    return renderToString(node());
+    return renderToString(node({ signal }));
   }
 
   console.warn(`Cannot handle react element type ${typeof node}`, node);

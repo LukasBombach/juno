@@ -1,4 +1,11 @@
-export default function Page() {
+interface RenderContext {
+  signal: <T>(value: T) => (() => T) & { set: (value: T) => void };
+  ssrData: any[];
+}
+
+export default function Page(ctx: RenderContext) {
+  const count = ctx.signal(Math.floor(Math.random() * 100));
+
   return (
     <html lang="en">
       <head>
@@ -8,7 +15,9 @@ export default function Page() {
         <title>juno</title>
       </head>
       <body>
-        hello juno
+        <h1>hello juno</h1>
+        <p>{count()}</p>
+        <button onClick={() => count.set(count() + 1)}>Click</button>
         <script type="module" src="/src/client.tsx"></script>
       </body>
     </html>

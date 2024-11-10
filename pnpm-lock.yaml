@@ -41,7 +41,11 @@ importers:
 
   packages/client: {}
 
-  packages/ssr: {}
+  packages/ssr:
+    dependencies:
+      '@maverick-js/signals':
+        specifier: 6.0.0
+        version: 6.0.0
 
   packages/transform:
     dependencies:
@@ -354,6 +358,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@maverick-js/signals@6.0.0':
+    resolution: {integrity: sha512-aPAxQOjxcGaLpjMcfE0mRuMgnCVLfdPSGINYmKDjTbTfY37lZdz9CGnVDrkr+svNSADZbUVk7oPVjXA2+vtxYg==}
 
   '@polka/url@1.0.0-next.28':
     resolution: {integrity: sha512-8LduaNlMZGwdZ6qWrKlfa+2M4gahzFkprZiAt2TF8uS0qQgBizKXpXURqvTJ4WtmupWxaLqjRb2UCTe72mu+Aw==}
@@ -899,6 +906,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.23.1':
     optional: true
+
+  '@maverick-js/signals@6.0.0': {}
 
   '@polka/url@1.0.0-next.28': {}
 
