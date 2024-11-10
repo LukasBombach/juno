@@ -1,0 +1,6 @@
+{
+  "name": "@juno/transform",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "package.ts"
+}
