@@ -4,6 +4,7 @@
   "type": "module",
   "main": "package.ts",
   "devDependencies": {
-    "@juno/ssr": "workspace:*"
+    "@juno/ssr": "workspace:*",
+    "@juno/transform": "workspace:*"
   }
 }

@@ -48,22 +48,25 @@ importers:
       '@swc/core':
         specifier: 1.9.1
         version: 1.9.1
-      lodash:
+      lodash-es:
         specifier: 4.17.21
         version: 4.17.21
     devDependencies:
       '@swc/types':
         specifier: 0.1.12
         version: 0.1.12
-      '@types/lodash':
-        specifier: 4.17.13
-        version: 4.17.13
+      '@types/lodash-es':
+        specifier: 4.17.12
+        version: 4.17.12
 
   packages/vite-plugin:
     devDependencies:
       '@juno/ssr':
         specifier: workspace:*
         version: link:../ssr
+      '@juno/transform':
+        specifier: workspace:*
+        version: link:../transform
 
 packages:
 
@@ -535,6 +538,9 @@ packages:
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
+  '@types/lodash-es@4.17.12':
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
+
   '@types/lodash@4.17.13':
     resolution: {integrity: sha512-lfx+dftrEZcdBPczf9d0Qv0x+j/rfNCMuC6OcfXmO8gkfeNAY88PgKUbvG56whcN23gc27yenwF6oJZXGFpYxg==}
 
@@ -626,8 +632,8 @@ packages:
   jsonfile@6.1.0:
     resolution: {integrity: sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==}
 
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+  lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
 
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
@@ -1016,6 +1022,10 @@ snapshots:
 
   '@types/estree@1.0.6': {}
 
+  '@types/lodash-es@4.17.12':
+    dependencies:
+      '@types/lodash': 4.17.13
+
   '@types/lodash@4.17.13': {}
 
   '@types/node@22.9.0':
@@ -1138,7 +1148,7 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
-  lodash@4.17.21: {}
+  lodash-es@4.17.21: {}
 
   loose-envify@1.4.0:
     dependencies:

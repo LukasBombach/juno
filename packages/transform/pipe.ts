@@ -1,4 +1,4 @@
-import { isMatchWith } from "lodash";
+import { isMatchWith } from "lodash-es";
 import { traverse } from "./traverse";
 import type { Node, NodeType, NodeTypeMap } from "./parse";
 

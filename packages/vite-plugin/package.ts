@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "path";
 import { renderToString } from "@juno/ssr";
+import { transform } from "@juno/transform";
 
 import type { Plugin } from "vite";
 
@@ -30,6 +31,7 @@ export default function juno(): Plugin {
         }
       });
     },
+
     async transform(code, id, options) {
       if (options?.ssr) {
         return null;
@@ -43,9 +45,7 @@ export default function juno(): Plugin {
         return null;
       }
 
-      console.log(id);
-
-      return code;
+      return await transform(code);
     },
   };
 }
