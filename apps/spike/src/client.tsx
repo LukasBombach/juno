@@ -1,6 +1,7 @@
 import { hydrate } from "@juno/client";
 import Page from "./page";
 
-console.log(Page.toString(), Page());
+console.debug(Page.toString());
+console.debug(Page());
 
 hydrate(document, <Page />);
