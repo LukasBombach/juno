@@ -1,10 +1,7 @@
-interface RenderContext {
-  signal: <T>(value: T) => (() => T) & { set: (value: T) => void };
-  ssrData: any[];
-}
+import { signal } from "@maverick-js/signals";
 
-export default function Page(ctx: RenderContext) {
-  const count = ctx.signal(Math.floor(Math.random() * 100));
+export default function Page() {
+  const count = signal(Math.floor(Math.random() * 100));
 
   return (
     <html lang="en">
