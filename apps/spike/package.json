@@ -11,5 +11,8 @@
     "@juno/client": "workspace:*",
     "@juno/vite-plugin-juno": "workspace:*",
     "vite-plugin-inspect": "0.8.7"
+  },
+  "dependencies": {
+    "@maverick-js/signals": "6.0.0"
   }
 }

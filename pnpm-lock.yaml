@@ -28,6 +28,10 @@ importers:
         version: 5.4.10(@types/node@22.9.0)
 
   apps/spike:
+    dependencies:
+      '@maverick-js/signals':
+        specifier: 6.0.0
+        version: 6.0.0
     devDependencies:
       '@juno/client':
         specifier: workspace:*
