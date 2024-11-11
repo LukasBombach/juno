@@ -12,6 +12,7 @@ type AnyNode =
   | t.JSXOpeningElement
   | t.JSXAttribute
   | t.JSXExpressionContainer
+  | t.JSXSpreadChild
   | t.Param
   | t.Pattern;
 

@@ -64,9 +64,22 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
           const expression = pipe(attr.value, is("JSXExpressionContainer"), getProp("expression"));
           return [name, expression];
         })
-      );
+      ) as [string, t.JSXExpression][];
 
-      return [["path", path], ...attrs] as (["path", number[]] | [string, t.JSXExpression])[];
+      const children = pipe(el.children, is("JSXExpressionContainer"), getProp("expression"));
+
+      const extractedClientCode: (["path", number[]] | ["children", t.JSXExpression[]] | [string, t.JSXExpression])[] =
+        [];
+
+      extractedClientCode.push(["path", path]);
+      extractedClientCode.push(...attrs);
+
+      if (children.length) {
+        console.log("children", children);
+        //extractedClientCode.push(["children", children]);
+      }
+
+      return extractedClientCode;
     })
   );
 
