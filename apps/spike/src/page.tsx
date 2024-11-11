@@ -1,7 +1,7 @@
 import { signal } from "@maverick-js/signals";
 
 export default function Page() {
-  const count = signal(Math.floor(Math.random() * 100));
+  const count = signal(1);
 
   return (
     <html lang="en">
