@@ -4,4 +4,5 @@ import Page from "./page";
 console.debug(Page.toString());
 console.debug(Page());
 
-hydrate(document, <Page />);
+// todo hydrate(document, <Page />);
+hydrate(document, Page() as any);
