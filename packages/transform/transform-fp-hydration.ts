@@ -94,6 +94,13 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
           return true;
         }
 
+        if (name === "children") {
+          if (!Array.isArray(expression)) {
+            throw new Error("Expected children to be an array");
+          }
+          return expression.length > 0;
+        }
+
         if (name.match(/^on[A-Z]/)) {
           return true;
         }
