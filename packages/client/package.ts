@@ -4,8 +4,6 @@ type Directive = {
 } & Record<string, unknown>;
 
 export function hydrate(root: Document | HTMLElement, directives: Directive[]) {
-  console.log("hydrating", { root, directives });
-
   directives.forEach(directive => {
     const { path, children, ...props } = directive;
     const selector = `& > ${path
@@ -14,6 +12,6 @@ export function hydrate(root: Document | HTMLElement, directives: Directive[]) {
       .join(" > ")}`;
     const el = root.querySelector(selector);
 
-    console.log("hydrating", { selector, el });
+    console.log("hydrating", { el, children, props });
   });
 }
