@@ -38,7 +38,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
   const interactiveIds: t.Identifier[] = pipe(
     returnStatement,
     findAll({ type: "JSXAttribute" }),
-    (attrs) => attrs.filter((attr) => idToString(attr.name).match(/on[A-Z]/) !== null),
+    attrs => attrs.filter(attr => idToString(attr.name).match(/on[A-Z]/) !== null),
     findAll({ type: "Identifier" }),
     flat()
   );
@@ -46,7 +46,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
   // create a Regex that matches all their names
   // todo quick hack, also we need to escape special regex characters
   const interactiveIdsNames = interactiveIds.length
-    ? new RegExp(`^${interactiveIds.map((id) => id.value).join("|")}$`)
+    ? new RegExp(`^${interactiveIds.map(id => id.value).join("|")}$`)
     : null;
 
   // reduce all JSXElements to a flat Array with they path and attributes
@@ -59,7 +59,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
       const props = pipe(
         el.opening.attributes,
         is("JSXAttribute"),
-        map((attr) => {
+        map(attr => {
           const name = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
           const expression = pipe(attr.value, is("JSXExpressionContainer"), getProp("expression"));
           return [name, expression];
@@ -88,7 +88,14 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
         extractedClientCode.push(["children", children]);
       }
 
-      return extractedClientCode;
+      const extractedClientCode2: {
+        path: number[];
+        attrs: Record<string, t.JSXExpression>;
+        events: Record<string, t.JSXExpression>;
+        children: t.JSXExpression[];
+      } = { path, attrs: Object.fromEntries(attrs), events: Object.fromEntries(events), children };
+
+      return extractedClientCode2;
     })
   );
 
@@ -96,38 +103,30 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
   // the path
   // event handlers
   // include an identifier that is used in an event handler
-  const remainingAttributes = flatPathedElementList
-    .map((entries) => {
-      return entries.filter(([name, expression]) => {
-        if (name === "path") {
-          return true;
-        }
+  const filteredElements = flatPathedElementList
+    .map(({ path, attrs, events, children }) => {
+      return {
+        path,
+        events,
+        children,
+        attrs: Object.fromEntries(
+          Object.entries(attrs).filter(([name, expression]) => {
+            const identifiers = pipe(
+              expression,
+              findAll({ type: "Identifier" }),
+              map(id => idToString(id))
+            );
 
-        if (name === "children") {
-          if (!Array.isArray(expression)) {
-            throw new Error("Expected children to be an array");
-          }
-          return expression.length > 0;
-        }
+            const includesInteractiveId = identifiers.some(id => interactiveIdsNames?.test(id));
 
-        if (name.match(/^on[A-Z]/)) {
-          return true;
-        }
-
-        const identifiers = pipe(
-          expression as t.JSXExpression,
-          findAll({ type: "Identifier" }),
-          map((id) => idToString(id))
-        );
-
-        const includesInteractiveId = identifiers.some((id) => interactiveIdsNames?.test(id));
-
-        return includesInteractiveId;
-      });
+            return includesInteractiveId;
+          })
+        ),
+      };
     })
     // todo dumbest hack assuming there's always a path
     // and if there are no attributes left, the length will be 1
-    .filter((entries) => entries.length > 1);
+    .filter(elm => Object.keys(elm.events).length > 1 || Object.keys(elm.attrs).length > 1);
 
   return {
     type: "ReturnStatement",
@@ -135,11 +134,11 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
     argument: {
       type: "ArrayExpression",
       span,
-      elements: remainingAttributes.map((attrs) => ({
+      elements: filteredElements.map(({ path, attrs, events, children }) => ({
         expression: {
           type: "ObjectExpression",
           span,
-          properties: attrs.map(([name, expression]) => {
+          properties: /* Object.entries(attrs).map(([name, expression]) => {
             if (name === "path") {
               return {
                 type: "KeyValueProperty",
@@ -152,7 +151,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
                 value: {
                   type: "ArrayExpression",
                   span,
-                  elements: (expression as number[]).map((num) => ({
+                  elements: (expression as number[]).map(num => ({
                     expression: {
                       type: "NumericLiteral",
                       span,
@@ -175,7 +174,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
                 value: {
                   type: "ArrayExpression",
                   span,
-                  elements: (expression as t.Expression[]).map((expr) => {
+                  elements: (expression as t.Expression[]).map(expr => {
                     return {
                       expression: {
                         type: "ArrowFunctionExpression",
@@ -202,7 +201,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
                 value: expression as t.JSXExpression,
               };
             }
-          }),
+          }) */,
         },
       })),
     },
@@ -211,12 +210,10 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
 
 function getPath(el: t.JSXElement, allElements: t.JSXElement[]): number[] {
   return getParents(allElements[0])(el)
-    .filter((parent) => parent.type === "JSXElement")
+    .filter(parent => parent.type === "JSXElement")
     .toReversed()
     .concat(el)
-    .map((cur, i, all) =>
-      i === 0 ? 1 : all[i - 1].children.filter((el) => el.type === "JSXElement").indexOf(cur) + 1
-    );
+    .map((cur, i, all) => (i === 0 ? 1 : all[i - 1].children.filter(el => el.type === "JSXElement").indexOf(cur) + 1));
 }
 
 function idToString(node: t.Identifier | t.JSXNamespacedName): string {
