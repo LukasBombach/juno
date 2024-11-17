@@ -75,8 +75,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
       extractedClientCode.push(...attrs);
 
       if (children.length) {
-        console.log("children", children);
-        //extractedClientCode.push(["children", children]);
+        extractedClientCode.push(["children", children]);
       }
 
       return extractedClientCode;
@@ -151,6 +150,34 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
                       raw: num.toString(),
                     },
                   })),
+                },
+              };
+            }
+            if (name === "children") {
+              return {
+                type: "KeyValueProperty",
+                key: {
+                  type: "Identifier",
+                  span,
+                  value: "children",
+                  optional: false,
+                },
+                value: {
+                  type: "ArrayExpression",
+                  span,
+                  elements: (expression as t.Expression[]).map(expr => {
+                    return {
+                      expression: {
+                        type: "ArrowFunctionExpression",
+                        span,
+                        ctxt: 0,
+                        params: [],
+                        body: expr,
+                        async: false,
+                        generator: false,
+                      },
+                    };
+                  }),
                 },
               };
             } else {
