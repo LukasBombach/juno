@@ -22,7 +22,7 @@ export default function Page() {
         <script type="module">
           {`
           import { hydrate } from "@juno/client";
-          import Page from "/src/page.tsx";
+          import Page from "/src/reactive-assignments.tsx";
 
           console.debug(Page.toString());
 
