@@ -38,7 +38,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
   const interactiveIds: t.Identifier[] = pipe(
     returnStatement,
     findAll({ type: "JSXAttribute" }),
-    (attrs) => attrs.filter((attr) => idToString(attr.name).match(/on[A-Z]/) !== null),
+    attrs => attrs.filter(attr => idToString(attr.name).match(/on[A-Z]/) !== null),
     findAll({ type: "Identifier" }),
     flat()
   );
@@ -46,7 +46,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
   // create a Regex that matches all their names
   // todo quick hack, also we need to escape special regex characters
   const interactiveIdsNames = interactiveIds.length
-    ? new RegExp(`^${interactiveIds.map((id) => id.value).join("|")}$`)
+    ? new RegExp(`^${interactiveIds.map(id => id.value).join("|")}$`)
     : null;
 
   const clientAttributes = pipe(
@@ -58,7 +58,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
       const props = pipe(
         el.opening.attributes,
         is("JSXAttribute"),
-        map((attr) => {
+        map(attr => {
           const name = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
           const expression: t.Expression = pipe(attr.value, is("JSXExpressionContainer"), getProp("expression"));
           return [name, expression];
@@ -72,7 +72,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
 
       // todo return readily processed  and usable AST ndoes
       let children: (t.Expression | t.NumericLiteral)[] = el.children
-        .map((child) => {
+        .map((child, i) => {
           if (child.type === "JSXExpressionContainer") {
             return {
               type: "ArrowFunctionExpression",
@@ -86,11 +86,13 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
           }
 
           if (child.type === "JSXText") {
+            const length = i === 0 ? child.value.trimStart().length : child.value.length;
+
             return {
               type: "NumericLiteral",
               span,
-              value: child.value.trim().length,
-              raw: String(child.value.trim().length),
+              value: length,
+              raw: String(length),
             };
           }
 
@@ -98,12 +100,12 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
 
           throw new Error(`Unexpected child type ${child.type}`);
         })
-        .filter((child) => child !== undefined) as (t.Expression | t.NumericLiteral)[];
+        .filter(child => child !== undefined) as (t.Expression | t.NumericLiteral)[];
 
       // todo 🚨🚨🚨🚨🚨🚨
       // todo cheap hack, will fail if there is other child than JSXExpressionContainer and JSXText
       // todo 🚨🚨🚨🚨🚨🚨
-      if (children.filter((child) => child.type !== "NumericLiteral").length === 0) {
+      if (children.filter(child => child.type !== "NumericLiteral").length === 0) {
         children = [];
       }
 
@@ -127,10 +129,10 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
             const identifiers = pipe(
               expression,
               findAll({ type: "Identifier" }),
-              map((id) => idToString(id))
+              map(id => idToString(id))
             );
 
-            const includesInteractiveId = identifiers.some((id) => interactiveIdsNames?.test(id));
+            const includesInteractiveId = identifiers.some(id => interactiveIdsNames?.test(id));
 
             return includesInteractiveId;
           })
@@ -138,7 +140,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
       };
     })
     .filter(
-      (elm) =>
+      elm =>
         Object.keys(elm.events).length > 0 || Object.keys(elm.attrs).length > 0 || Object.keys(elm.children).length > 0
     );
 
@@ -166,7 +168,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
           value: {
             type: "ArrayExpression",
             span,
-            elements: path.map((num) => ({
+            elements: path.map(num => ({
               expression: {
                 type: "NumericLiteral",
                 span,
@@ -253,7 +255,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
             value: {
               type: "ArrayExpression",
               span,
-              elements: children.map((child) => ({
+              elements: children.map(child => ({
                 expression: child,
               })),
             },
@@ -274,13 +276,11 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
 
 function getPath(el: t.JSXElement, allElements: t.JSXElement[]): number[] {
   return getParents(allElements[0])(el)
-    .filter((parent) => parent.type === "JSXElement")
+    .filter(parent => parent.type === "JSXElement")
     .slice()
     .reverse()
     .concat(el)
-    .map((cur, i, all) =>
-      i === 0 ? 1 : all[i - 1].children.filter((el) => el.type === "JSXElement").indexOf(cur) + 1
-    );
+    .map((cur, i, all) => (i === 0 ? 1 : all[i - 1].children.filter(el => el.type === "JSXElement").indexOf(cur) + 1));
 }
 
 function idToString(node: t.Identifier | t.JSXNamespacedName): string {
