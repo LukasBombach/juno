@@ -13,7 +13,7 @@ export default function Page() {
       </head>
       <body>
         <h1>hello juno</h1>
-        <p>{count()}</p>
+        <p>You clicked {count()} times</p>
         <button onClick={() => count.set(count() + 1)}>Click</button>
         <script type="module" src="/src/client.tsx"></script>
       </body>

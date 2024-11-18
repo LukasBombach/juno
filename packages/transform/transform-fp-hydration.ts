@@ -70,13 +70,48 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
         .filter(([name]) => name.match(/^on[A-Z]/))
         .map(([name, expression]) => [name.substring(2).toLowerCase(), expression] as [string, t.Expression]);
 
-      const children = pipe(el.children, is("JSXExpressionContainer"), getProp("expression"));
+      // todo return readily processed  and usable AST ndoes
+      let children: (t.Expression | t.NumericLiteral)[] = el.children
+        .map((child) => {
+          if (child.type === "JSXExpressionContainer") {
+            return {
+              type: "ArrowFunctionExpression",
+              span,
+              ctxt: 0,
+              params: [],
+              body: child.expression,
+              async: false,
+              generator: false,
+            };
+          }
+
+          if (child.type === "JSXText") {
+            return {
+              type: "NumericLiteral",
+              span,
+              value: child.value.length,
+              raw: String(child.value.length),
+            };
+          }
+
+          return undefined;
+
+          throw new Error(`Unexpected child type ${child.type}`);
+        })
+        .filter((child) => child !== undefined) as (t.Expression | t.NumericLiteral)[];
+
+      // todo 🚨🚨🚨🚨🚨🚨
+      // todo cheap hack, will fail if there is other child than JSXExpressionContainer and JSXText
+      // todo 🚨🚨🚨🚨🚨🚨
+      if (children.filter((child) => child.type !== "NumericLiteral").length === 0) {
+        children = [];
+      }
 
       const extractedClientCode2: {
         path: number[];
         attrs: Record<string, t.Expression>;
         events: Record<string, t.Expression>;
-        children: t.Expression[];
+        children: (t.Expression | t.NumericLiteral)[];
       } = { path, attrs: Object.fromEntries(attrs), events: Object.fromEntries(events), children };
 
       return extractedClientCode2;
@@ -117,6 +152,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
         const properties: t.ObjectExpression["properties"] = [];
 
         /**
+         * 🗺️ path
          * Definitely always add the path property { path: [1,2,3] }
          */
         properties.push({
@@ -142,6 +178,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
         });
 
         /**
+         * 🎨 attrs
          * Only with attrs present, add attrs property { attrs: { key: value } }
          */
         if (Object.keys(attrs).length) {
@@ -171,6 +208,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
         }
 
         /**
+         * 👆 events
          * Only with events present, add events property { events: { key: value } }
          */
         if (Object.keys(events).length) {
@@ -200,6 +238,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
         }
 
         /**
+         * 🧒 children
          * Only with children present, add children property { children: [expression] }
          */
         if (children.length) {
@@ -215,15 +254,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
               type: "ArrayExpression",
               span,
               elements: children.map((child) => ({
-                expression: {
-                  type: "ArrowFunctionExpression",
-                  span,
-                  ctxt: 0,
-                  params: [],
-                  body: child,
-                  async: false,
-                  generator: false,
-                },
+                expression: child,
               })),
             },
           });
