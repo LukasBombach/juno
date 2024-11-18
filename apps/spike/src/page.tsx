@@ -19,7 +19,16 @@ export default function Page() {
         <button onClick={handleClick}>
           Clicked {count()} {count() === 1 ? "time" : "times"}
         </button>
-        <script type="module" src="/src/client.tsx"></script>
+        <script type="module">
+          {`
+          import { hydrate } from "@juno/client";
+          import Page from "/src/page.tsx";
+
+          console.debug(Page.toString());
+
+          hydrate(document, Page());
+          `}
+        </script>
       </body>
     </html>
   );
