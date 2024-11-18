@@ -61,23 +61,23 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
         is("JSXAttribute"),
         map(attr => {
           const name = attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
-          const expression = pipe(attr.value, is("JSXExpressionContainer"), getProp("expression"));
+          const expression: t.Expression = pipe(attr.value, is("JSXExpressionContainer"), getProp("expression"));
           return [name, expression];
         })
-      ) as [string, t.JSXExpression][];
+      ) as [string, t.Expression][];
 
       const attrs = props.filter(([name]) => !name.match(/^on[A-Z]/));
       const events = props
         .filter(([name]) => name.match(/^on[A-Z]/))
-        .map(([name, expression]) => [name.substring(2).toLowerCase(), expression] as [string, t.JSXExpression]);
+        .map(([name, expression]) => [name.substring(2).toLowerCase(), expression] as [string, t.Expression]);
 
       const children = pipe(el.children, is("JSXExpressionContainer"), getProp("expression"));
 
       const extractedClientCode: (
         | ["path", number[]]
-        | ["children", t.JSXExpression[]]
-        | ["attrs", [string, t.JSXExpression][]]
-        | ["events", [string, t.JSXExpression][]]
+        | ["children", t.Expression[]]
+        | ["attrs", [string, t.Expression][]]
+        | ["events", [string, t.Expression][]]
       )[] = [];
 
       extractedClientCode.push(["path", path]);
@@ -90,9 +90,9 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
 
       const extractedClientCode2: {
         path: number[];
-        attrs: Record<string, t.JSXExpression>;
-        events: Record<string, t.JSXExpression>;
-        children: t.JSXExpression[];
+        attrs: Record<string, t.Expression>;
+        events: Record<string, t.Expression>;
+        children: t.Expression[];
       } = { path, attrs: Object.fromEntries(attrs), events: Object.fromEntries(events), children };
 
       return extractedClientCode2;
@@ -124,9 +124,10 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
         ),
       };
     })
-    // todo dumbest hack assuming there's always a path
-    // and if there are no attributes left, the length will be 1
-    .filter(elm => Object.keys(elm.events).length > 1 || Object.keys(elm.attrs).length > 1);
+    .filter(
+      elm =>
+        Object.keys(elm.events).length > 0 || Object.keys(elm.attrs).length > 0 || Object.keys(elm.children).length > 0
+    );
 
   return {
     type: "ReturnStatement",
@@ -138,70 +139,89 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
         expression: {
           type: "ObjectExpression",
           span,
-          properties: /* Object.entries(attrs).map(([name, expression]) => {
-            if (name === "path") {
-              return {
-                type: "KeyValueProperty",
-                key: {
-                  type: "Identifier",
-                  span,
-                  value: "path",
-                  optional: false,
-                },
-                value: {
-                  type: "ArrayExpression",
-                  span,
-                  elements: (expression as number[]).map(num => ({
-                    expression: {
-                      type: "NumericLiteral",
-                      span,
-                      value: num,
-                      raw: num.toString(),
-                    },
-                  })),
-                },
-              };
-            }
-            if (name === "children") {
-              return {
-                type: "KeyValueProperty",
-                key: {
-                  type: "Identifier",
-                  span,
-                  value: "children",
-                  optional: false,
-                },
-                value: {
-                  type: "ArrayExpression",
-                  span,
-                  elements: (expression as t.Expression[]).map(expr => {
-                    return {
-                      expression: {
-                        type: "ArrowFunctionExpression",
-                        span,
-                        ctxt: 0,
-                        params: [],
-                        body: expr,
-                        async: false,
-                        generator: false,
-                      },
-                    };
-                  }),
-                },
-              };
-            } else {
-              return {
-                type: "KeyValueProperty",
-                key: {
-                  type: "Identifier",
-                  span,
-                  value: name,
-                  optional: false,
-                },
-                value: expression as t.JSXExpression,
-              };
-            }
-          }) */,
+          properties: [
+            {
+              type: "KeyValueProperty",
+              key: {
+                type: "Identifier",
+                span,
+                value: "path",
+                optional: false,
+              },
+              value: {
+                type: "ArrayExpression",
+                span,
+                elements: path.map(num => ({
+                  expression: {
+                    type: "NumericLiteral",
+                    span,
+                    value: num,
+                    raw: String(num),
+                  },
+                })),
+              },
+            },
+            {
+              type: "KeyValueProperty",
+              key: {
+                type: "Identifier",
+                span,
+                value: "attrs",
+                optional: false,
+              },
+              value: {
+                type: "ObjectExpression",
+                span,
+                properties: Object.entries(attrs).map(([name, expression]) => ({
+                  type: "KeyValueProperty",
+                  key: {
+                    type: "Identifier",
+                    span,
+                    value: name,
+                    optional: false,
+                  },
+                  value: expression,
+                })),
+              },
+            },
+            {
+              type: "KeyValueProperty",
+              key: {
+                type: "Identifier",
+                span,
+                value: "events",
+                optional: false,
+              },
+              value: {
+                type: "ObjectExpression",
+                span,
+                properties: Object.entries(events).map(([name, expression]) => ({
+                  type: "KeyValueProperty",
+                  key: {
+                    type: "Identifier",
+                    span,
+                    value: name,
+                    optional: false,
+                  },
+                  value: expression,
+                })),
+              },
+            },
+            {
+              type: "KeyValueProperty",
+              key: {
+                type: "Identifier",
+                span,
+                value: "children",
+                optional: false,
+              },
+              value: {
+                type: "ArrayExpression",
+                span,
+                elements: children.map(expression => ({ expression })),
+              },
+            },
+          ],
         },
       })),
     },
