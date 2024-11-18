@@ -3,6 +3,10 @@ import { signal } from "@maverick-js/signals";
 export default function Page() {
   const count = signal(1);
 
+  function handleClick() {
+    count.set(count() + 1);
+  }
+
   return (
     <html lang="en">
       <head>
@@ -12,11 +16,9 @@ export default function Page() {
         <title>juno</title>
       </head>
       <body>
-        <h1>hello juno</h1>
-        <p>
-          You clicked {count()} {count() === 1 ? "time" : "times"}
-        </p>
-        <button onClick={() => count.set(count() + 1)}>Click</button>
+        <button onClick={handleClick}>
+          Clicked {count()} {count() === 1 ? "time" : "times"}
+        </button>
         <script type="module" src="/src/client.tsx"></script>
       </body>
     </html>
