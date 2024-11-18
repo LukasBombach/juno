@@ -72,7 +72,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
 
       // todo return readily processed  and usable AST ndoes
       let children: (t.Expression | t.NumericLiteral)[] = el.children
-        .map((child, i) => {
+        .map((child, i, all) => {
           if (child.type === "JSXExpressionContainer") {
             return {
               type: "ArrowFunctionExpression",
@@ -86,7 +86,12 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
           }
 
           if (child.type === "JSXText") {
-            const length = i === 0 ? child.value.trimStart().length : child.value.length;
+            const length =
+              i === 0
+                ? child.value.trimStart().length
+                : i === all.length - 1
+                ? child.value.trimEnd().length
+                : child.value.length;
 
             return {
               type: "NumericLiteral",
@@ -108,6 +113,8 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
       if (children.filter(child => child.type !== "NumericLiteral").length === 0) {
         children = [];
       }
+
+      children = children.slice(0, children.findLastIndex(node => node.type !== "NumericLiteral") + 1);
 
       const extractedClientCode2: {
         path: number[];
