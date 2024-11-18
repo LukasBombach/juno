@@ -30,7 +30,7 @@ const span = {
  * ```
  * return [
  *   { path: [1,2], children: [count] },
- *   { path: [1,3], onClick: () => setCount(count + 1) },
+ *   { path: [1,3], events: { click: () => setCount(count + 1) } },
  * ]
  */
 export function transformHydrations(returnStatement: Node<"ReturnStatement">): Node<"ReturnStatement"> {
@@ -49,8 +49,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
     ? new RegExp(`^${interactiveIds.map((id) => id.value).join("|")}$`)
     : null;
 
-  // reduce all JSXElements to a flat Array with they path and attributes
-  const flatPathedElementList = pipe(
+  const clientAttributes = pipe(
     returnStatement,
     findAll({ type: "JSXElement" }),
     map((el, _, allElements) => {
@@ -73,21 +72,6 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
 
       const children = pipe(el.children, is("JSXExpressionContainer"), getProp("expression"));
 
-      const extractedClientCode: (
-        | ["path", number[]]
-        | ["children", t.Expression[]]
-        | ["attrs", [string, t.Expression][]]
-        | ["events", [string, t.Expression][]]
-      )[] = [];
-
-      extractedClientCode.push(["path", path]);
-      extractedClientCode.push(["attrs", attrs]);
-      extractedClientCode.push(["events", events]);
-
-      if (children.length) {
-        extractedClientCode.push(["children", children]);
-      }
-
       const extractedClientCode2: {
         path: number[];
         attrs: Record<string, t.Expression>;
@@ -97,13 +81,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
 
       return extractedClientCode2;
     })
-  );
-
-  // allow attributes that are
-  // the path
-  // event handlers
-  // include an identifier that is used in an event handler
-  const filteredElements = flatPathedElementList
+  )
     .map(({ path, attrs, events, children }) => {
       return {
         path,
@@ -135,7 +113,7 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
     argument: {
       type: "ArrayExpression",
       span,
-      elements: filteredElements.map(({ path, attrs, events, children }) => ({
+      elements: clientAttributes.map(({ path, attrs, events, children }) => ({
         expression: {
           type: "ObjectExpression",
           span,
