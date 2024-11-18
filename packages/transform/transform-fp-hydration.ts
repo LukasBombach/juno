@@ -218,7 +218,17 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
               value: {
                 type: "ArrayExpression",
                 span,
-                elements: children.map(expression => ({ expression })),
+                elements: children.map(child => ({
+                  expression: {
+                    type: "ArrowFunctionExpression",
+                    span,
+                    ctxt: 0,
+                    params: [],
+                    body: child,
+                    async: false,
+                    generator: false,
+                  },
+                })),
               },
             },
           ],
