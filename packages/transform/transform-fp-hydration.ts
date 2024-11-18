@@ -89,8 +89,8 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
             return {
               type: "NumericLiteral",
               span,
-              value: child.value.length,
-              raw: String(child.value.length),
+              value: child.value.trim().length,
+              raw: String(child.value.trim().length),
             };
           }
 
