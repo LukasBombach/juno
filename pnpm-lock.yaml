@@ -43,7 +43,11 @@ importers:
         specifier: 0.8.7
         version: 0.8.7(rollup@4.25.0)(vite@5.4.10(@types/node@22.9.0))
 
-  packages/client: {}
+  packages/client:
+    dependencies:
+      '@maverick-js/signals':
+        specifier: 6.0.0
+        version: 6.0.0
 
   packages/ssr:
     dependencies:

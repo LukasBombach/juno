@@ -8,11 +8,11 @@ type Directive = {
 };
 
 export function hydrate(root: Document | HTMLElement, directives: Directive[]) {
-  directives.forEach(directive => {
+  directives.forEach((directive) => {
     const { path, attrs, events, children } = directive;
     const selector = `& > ${path
       .slice(1)
-      .map(n => `*:nth-child(${n})`)
+      .map((n) => `*:nth-child(${n})`)
       .join(" > ")}`;
     const el = root.querySelector(selector);
 
@@ -20,7 +20,13 @@ export function hydrate(root: Document | HTMLElement, directives: Directive[]) {
       throw new Error(`Element not found: ${selector}`);
     }
 
-    console.log("hydrating", { el, attrs, events, children });
+    console.debug(
+      "hydrating",
+      el,
+      ...Object.entries({ attrs, events, children })
+        .filter(([_, value]) => value !== undefined)
+        .flat()
+    );
 
     for (const [name, handler] of Object.entries(events || {})) {
       el.addEventListener(name, handler);

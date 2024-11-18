@@ -113,105 +113,130 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
     argument: {
       type: "ArrayExpression",
       span,
-      elements: clientAttributes.map(({ path, attrs, events, children }) => ({
-        expression: {
-          type: "ObjectExpression",
-          span,
-          properties: [
-            {
-              type: "KeyValueProperty",
-              key: {
-                type: "Identifier",
+      elements: clientAttributes.map(({ path, attrs, events, children }) => {
+        const properties: t.ObjectExpression["properties"] = [];
+
+        /**
+         * Definitely always add the path property { path: [1,2,3] }
+         */
+        properties.push({
+          type: "KeyValueProperty",
+          key: {
+            type: "Identifier",
+            span,
+            value: "path",
+            optional: false,
+          },
+          value: {
+            type: "ArrayExpression",
+            span,
+            elements: path.map((num) => ({
+              expression: {
+                type: "NumericLiteral",
                 span,
-                value: "path",
-                optional: false,
+                value: num,
+                raw: String(num),
               },
-              value: {
-                type: "ArrayExpression",
-                span,
-                elements: path.map((num) => ({
-                  expression: {
-                    type: "NumericLiteral",
-                    span,
-                    value: num,
-                    raw: String(num),
-                  },
-                })),
-              },
+            })),
+          },
+        });
+
+        /**
+         * Only with attrs present, add attrs property { attrs: { key: value } }
+         */
+        if (Object.keys(attrs).length) {
+          properties.push({
+            type: "KeyValueProperty",
+            key: {
+              type: "Identifier",
+              span,
+              value: "attrs",
+              optional: false,
             },
-            {
-              type: "KeyValueProperty",
-              key: {
-                type: "Identifier",
-                span,
-                value: "attrs",
-                optional: false,
-              },
-              value: {
-                type: "ObjectExpression",
-                span,
-                properties: Object.entries(attrs).map(([name, expression]) => ({
-                  type: "KeyValueProperty",
-                  key: {
-                    type: "Identifier",
-                    span,
-                    value: name,
-                    optional: false,
-                  },
-                  value: expression,
-                })),
-              },
+            value: {
+              type: "ObjectExpression",
+              span,
+              properties: Object.entries(attrs).map(([name, expression]) => ({
+                type: "KeyValueProperty",
+                key: {
+                  type: "Identifier",
+                  span,
+                  value: name,
+                  optional: false,
+                },
+                value: expression,
+              })),
             },
-            {
-              type: "KeyValueProperty",
-              key: {
-                type: "Identifier",
-                span,
-                value: "events",
-                optional: false,
-              },
-              value: {
-                type: "ObjectExpression",
-                span,
-                properties: Object.entries(events).map(([name, expression]) => ({
-                  type: "KeyValueProperty",
-                  key: {
-                    type: "Identifier",
-                    span,
-                    value: name,
-                    optional: false,
-                  },
-                  value: expression,
-                })),
-              },
+          });
+        }
+
+        /**
+         * Only with events present, add events property { events: { key: value } }
+         */
+        if (Object.keys(events).length) {
+          properties.push({
+            type: "KeyValueProperty",
+            key: {
+              type: "Identifier",
+              span,
+              value: "events",
+              optional: false,
             },
-            {
-              type: "KeyValueProperty",
-              key: {
-                type: "Identifier",
-                span,
-                value: "children",
-                optional: false,
-              },
-              value: {
-                type: "ArrayExpression",
-                span,
-                elements: children.map((child) => ({
-                  expression: {
-                    type: "ArrowFunctionExpression",
-                    span,
-                    ctxt: 0,
-                    params: [],
-                    body: child,
-                    async: false,
-                    generator: false,
-                  },
-                })),
-              },
+            value: {
+              type: "ObjectExpression",
+              span,
+              properties: Object.entries(events).map(([name, expression]) => ({
+                type: "KeyValueProperty",
+                key: {
+                  type: "Identifier",
+                  span,
+                  value: name,
+                  optional: false,
+                },
+                value: expression,
+              })),
             },
-          ],
-        },
-      })),
+          });
+        }
+
+        /**
+         * Only with children present, add children property { children: [expression] }
+         */
+        if (children.length) {
+          properties.push({
+            type: "KeyValueProperty",
+            key: {
+              type: "Identifier",
+              span,
+              value: "children",
+              optional: false,
+            },
+            value: {
+              type: "ArrayExpression",
+              span,
+              elements: children.map((child) => ({
+                expression: {
+                  type: "ArrowFunctionExpression",
+                  span,
+                  ctxt: 0,
+                  params: [],
+                  body: child,
+                  async: false,
+                  generator: false,
+                },
+              })),
+            },
+          });
+        }
+
+        return {
+          expression: {
+            type: "ObjectExpression",
+            span,
+            properties,
+          },
+        };
+      }),
     },
   };
 }
