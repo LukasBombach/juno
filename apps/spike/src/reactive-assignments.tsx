@@ -16,7 +16,7 @@ export default function Page() {
         <title>juno</title>
       </head>
       <body>
-        <button onClick={handleClick}>
+        <button onClick={() => count.set(count() + 1)}>
           Clicked {count()} {count() === 1 ? "time" : "times"}
         </button>
         <script type="module">

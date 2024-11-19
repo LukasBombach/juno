@@ -114,6 +114,22 @@ export function transformHydrations(returnStatement: Node<"ReturnStatement">): N
         children = [];
       }
 
+      children = children.filter(child => {
+        if (child.type === "NumericLiteral") {
+          return true;
+        }
+
+        const identifiers = pipe(
+          child,
+          findAll({ type: "Identifier" }),
+          map(id => idToString(id))
+        );
+
+        const includesInteractiveId = identifiers.some(id => interactiveIdsNames?.test(id));
+
+        return includesInteractiveId;
+      });
+
       children = children.slice(0, children.findLastIndex(node => node.type !== "NumericLiteral") + 1);
 
       const extractedClientCode2: {
