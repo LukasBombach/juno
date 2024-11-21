@@ -12,7 +12,7 @@ export default function juno(): Plugin {
 
     configureServer(vite) {
       vite.middlewares.use(async (req, res, next) => {
-        const page = !req.url ? "/page" : req.url === "/" ? "/page" : req.url;
+        const page = !req.url ? "/index" : req.url === "/" ? "/index" : req.url;
         const filePath = path.resolve(`src/${page}.tsx`);
 
         if (fs.existsSync(filePath)) {
