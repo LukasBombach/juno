@@ -17,7 +17,7 @@ export default function Page() {
           console.debug(Page.toString());
 
           hydrate(document.body, Page());
-          `}
+        `}
       </script>
     </Html>
   );
