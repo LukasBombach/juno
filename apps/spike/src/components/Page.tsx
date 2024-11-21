@@ -1,17 +1,8 @@
-import fs from "node:fs";
+import { ListOfExamples } from "./ListOfExamples";
 
 import type { FC, ReactNode } from "react";
 
-function getPages(): string[] {
-  return fs
-    .readdirSync(process.cwd() + "/src")
-    .filter((file) => file.endsWith(".tsx"))
-    .map((file) => file.replace(/\.tsx$/, ""));
-}
-
 export const Page: FC<{ children?: ReactNode; title?: string }> = (props) => {
-  const pages = getPages();
-
   return (
     <html lang="en">
       <head>
@@ -21,15 +12,7 @@ export const Page: FC<{ children?: ReactNode; title?: string }> = (props) => {
         <title>{props.title} - juno</title>
       </head>
       <body>
-        <nav>
-          <ul>
-            {pages.map((name) => (
-              <li key={name}>
-                <a href={`/${name}`}>{name}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <ListOfExamples />
         <main>{props.children}</main>
       </body>
     </html>

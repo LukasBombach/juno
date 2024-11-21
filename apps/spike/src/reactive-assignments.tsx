@@ -6,11 +6,9 @@ export default function ReactiveAssignments() {
 
   return (
     <Page title="Reactive Assignments">
-      <div id="example">
-        <button onClick={() => count.set(count() + 1)}>
-          Clicked {count()} {count() === 1 ? "time" : "times"}
-        </button>
-      </div>
+      <button onClick={() => count.set(count() + 1)}>
+        Clicked {count()} {count() === 1 ? "time" : "times"}
+      </button>
       <script type="module">
         {`
           import { hydrate } from "@juno/client";
@@ -18,7 +16,7 @@ export default function ReactiveAssignments() {
 
           console.debug(Page.toString());
 
-          hydrate(document.querySelector("#example"), Page());
+          hydrate(document.querySelector("main"), Page());
         `}
       </script>
     </Page>
