@@ -1,27 +1,9 @@
-import fs from "node:fs";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import { Html } from "./components/Html";
+import { Page } from "./components/Page";
 
-function getPages(): string[] {
-  return fs
-    .readdirSync(dirname(fileURLToPath(import.meta.url)))
-    .filter((file) => file.endsWith(".tsx"))
-    .map((file) => file.replace(/\.tsx$/, ""));
-}
-
-export default function Page() {
-  const pages = getPages();
-
+export default function Index() {
   return (
-    <Html title="Overview">
-      <ul>
-        {pages.map((name) => (
-          <li key={name}>
-            <a href={`/${name}`}>{name}</a>
-          </li>
-        ))}
-      </ul>
-    </Html>
+    <Page title="Overview">
+      <p>Select an example from the list</p>
+    </Page>
   );
 }

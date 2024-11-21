@@ -1,14 +1,16 @@
 import { signal } from "@maverick-js/signals";
-import { Html } from "./components/Html";
+import { Page } from "./components/Page";
 
-export default function Page() {
+export default function ReactiveAssignments() {
   const count = signal(1);
 
   return (
-    <Html title="Reactive Assignments">
-      <button onClick={() => count.set(count() + 1)}>
-        Clicked {count()} {count() === 1 ? "time" : "times"}
-      </button>
+    <Page title="Reactive Assignments">
+      <div id="example">
+        <button onClick={() => count.set(count() + 1)}>
+          Clicked {count()} {count() === 1 ? "time" : "times"}
+        </button>
+      </div>
       <script type="module">
         {`
           import { hydrate } from "@juno/client";
@@ -16,9 +18,9 @@ export default function Page() {
 
           console.debug(Page.toString());
 
-          hydrate(document.body, Page());
+          hydrate(document.querySelector("#example"), Page());
         `}
       </script>
-    </Html>
+    </Page>
   );
 }
