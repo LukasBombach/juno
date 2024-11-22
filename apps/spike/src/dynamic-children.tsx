@@ -3,21 +3,6 @@ import { Page } from "./components/Page";
 
 import type { FC } from "react";
 
-const BunchOfDivs: FC = () => (
-  <>
-    <div>Div 1</div>
-    <div>Div 2</div>
-    <div>Div 3</div>
-    <div>Div 4</div>
-    <div>Div 5</div>
-    <div>Div 6</div>
-    <div>Div 7</div>
-    <div>Div 8</div>
-    <div>Div 9</div>
-    <div>Div 10</div>
-  </>
-);
-
 const DynamicDivs: FC = () => {
   const numDivs = Math.floor(Math.random() * 10) + 1;
 
@@ -30,12 +15,11 @@ const DynamicDivs: FC = () => {
   );
 };
 
-export default function ReactiveAssignments() {
+export default function DynamicChildren() {
   const count = signal(1);
 
   return (
-    <Page title="Nested Children vs Path">
-      <BunchOfDivs />
+    <Page title="Dynamic Children vs Path vs Hydraition">
       <DynamicDivs />
       <button onClick={() => count.set(count() + 1)}>
         Clicked {count()} {count() === 1 ? "time" : "times"}
