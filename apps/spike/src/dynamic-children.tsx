@@ -3,13 +3,14 @@ import { Page } from "./components/Page";
 
 import type { FC } from "react";
 
-const DynamicDivs: FC = () => {
-  const numDivs = Math.floor(Math.random() * 10) + 1;
+const length = Math.floor(Math.random() * 10) + 1;
+const randomLengthArray = Array.from({ length }, (_, i) => i + 1);
 
+const RandomDivs: FC = () => {
   return (
     <>
-      {Array.from({ length: numDivs }, (_, i) => (
-        <div key={i}>Div {i + 1}</div>
+      {randomLengthArray.map((i) => (
+        <div key={i} />
       ))}
     </>
   );
@@ -20,10 +21,8 @@ export default function DynamicChildren() {
 
   return (
     <Page title="Dynamic Children vs Path vs Hydraition">
-      <DynamicDivs />
-      <button onClick={() => count.set(count() + 1)}>
-        Clicked {count()} {count() === 1 ? "time" : "times"}
-      </button>
+      <RandomDivs />
+      <button onClick={() => count.set(count() + 1)}>Clicked {count()}</button>
     </Page>
   );
 }
