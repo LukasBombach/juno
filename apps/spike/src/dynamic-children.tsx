@@ -60,6 +60,7 @@ const serverResult = `
           <div />
           <div />
           <button>Clicked 1</button>
+          <script type="juno/hydrate" id="juno-hydrate-169"></script>
         </main>
       </body>
     </html>
