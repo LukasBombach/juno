@@ -33,9 +33,9 @@ importers:
         specifier: 6.0.0
         version: 6.0.0
     devDependencies:
-      '@juno/client':
+      '@juno/hydrate':
         specifier: workspace:*
-        version: link:../../packages/client
+        version: link:../../packages/hydrate
       '@juno/vite-plugin-juno':
         specifier: workspace:*
         version: link:../../packages/vite-plugin
@@ -43,7 +43,7 @@ importers:
         specifier: 0.8.7
         version: 0.8.7(rollup@4.25.0)(vite@5.4.10(@types/node@22.9.0))
 
-  packages/client:
+  packages/hydrate:
     dependencies:
       '@maverick-js/signals':
         specifier: 6.0.0

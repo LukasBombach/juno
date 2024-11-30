@@ -1,5 +1,5 @@
 {
-  "name": "@juno/client",
+  "name": "@juno/hydrate",
   "version": "1.0.0",
   "type": "module",
   "main": "package.ts",

@@ -11,7 +11,7 @@ export default function ReactiveAssignments() {
       </button>
       <script type="module">
         {`
-          import { hydrate } from "@juno/client";
+          import { hydrate } from "@juno/hydrate";
           import Page from "/src/reactive-assignments.tsx";
 
           console.debug(Page.toString());
