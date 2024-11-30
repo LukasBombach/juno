@@ -3,7 +3,7 @@ import { Page } from "./components/Page";
 
 import type { FC } from "react";
 
-const Step1: FC = () => (
+const ChildA: FC = () => (
   <section>
     <p>Lots of static JSX</p>
     <p>Things that would not show up in the JS bundle</p>
@@ -12,7 +12,7 @@ const Step1: FC = () => (
   </section>
 );
 
-const Step2: FC = () => (
+const ChildB: FC = () => (
   <section>
     <p>because it will be swapped in the client</p>
     <p>so the template code for this needs to be</p>
@@ -21,16 +21,14 @@ const Step2: FC = () => (
 );
 
 export default function ConditionalChildrenWithLotsOfJsx() {
-  const step = signal(1);
+  const toggle = signal(true);
 
-  const next = () => step.set(step() + 1);
-  const prev = () => step.set(step() - 1);
+  const switchToggle = () => toggle.set(!toggle());
 
   return (
     <Page title="Conditional Children with lots of JSX">
-      {step() === 1 ? <Step1 /> : <Step2 />}
-      <button onClick={next}>Prev</button>
-      <button onClick={prev}>Next</button>
+      {toggle() ? <ChildA /> : <ChildB />}
+      <button onClick={switchToggle}>Swtich</button>
     </Page>
   );
 }
