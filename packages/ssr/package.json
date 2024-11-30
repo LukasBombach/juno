@@ -1,0 +1,9 @@
+{
+  "name": "@juno/ssr",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "package.ts",
+  "dependencies": {
+    "@maverick-js/signals": "6.0.0"
+  }
+}

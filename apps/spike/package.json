@@ -1,0 +1,18 @@
+{
+  "name": "@juno/spike_02",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_OPTIONS='--import tsx' vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@juno/client": "workspace:*",
+    "@juno/vite-plugin-juno": "workspace:*",
+    "vite-plugin-inspect": "0.8.7"
+  },
+  "dependencies": {
+    "@maverick-js/signals": "6.0.0"
+  }
+}

@@ -1,32 +1,18 @@
 {
-  "name": "juno",
+  "name": "@juno/monorepo",
   "private": true,
-  "version": "0.3.0",
-  "type": "module",
+  "keywords": [],
+  "author": "Lukas Bombach",
+  "license": "MIT",
   "scripts": {
-    "dev": "bun run juno/server.ts",
-    "test": "vitest"
+    "dev": "pnpm --filter @juno/spike_02 dev"
   },
   "devDependencies": {
-    "@swc/core": "1.5.7",
-    "@types/express": "4.17.21",
-    "@types/lodash": "4.17.6",
-    "@types/react": "18.3.1",
-    "chalk": "5.3.0",
-    "cli-cursor": "4.0.0",
+    "@types/node": "22.9.0",
+    "@types/react": "18.3.12",
     "react": "18.3.1",
-    "recast": "0.23.7",
-    "typescript": "5.2.2",
-    "vite": "5.2.0",
-    "vite-plugin-full-reload": "1.1.0",
-    "vite-plugin-inspect": "0.8.4",
-    "vite-tsconfig-paths": "4.3.2",
-    "vitest": "2.1.1"
-  },
-  "dependencies": {
-    "@maverick-js/signals": "5.11.5",
-    "express": "4.19.2",
-    "fp-ts": "2.16.6",
-    "lodash": "4.17.21"
+    "tsx": "4.19.2",
+    "typescript": "5.6.2",
+    "vite": "5.4.10"
   }
 }
