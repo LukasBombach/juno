@@ -16,7 +16,7 @@ type AnyNode =
   | t.Param
   | t.Pattern;
 
-export type Node<T = void> = T extends NodeType ? NodeTypeMap[T] : AnyNode /*  | t.Argument */;
+export type Node<T = void> = T extends NodeType ? NodeTypeMap[T] : AnyNode;
 
 export type NodeType = AnyNode["type"];
 
@@ -24,7 +24,10 @@ export type NodeTypeMap = {
   [K in NodeType]: Extract<Node, { type: K }>;
 };
 
-export async function parse(src: string, options?: ParseOptions): Promise<t.Module> {
+export async function parse(
+  src: string,
+  options: ParseOptions = { syntax: "typescript", tsx: true }
+): Promise<t.Module> {
   return await swcparse(src, options);
 }
 

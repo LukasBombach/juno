@@ -4,6 +4,7 @@
   "type": "module",
   "main": "package.ts",
   "dependencies": {
+    "@juno/parse": "workspace:*",
     "@swc/core": "1.9.1",
     "lodash-es": "4.17.21"
   },

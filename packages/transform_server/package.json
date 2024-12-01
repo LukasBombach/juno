@@ -1,0 +1,9 @@
+{
+  "name": "@juno/transform_server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "package.ts",
+  "dependencies": {
+    "@juno/parse": "workspace:*"
+  }
+}
