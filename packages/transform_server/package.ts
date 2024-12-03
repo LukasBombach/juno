@@ -11,15 +11,26 @@ export async function transformServer(src: string): Promise<string> {
 export async function transformClient(src: string): Promise<string> {
   const module = await parse(src);
 
-  const components = getComponents(module).forEach((component) => {
-    getReturnStatements(component)
+  const jsxReturns = getFunctions(module)
+    .flatMap(getReturnStatements)
+    .filter(returnsJsx)
+    .forEach((rtn) => replace(rtn, toHydrationInstructions(rtn)));
+
+  for (const fn of getFunctions(module)) {
+    for (const rtnStatement of getReturnStatements(fn)) {
+      if (returnsJsx(rtnStatement)) {
+        replace(rtnStatement, toHydrationInstructions(rtnStatement));
+      }
+    }
+  }
+
+  getFunctions(module).forEach((fn) => {
+    getReturnStatements(fn)
       .filter(returnsJsx)
       .forEach((returnStatement) => {
-        returnStatement;
+        replace(returnStatement, toHydrationInstructions(returnStatement));
       });
   });
-
-  getJsxElements(module).filter(shouldBeHydrated).map(toHydrationInstruction);
 
   return await print(module);
 }
