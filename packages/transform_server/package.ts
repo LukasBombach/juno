@@ -13,8 +13,8 @@ export async function transformClient(src: string): Promise<string> {
 
   getFunctions(module)
     .flatMap(getReturnStatements)
-    .filter(returnsJsx)
-    .forEach((rtn) => replace(rtn, toHydrationInstructions(rtn)));
+    .flatMap(getReturnedJsxRoots)
+    .forEach((jsx) => replace(jsx, getDomBindings(jsx)));
 
   return await print(module);
 }
