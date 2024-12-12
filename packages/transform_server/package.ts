@@ -5,7 +5,7 @@ export async function transformServer(src: string): Promise<string> {
 
   // prettier-ignore
   pipe(module,
-    getComponents(),
+    getFunctions(),
     getJxElements(),
     isInteractive(),
     appendHydrationMarker(),
