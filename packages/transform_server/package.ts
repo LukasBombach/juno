@@ -23,9 +23,9 @@ export async function transformClient(src: string): Promise<string> {
   pipe(
     module,
     getFunctions(),
-    getReturnStatements(),
-    getJsxRoots(),
-    replaceWithHydrationJs()
+    // getReturnStatements(),
+    // getJsxRoots(),
+    // replaceWithHydrationJs()
   );
 
   return await print(module);
