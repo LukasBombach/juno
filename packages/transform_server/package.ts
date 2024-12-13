@@ -4,7 +4,8 @@ export async function transformServer(src: string): Promise<string> {
   const module = await parse(src);
 
   // prettier-ignore
-  pipe(module,
+  pipe(
+    module,
     getFunctions(),
     getJxElements(),
     filterInteractive(),
@@ -18,7 +19,8 @@ export async function transformClient(src: string): Promise<string> {
   const module = await parse(src);
 
   // prettier-ignore
-  pipe(module,
+  pipe(
+    module,
     getFunctions(),
     getReturnStatements(),
     getJsxRoots(),
