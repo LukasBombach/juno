@@ -7,7 +7,7 @@ export async function transformServer(src: string): Promise<string> {
   pipe(module,
     getFunctions(),
     getJxElements(),
-    isInteractive(),
+    filterInteractive(),
     appendHydrationMarker(),
   );
 
@@ -17,10 +17,13 @@ export async function transformServer(src: string): Promise<string> {
 export async function transformClient(src: string): Promise<string> {
   const module = await parse(src);
 
-  getFunctions(module)
-    .flatMap(getReturnStatements)
-    .flatMap(getReturnedJsxRoots)
-    .forEach(el => replace(el, getDomBindings(el)));
+  // prettier-ignore
+  pipe(module,
+    getFunctions(),
+    getReturnStatements(),
+    getJsxRoots(),
+    replaceWithHydrationJs()
+  );
 
   return await print(module);
 }
