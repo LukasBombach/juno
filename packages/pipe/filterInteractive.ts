@@ -14,7 +14,8 @@ function filterInteractiveJsxBySimpleIdentifierStrategy(elements: Node<"JSXEleme
   const x = pipe(
     elements,
     flatMap(el => el.opening.attributes),
-    filter(attr => attr.type === "JSXAttribute")
+    filter(attr => attr.type === "JSXAttribute"),
+    filter(attr => Boolean(attr.name.value.match(/^on[A-Z]/)))
   );
 }
 
@@ -26,7 +27,9 @@ function flatMap<T, R>(fn: (value: T) => R[]): (arr: T[]) => R[] {
   return arr => arr.flatMap(fn);
 }
 
-function filter<T, S extends T>(fn: (value: T) => value is S): (arr: T[]) => S[] {
+function filter<T>(fn: (value: T) => boolean): (arr: T[]) => T[];
+function filter<T, S extends T>(fn: (value: T) => value is S): (arr: T[]) => S[];
+function filter<T>(fn: (value: T) => boolean): (arr: T[]) => T[] {
   return arr => arr.filter(fn);
 }
 
