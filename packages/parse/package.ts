@@ -2,6 +2,8 @@ import { parse as swcparse, print as swcprint } from "@swc/core";
 import type { ParseOptions, Options as PrintOptions } from "@swc/core";
 import type * as t from "@swc/types";
 
+export type * as t from "@swc/types";
+
 type AnyNode =
   | t.Program
   | t.Statement
