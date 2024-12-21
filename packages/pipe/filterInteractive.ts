@@ -1,4 +1,5 @@
 import { pipe } from "./pipe";
+import { flatMap, filter } from "./array";
 
 import type { Node, t } from "@juno/parse";
 
@@ -18,16 +19,6 @@ function filterInteractiveJsxBySimpleIdentifierStrategy(elements: Node<"JSXEleme
   );
 
   throw new Error("Not implemented: filterInteractiveJsxBySimpleIdentifierStrategy");
-}
-
-function flatMap<T, R>(fn: (value: T) => R[]): (arr: T[]) => R[] {
-  return arr => arr.flatMap(fn);
-}
-
-function filter<T, S extends T>(predicate: (value: T) => value is S): (arr: T[]) => S[];
-function filter<T>(predicate: (value: T) => boolean): (arr: T[]) => T[];
-function filter(predicate: (value: any) => boolean) {
-  return (arr: any[]) => arr.filter(predicate);
 }
 
 function getName(attr: t.JSXAttribute): string {
