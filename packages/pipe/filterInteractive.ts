@@ -13,20 +13,20 @@ export function filterInteractive() {
 function filterInteractiveJsxBySimpleIdentifierStrategy(elements: Node<"JSXElement">[]): Node<"JSXElement">[] {
   const x = pipe(
     elements,
-    flatMap((el) => el.opening.attributes),
-    filter((attr) => attr.type === "JSXAttribute"),
-    filter((attr) => Boolean(getName(attr)?.match(/^on[A-Z]/)))
+    flatMap(el => el.opening.attributes),
+    filter(attr => attr.type === "JSXAttribute"),
+    filter(attr => !!getName(attr)?.match(/^on[A-Z]/))
   );
 
   throw new Error("Not implemented: filterInteractiveJsxBySimpleIdentifierStrategy");
 }
 
 function map<T, R>(fn: (value: T) => R): (arr: T[]) => R[] {
-  return (arr) => arr.map(fn);
+  return arr => arr.map(fn);
 }
 
 function flatMap<T, R>(fn: (value: T) => R[]): (arr: T[]) => R[] {
-  return (arr) => arr.flatMap(fn);
+  return arr => arr.flatMap(fn);
 }
 
 function filter<T, S extends T>(predicate: (value: T) => value is S): (arr: T[]) => S[];
