@@ -13,24 +13,26 @@ export function filterInteractive() {
 function filterInteractiveJsxBySimpleIdentifierStrategy(elements: Node<"JSXElement">[]): Node<"JSXElement">[] {
   const x = pipe(
     elements,
-    flatMap(el => el.opening.attributes),
-    filter(attr => attr.type === "JSXAttribute"),
-    filter(attr => Boolean(getName(attr)?.match(/^on[A-Z]/)))
+    flatMap((el) => el.opening.attributes),
+    filter((attr) => attr.type === "JSXAttribute"),
+    filter((attr) => Boolean(getName(attr)?.match(/^on[A-Z]/)))
   );
+
+  throw new Error("Not implemented: filterInteractiveJsxBySimpleIdentifierStrategy");
 }
 
 function map<T, R>(fn: (value: T) => R): (arr: T[]) => R[] {
-  return arr => arr.map(fn);
+  return (arr) => arr.map(fn);
 }
 
 function flatMap<T, R>(fn: (value: T) => R[]): (arr: T[]) => R[] {
-  return arr => arr.flatMap(fn);
+  return (arr) => arr.flatMap(fn);
 }
 
-function filter<T, S extends T>(fn: (value: T) => value is S): (arr: T[]) => S[];
-function filter<T>(fn: (value: T) => boolean): (arr: T[]) => T[];
-function filter<T, S extends T>(fn: (value: T) => any): (arr: T[]) => S[] {
-  return arr => arr.filter(fn) as S[];
+function filter<T, S extends T>(predicate: (value: T) => value is S): (arr: T[]) => S[];
+function filter<T>(predicate: (value: T) => boolean): (arr: T[]) => T[];
+function filter(predicate: (value: any) => boolean) {
+  return (arr: any[]) => arr.filter(predicate);
 }
 
 function getAttributes(element: t.JSXElement): t.JSXAttributeOrSpread[] {
@@ -53,4 +55,6 @@ function getIdentifiers(node: Node): t.Identifier[] {
   throw new Error("Not implemented: getIdentifiers");
 }
 
-function unique<T>(): T[] {}
+function unique<T>(): (arr: T[]) => T[] {
+  return (arr: T[]) => Array.from(new Set(arr));
+}
