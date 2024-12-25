@@ -1,4 +1,4 @@
-import { traverse } from "@juno/traverse";
+import { traverse, traverse2 } from "@juno/traverse";
 import { pipe } from "./pipe";
 import { flatMap, filter } from "./array";
 
@@ -26,8 +26,8 @@ function getName(attr: t.JSXAttribute): string {
   return attr.name.type === "Identifier" ? attr.name.value : attr.name.name.value;
 }
 
-function getIdentifiers(node: Node): t.Identifier[] {
-  return traverse(node)
+function getIdentifiers(current: Node): t.Identifier[] {
+  return traverse2(current)
     .map(([n]) => n)
     .filter(n => n.type === "Identifier")
     .toArray();
