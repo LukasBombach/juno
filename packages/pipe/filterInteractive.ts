@@ -1,6 +1,6 @@
 import { traverse } from "@juno/traverse";
 import { pipe } from "./pipe";
-import { flatMap, filter, unique } from "./array";
+import { flatMap, map, filter, unique } from "./array";
 
 import type { Node, t } from "@juno/parse";
 
@@ -17,7 +17,8 @@ function filterInteractiveJsxBySimpleIdentifierStrategy(elements: Node<"JSXEleme
     filter(attr => attr.type === "JSXAttribute"),
     filter(attr => !!getName(attr)?.match(/^on[A-Z]/)),
     flatMap(attr => getIdentifiers(attr)),
-    unique()
+    unique(),
+    toRegex()
   );
 
   throw new Error("Not implemented: filterInteractiveJsxBySimpleIdentifierStrategy");
@@ -32,4 +33,8 @@ function getIdentifiers(current: Node): t.Identifier[] {
     .map(([n]) => n)
     .filter(n => n.type === "Identifier")
     .toArray();
+}
+
+function toRegex(): (ids: t.Identifier[]) => RegExp {
+  return ids => (ids.length ? new RegExp(`^(${ids.map(id => id.value).join("|")})$`) : /never-match^/);
 }
