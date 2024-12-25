@@ -63,6 +63,9 @@ importers:
       '@juno/parse':
         specifier: workspace:*
         version: link:../parse
+      '@juno/traverse':
+        specifier: workspace:*
+        version: link:../traverse
 
   packages/ssr:
     dependencies:
@@ -97,6 +100,12 @@ importers:
       '@juno/pipe':
         specifier: workspace:*
         version: link:../pipe
+
+  packages/traverse:
+    dependencies:
+      '@juno/parse':
+        specifier: workspace:*
+        version: link:../parse
 
   packages/vite-plugin:
     devDependencies:
