@@ -11,3 +11,7 @@ export function map<T, R>(fn: (value: T) => R): (arr: T[]) => R[] {
 export function flatMap<T, R>(fn: (value: T) => R[]): (arr: T[]) => R[] {
   return arr => arr.flatMap(fn);
 }
+
+export function unique<T>(): (arr: T[]) => T[] {
+  return (arr: T[]) => Array.from(new Set(arr));
+}
