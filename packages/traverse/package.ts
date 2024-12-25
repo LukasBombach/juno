@@ -2,6 +2,10 @@ import { isNode } from "@juno/parse";
 
 import type { Node } from "@juno/parse";
 
+/**
+ * @todo when a child is an object (but not a node), it should be traversed
+ * @todo when a child is an array of objects (but not nodes), they should be traversed
+ */
 export function* traverse(current: Node): Generator<[node: Node, parent: Node, property: string, index: number]> {
   let parent = current;
   let property: keyof typeof parent;
