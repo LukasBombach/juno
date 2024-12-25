@@ -1,27 +1,27 @@
 import { traverse } from "@juno/traverse";
 import { pipe } from "./pipe";
-import { flatMap, map, filter, unique } from "./array";
+import { flatMap, filter, unique } from "./array";
 
 import type { Node, t } from "@juno/parse";
 
 export function filterInteractive() {
   return (elements: Node<"JSXElement">[]): Node<"JSXElement">[] => {
-    return filterInteractiveJsxBySimpleIdentifierStrategy(elements);
+    const isInteractive = pipe(
+      elements,
+      flatMap(el => el.opening.attributes),
+      filter(attr => attr.type === "JSXAttribute"),
+      filter(attr => !!getName(attr)?.match(/^on[A-Z]/)),
+      flatMap(attr => getIdentifiers(attr)),
+      unique(),
+      toRegex()
+    );
+
+    return elements.filter(el => {
+      return [...el.opening.attributes, ...el.children.filter(child => child.type === "JSXExpressionContainer")]
+        .flatMap(attr => getIdentifiers(attr))
+        .some(id => isInteractive.test(id.value));
+    });
   };
-}
-
-function filterInteractiveJsxBySimpleIdentifierStrategy(elements: Node<"JSXElement">[]): Node<"JSXElement">[] {
-  const x = pipe(
-    elements,
-    flatMap(el => el.opening.attributes),
-    filter(attr => attr.type === "JSXAttribute"),
-    filter(attr => !!getName(attr)?.match(/^on[A-Z]/)),
-    flatMap(attr => getIdentifiers(attr)),
-    unique(),
-    toRegex()
-  );
-
-  throw new Error("Not implemented: filterInteractiveJsxBySimpleIdentifierStrategy");
 }
 
 function getName(attr: t.JSXAttribute): string {
