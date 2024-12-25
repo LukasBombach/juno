@@ -27,3 +27,23 @@ export function* traverse(current: Node): Generator<[node: Node, parent: Node, p
     }
   }
 }
+
+export function* traverse2(current: unknown, parents: Node[] = []): Generator<[node: Node, parents: Node[]]> {
+  if (isNode(current)) {
+    yield [current, parents];
+  }
+
+  const nextParents = isNode(current) ? [current, ...parents] : [...parents];
+
+  if (Array.isArray(current)) {
+    for (const child of current) {
+      yield* traverse2(child, nextParents);
+    }
+  }
+
+  if (typeof current === "object" && current !== null) {
+    for (const child of Object.values(current)) {
+      yield* traverse2(child, nextParents);
+    }
+  }
+}
