@@ -1,13 +1,14 @@
 import { traverse } from "@juno/traverse";
 import { pipe } from "./pipe";
-import { flatMap, filter, unique } from "./array";
+import { flatMap, filter, unique, map } from "./array";
 
 import type { Node, t } from "@juno/parse";
 
 export function filterInteractive() {
-  return (elements: Node<"JSXElement">[]): Node<"JSXElement">[] => {
+  return (elements: [el: Node<"JSXElement">, parents: Node[]][]): [el: Node<"JSXElement">, parents: Node[]][] => {
     const isInteractive = pipe(
       elements,
+      map(([el]) => el),
       flatMap(el => el.opening.attributes),
       filter(attr => attr.type === "JSXAttribute"),
       filter(attr => !!getName(attr)?.match(/^on[A-Z]/)),
@@ -16,7 +17,7 @@ export function filterInteractive() {
       toRegex()
     );
 
-    return elements.filter(el => {
+    return elements.filter(([el]) => {
       return [...el.opening.attributes, ...el.children.filter(child => child.type === "JSXExpressionContainer")]
         .flatMap(attr => getIdentifiers(attr))
         .some(id => isInteractive.test(id.value));
