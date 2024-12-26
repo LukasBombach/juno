@@ -15,7 +15,7 @@ export function* traverse(current: unknown, parents: Node[] = []): Generator<[no
     }
   }
 
-  if (typeof current === "object" && current !== null) {
+  if (!Array.isArray(current) && typeof current === "object" && current !== null) {
     for (const child of Object.values(current)) {
       yield* traverse(child, nextParents);
     }

@@ -7,10 +7,9 @@ const functionTypes = ["FunctionDeclaration", "FunctionExpression", "ArrowFuncti
 
 export function getFunctions() {
   return (node: Node): Node<FunctionType>[] => {
-    return traverse(node)
+    return Array.from(traverse(node))
       .map(([n]) => n)
-      .filter(isFunctionType)
-      .toArray();
+      .filter(isFunctionType);
   };
 }
 

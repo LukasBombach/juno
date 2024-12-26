@@ -2,6 +2,9 @@ import type { Node } from "@juno/parse";
 
 export function appendHydrationMarker() {
   return (nodes: Node<"JSXElement">[]): void => {
-    throw new Error("Not implemented: appendHydrationMarker");
+    console.log(
+      "appendHydrationMarker\n",
+      nodes.map(node => `${(node.opening.name as any).value} at ${node.span.start}:${node.span.end}`).join("\n ")
+    );
   };
 }

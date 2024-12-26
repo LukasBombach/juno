@@ -29,10 +29,9 @@ function getName(attr: t.JSXAttribute): string {
 }
 
 function getIdentifiers(current: Node): t.Identifier[] {
-  return traverse(current)
+  return Array.from(traverse(current))
     .map(([n]) => n)
-    .filter(n => n.type === "Identifier")
-    .toArray();
+    .filter(n => n.type === "Identifier");
 }
 
 function toRegex(): (ids: t.Identifier[]) => RegExp {
