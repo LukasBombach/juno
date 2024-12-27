@@ -6,3 +6,4 @@ export { getJSXElements } from "./getJSXElements";
 export { getJsxRoots } from "./getJsxRoots";
 export { getReturnStatements } from "./getReturnStatements";
 export { pipe } from "./pipe";
+export { replaceWithHydrationJs } from "./replaceWithHydrationJs";

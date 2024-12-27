@@ -7,6 +7,7 @@ import {
   getJsxRoots,
   getReturnStatements,
   pipe,
+  replaceWithHydrationJs,
 } from "@juno/pipe";
 
 export async function transformServer(src: string): Promise<string> {
@@ -28,18 +29,18 @@ export async function transformClient(src: string): Promise<string> {
   const module = await parse(src);
 
   // prettier-ignore
-  const x = pipe(
+  pipe(
     module,
     getFunctions(),
     getReturnStatements(),
     getJsxRoots(),
-    // replaceWithHydrationJs()
+    replaceWithHydrationJs()
   );
 
   return await print(module);
 }
 
-transformServer(`
+const code = `
   function App() {
     let count = 1
 
@@ -50,4 +51,7 @@ transformServer(`
       </main>
     );
   }
-`).then(console.log);
+`;
+
+transformServer(code).then(console.log);
+transformClient(code);
