@@ -11,6 +11,7 @@ type AnyNode =
   | t.Declaration
   | t.SpreadElement
   | t.VariableDeclarator
+  | t.JSXElement
   | t.JSXOpeningElement
   | t.JSXAttribute
   | t.JSXExpressionContainer
