@@ -68,8 +68,8 @@ function createMarker(value: string): t.JSXElement {
             type: "StringLiteral",
             // @ts-expect-error swc is type wrongfully
             ctxt: 0,
-            value: "juno/hydration",
-            raw: '"juno/hydration"',
+            value: "juno/h",
+            raw: '"juno/h"',
             span,
           },
         },
