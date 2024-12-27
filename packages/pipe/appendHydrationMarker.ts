@@ -6,15 +6,26 @@ export function appendHydrationMarker() {
       const parent = parents[0];
       const { start, end } = node.span;
       const marker = createMarker(`juno-${start}-${end}`);
+      const newline = jsxNewline();
       const isJsx = parent.type === "JSXElement";
       if (isJsx) {
         const index = parent.children.indexOf(node);
-        parent.children.splice(index + 1, 0, marker);
+        parent.children.splice(index + 1, 0, newline, marker);
         // console.log("appendHydrationMarker", isJsx, index);
       } else {
         console.log("appendHydrationMarker", isJsx);
       }
     });
+  };
+}
+
+function jsxNewline(): t.JSXText {
+  return {
+    type: "JSXText",
+    value: "\n        ",
+    raw: '"\n        "',
+    // @ts-expect-error swc is type wrongfully
+    span: { start: 0, end: 0 /* , ctxt: 0 */ },
   };
 }
 
@@ -79,7 +90,7 @@ function createMarker(value: string): t.JSXElement {
             // @ts-expect-error swc is type wrongfully
             ctxt: 0,
             value: value,
-            raw: `"${value}"`,
+            raw: JSON.stringify(value),
             span,
           },
         },
