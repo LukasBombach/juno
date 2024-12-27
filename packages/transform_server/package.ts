@@ -1,5 +1,12 @@
 import { parse, print } from "@juno/parse";
-import { pipe, getFunctions, getJSXElements, filterInteractive, appendHydrationMarker } from "@juno/pipe";
+import {
+  pipe,
+  getFunctions,
+  getJSXElements,
+  filterInteractive,
+  appendHydrationMarker,
+  getReturnStatements,
+} from "@juno/pipe";
 
 export async function transformServer(src: string): Promise<string> {
   const module = await parse(src);
@@ -20,10 +27,10 @@ export async function transformClient(src: string): Promise<string> {
   const module = await parse(src);
 
   // prettier-ignore
-  pipe(
+  const x = pipe(
     module,
     getFunctions(),
-    // getReturnStatements(),
+    getReturnStatements(),
     // getJsxRoots(),
     // replaceWithHydrationJs()
   );
