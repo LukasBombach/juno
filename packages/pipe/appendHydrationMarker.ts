@@ -2,31 +2,40 @@ import type { Node, t } from "@juno/parse";
 
 export function appendHydrationMarker() {
   return (nodes: [el: Node<"JSXElement">, parents: Node[]][]): void => {
-    nodes.forEach(node => {
+    nodes.forEach(([node, parents]) => {
+      const parent = parents[0];
       const { start, end } = node.span;
       const marker = createMarker(`juno-${start}-${end}`);
-      insertAfter(node, marker);
+      const isJsx = parent.type === "JSXElement";
+      if (isJsx) {
+        const index = parent.children.indexOf(node);
+        parent.children.splice(index + 1, 0, marker);
+        // console.log("appendHydrationMarker", isJsx, index);
+      } else {
+        console.log("appendHydrationMarker", isJsx);
+      }
     });
-
-    console.log(
-      "appendHydrationMarker\n",
-      nodes.map(node => `${(node.opening.name as any).value} at ${node.span.start}:${node.span.end}`).join("\n ")
-    );
   };
 }
 
 function createMarker(value: string): t.JSXElement {
-  const span: t.Span = { start: 0, end: 0, ctxt: 0 };
+  // @ts-expect-error swc is type wrongfully
+  const span: t.Span = { start: 0, end: 0 /* , ctxt: 0 */ };
+
   return {
     type: "JSXElement",
+    ctxt: 0,
     span,
     children: [],
     opening: {
       type: "JSXOpeningElement",
+      ctxt: 0,
       selfClosing: true,
       span,
       name: {
         type: "Identifier",
+        // @ts-expect-error swc is type wrongfully
+        ctxt: 0,
         value: "script",
         optional: false,
         span,
@@ -34,31 +43,43 @@ function createMarker(value: string): t.JSXElement {
       attributes: [
         {
           type: "JSXAttribute",
+          ctxt: 0,
           span,
           name: {
             type: "Identifier",
+            // @ts-expect-error swc is type wrongfully
+            ctxt: 0,
             value: "type",
             optional: false,
             span,
           },
           value: {
             type: "StringLiteral",
+            // @ts-expect-error swc is type wrongfully
+            ctxt: 0,
             value: "juno/hydration",
+            raw: '"juno/hydration"',
             span,
           },
         },
         {
           type: "JSXAttribute",
+          ctxt: 0,
           span,
           name: {
             type: "Identifier",
+            // @ts-expect-error swc is type wrongfully
+            ctxt: 0,
             value: "id",
             optional: false,
             span,
           },
           value: {
             type: "StringLiteral",
+            // @ts-expect-error swc is type wrongfully
+            ctxt: 0,
             value: value,
+            raw: `"${value}"`,
             span,
           },
         },
