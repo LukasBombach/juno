@@ -10,6 +10,9 @@ type InteractiveElement = {
   children: (number | t.Expression)[];
 };
 
+// @ts-expect-error swc is type wrongfully
+const span: t.Span = { start: 0, end: 0 /* , ctxt: 0 */ };
+
 export function replaceWithHydrationJs() {
   return (elements: Node<"JSXElement">[]): void => {
     elements.forEach(element => {
@@ -103,3 +106,28 @@ function getJSXElements() {
       .filter((n): n is Node<"JSXElement"> => n.type === "JSXElement");
   };
 }
+
+const b = {
+  array: (expressions: t.Expression[]): t.ArrayExpression => ({
+    type: "ArrayExpression",
+    elements: expressions.map(expression => ({ expression })),
+    span,
+  }),
+  object: (properties: t.Property[]): t.ObjectExpression => ({
+    type: "ObjectExpression",
+    properties,
+    span,
+  }),
+  ident: (value: string): t.Identifier => ({
+    type: "Identifier",
+    optional: false,
+    value,
+    span,
+  }),
+  string: (value: string): t.StringLiteral => ({
+    type: "StringLiteral",
+    raw: JSON.stringify(value),
+    value,
+    span,
+  }),
+};
