@@ -56,6 +56,13 @@ export function replaceWithHydrationJs() {
                 return child.expression;
               }
               throw new Error(`Cannot handle JSX child type: ${child.type}`);
+            })
+            .filter((child, i, all) => {
+              // filtering out static text nodes after the last expression
+              // because they are not needed and we can might have children
+              // arrays that are not interactive, just text nodes
+              const lastExpression = all.findLastIndex(c => typeof c !== "number");
+              return typeof child !== "number" || i < lastExpression;
             });
 
           const interactiveChildren = serializedChildren.filter(child => typeof child !== "number");
