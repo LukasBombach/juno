@@ -46,7 +46,7 @@ const code = `
 
     return (
       <main>
-        <h1>{count}</h1>
+        <h1>hello {count}</h1>
         <button onClick={() => count++}>Click me</button>
       </main>
     );

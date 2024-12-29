@@ -43,6 +43,9 @@ export function replaceWithHydrationJs() {
               if (child.type === "JSXExpressionContainer") {
                 return getIdentifiers(child.expression).some(id => isInteractive.test(id.value));
               }
+              if (child.type === "JSXElement") {
+                return false;
+              }
               throw new Error(`Cannot handle JSX child type: ${child.type}`);
             })
             .map(child => {
@@ -61,11 +64,13 @@ export function replaceWithHydrationJs() {
             interactiveElements.push({
               marker,
               attrs: interactiveAttrs,
-              children: interactiveChildren,
+              children: serializedChildren,
             });
           }
         }
       }
+
+      console.dir(interactiveElements, { depth: null });
     });
   };
 }
