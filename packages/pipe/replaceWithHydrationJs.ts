@@ -80,7 +80,22 @@ export function replaceWithHydrationJs() {
         }
       }
 
-      console.dir(interactiveElements, { depth: null });
+      console.dir(
+        b.array(
+          interactiveElements.map(el =>
+            b.object({
+              marker: b.string(el.marker),
+              attrs: b.object(
+                Object.fromEntries(
+                  el.attrs.map(attr => [getName(attr), (attr.value as t.JSXExpressionContainer).expression])
+                )
+              ),
+              children: b.array(el.children.map(child => (typeof child === "number" ? b.number(child) : child))),
+            })
+          )
+        ),
+        { depth: null }
+      );
     });
   };
 }
@@ -113,9 +128,14 @@ const b = {
     elements: expressions.map(expression => ({ expression })),
     span,
   }),
-  object: (properties: t.Property[]): t.ObjectExpression => ({
+  object: (properties: Record<string, t.Expression>): t.ObjectExpression => ({
     type: "ObjectExpression",
-    properties,
+    properties: Object.entries(properties).map(([key, value]) => ({
+      type: "KeyValueProperty",
+      key: b.ident(key),
+      value,
+      span,
+    })),
     span,
   }),
   ident: (value: string): t.Identifier => ({
@@ -126,6 +146,12 @@ const b = {
   }),
   string: (value: string): t.StringLiteral => ({
     type: "StringLiteral",
+    raw: JSON.stringify(value),
+    value,
+    span,
+  }),
+  number: (value: number): t.NumericLiteral => ({
+    type: "NumericLiteral",
     raw: JSON.stringify(value),
     value,
     span,
