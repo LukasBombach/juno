@@ -6,17 +6,17 @@ import type { Node } from "@juno/parse";
  * [1] todo | return condition ? <div /> : <span />;
  */
 export function getJsxRoots() {
-  return (nodes: Node<"ReturnStatement">[]): Node<"JSXElement">[] => {
+  return (nodes: Node<"ReturnStatement">[]): [element: Node<"JSXElement">, parents: Node[]][] => {
     return nodes
-      .flatMap((node) => {
+      .flatMap(node => {
         // [1]
-        for (const [child] of traverse(node.argument)) {
+        for (const [child, parents] of traverse(node.argument)) {
           if (child.type === "JSXElement") {
-            return child;
+            return [child, parents];
           }
         }
         return undefined;
       })
-      .filter((el): el is Node<"JSXElement"> => el?.type === "JSXElement");
+      .filter(Boolean) as [Node<"JSXElement">, Node[]][];
   };
 }

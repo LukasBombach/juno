@@ -14,8 +14,8 @@ type InteractiveElement = {
 const span: t.Span = { start: 0, end: 0 /* , ctxt: 0 */ };
 
 export function replaceWithHydrationJs() {
-  return (elements: Node<"JSXElement">[]): void => {
-    elements.forEach(element => {
+  return (elements: [element: Node<"JSXElement">, parents: Node[]][]): void => {
+    elements.forEach(([element, parents]) => {
       const interactiveElements: InteractiveElement[] = [];
 
       const isInteractive = pipe(
