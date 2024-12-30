@@ -8,15 +8,15 @@ import type { Node } from "@juno/parse";
 export function getJsxRoots() {
   return (nodes: Node<"ReturnStatement">[]): [element: Node<"JSXElement">, parents: Node[]][] => {
     return nodes
-      .flatMap(node => {
+      .map(returnStatement => {
         // [1]
-        for (const [child, parents] of traverse(node.argument)) {
+        for (const [child, parents] of traverse(returnStatement)) {
           if (child.type === "JSXElement") {
-            return [child, parents];
+            return [child, parents] as [element: Node<"JSXElement">, parents: Node[]];
           }
         }
         return undefined;
       })
-      .filter(Boolean) as [Node<"JSXElement">, Node[]][];
+      .filter(n => n !== undefined);
   };
 }

@@ -16,6 +16,8 @@ const span: t.Span = { start: 0, end: 0 /* , ctxt: 0 */ };
 export function replaceWithHydrationJs() {
   return (elements: [element: Node<"JSXElement">, parents: Node[]][]): void => {
     elements.forEach(([element, parents]) => {
+      console.log(parents);
+
       const interactiveElements: InteractiveElement[] = [];
 
       const isInteractive = pipe(
