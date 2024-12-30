@@ -54,4 +54,4 @@ const code = `
 `;
 
 transformServer(code).then(console.log);
-transformClient(code);
+transformClient(code).then(console.log);

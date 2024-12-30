@@ -16,7 +16,7 @@ const span: t.Span = { start: 0, end: 0 /* , ctxt: 0 */ };
 export function replaceWithHydrationJs() {
   return (elements: [element: Node<"JSXElement">, parents: Node[]][]): void => {
     elements.forEach(([element, parents]) => {
-      console.log(parents);
+      const parent = parents[0];
 
       const interactiveElements: InteractiveElement[] = [];
 
@@ -82,8 +82,8 @@ export function replaceWithHydrationJs() {
         }
       }
 
-      console.dir(
-        b.array(
+      if (parent.type === "ParenthesisExpression") {
+        parent.expression = b.array(
           interactiveElements.map(el =>
             b.object({
               marker: b.string(el.marker),
@@ -95,9 +95,10 @@ export function replaceWithHydrationJs() {
               children: b.array(el.children.map(child => (typeof child === "number" ? b.number(child) : child))),
             })
           )
-        ),
-        { depth: null }
-      );
+        );
+      } else {
+        throw new Error(`Cannot handle parent type: ${parent.type}`);
+      }
     });
   };
 }
