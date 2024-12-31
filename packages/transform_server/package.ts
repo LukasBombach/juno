@@ -41,16 +41,26 @@ export async function transformClient(src: string): Promise<string> {
 }
 
 const code = `
-  function App() {
-    let count = 1
+import { signal } from "@maverick-js/signals";
 
-    return (
-      <main>
-        <h1>hello {count}</h1>
-        <button onClick={() => count++}>Click me</button>
-      </main>
-    );
-  }
+export default function Page() {
+  const count = signal(Math.floor(Math.random() * 100));
+
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>juno</title>
+      </head>
+      <body>
+        <p>{count()}</p>
+        <button onClick={() => count.set(count() + 1)}>Click</button>
+      </body>
+    </html>
+  );
+}
 `;
 
 transformServer(code).then(console.log);
