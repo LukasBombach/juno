@@ -12,31 +12,26 @@ export default function juno(): Plugin {
 
     configureServer(vite) {
       vite.middlewares.use(async (req, res, next) => {
-        const page = !req.url ? "/index" : req.url === "/" ? "/index" : req.url;
-        const filePath = path.resolve(`src/${page}.tsx`);
+        const pagePath = resolvePage(req.url);
 
-        if (fs.existsSync(filePath)) {
-          try {
-            const page = await vite.ssrLoadModule(filePath);
-            const html = renderToString(page.default);
-            const viteHtml = await vite.transformIndexHtml(req.originalUrl!, html);
-            res.end(viteHtml);
-          } catch (e) {
-            vite.ssrFixStacktrace(e instanceof Error ? e : new Error(String(e)));
-            console.error(e);
-            next(e);
-          }
-        } else {
-          next();
+        if (!pagePath) {
+          return next();
+        }
+
+        try {
+          const page = await vite.ssrLoadModule(pagePath);
+          const html = renderToString(page.default);
+          const viteHtml = await vite.transformIndexHtml(req.originalUrl!, html);
+          res.end(viteHtml);
+        } catch (e) {
+          vite.ssrFixStacktrace(e instanceof Error ? e : new Error(String(e)));
+          console.error(e);
+          next(e);
         }
       });
     },
 
     async transform(code, id, options) {
-      if (options?.ssr) {
-        return null;
-      }
-
       if (id.includes("node_modules")) {
         return null;
       }
@@ -45,7 +40,18 @@ export default function juno(): Plugin {
         return null;
       }
 
+      if (options?.ssr) {
+        return null;
+      }
+
       return await transform(code);
     },
   };
+}
+
+function resolvePage(url: string | undefined): string | null {
+  const page = !url ? "/index" : url === "/" ? "/index" : url;
+  const filePath = path.resolve(`src/${page}.tsx`);
+  const exists = fs.existsSync(filePath);
+  return exists ? filePath : null;
 }
