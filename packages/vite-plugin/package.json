@@ -5,6 +5,7 @@
   "main": "package.ts",
   "devDependencies": {
     "@juno/ssr": "workspace:*",
-    "@juno/transform": "workspace:*"
+    "@juno/transform": "workspace:*",
+    "@juno/transform_server": "workspace:*"
   }
 }

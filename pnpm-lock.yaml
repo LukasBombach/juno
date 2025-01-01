@@ -115,6 +115,9 @@ importers:
       '@juno/transform':
         specifier: workspace:*
         version: link:../transform
+      '@juno/transform_server':
+        specifier: workspace:*
+        version: link:../transform_server
 
 packages:
 

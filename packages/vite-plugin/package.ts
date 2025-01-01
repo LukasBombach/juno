@@ -1,7 +1,8 @@
 import fs from "node:fs";
 import path from "path";
 import { renderToString } from "@juno/ssr";
-import { transform } from "@juno/transform";
+// import { transform } from "@juno/transform";
+import { transformClient } from "@juno/transform_server";
 
 import type { Plugin } from "vite";
 
@@ -44,7 +45,7 @@ export default function juno(): Plugin {
         return null;
       }
 
-      return await transform(code);
+      return await transformClient(code);
     },
   };
 }
