@@ -4,8 +4,9 @@ export function appendHydrationMarker() {
   return (nodes: [el: Node<"JSXElement">, parents: Node[]][]): void => {
     nodes.forEach(([node, parents]) => {
       const parent = parents[0];
-      const { start, end } = node.span;
-      const marker = createMarker(`juno-${start}-${end}`);
+      const { start } = node.span;
+      console.log("server marker", `juno${start}`);
+      const marker = createMarker(`juno${start}`);
       const newline = jsxNewline();
       const isJsx = parent.type === "JSXElement";
       if (isJsx) {
@@ -13,7 +14,7 @@ export function appendHydrationMarker() {
         parent.children.splice(index + 1, 0, newline, marker);
         // console.log("appendHydrationMarker", isJsx, index);
       } else {
-        console.log("appendHydrationMarker", isJsx);
+        throw new Error("appendHydrationMarker");
       }
     });
   };

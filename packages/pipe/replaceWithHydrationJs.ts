@@ -34,9 +34,6 @@ export function replaceWithHydrationJs() {
 
       for (const [node] of traverse(element)) {
         if (node.type === "JSXElement") {
-          const { start, end } = node.span;
-          const marker = `juno-${start}-${end}`;
-
           const interactiveAttrs = node.opening.attributes
             .filter(attr => attr.type === "JSXAttribute")
             .filter(attr => getIdentifiers(attr).some(id => isInteractive.test(id.value)));
@@ -74,6 +71,10 @@ export function replaceWithHydrationJs() {
           const interactiveChildren = serializedChildren.filter(child => typeof child !== "number");
 
           if (interactiveAttrs.length || interactiveChildren.length) {
+            const { start } = node.span;
+            console.log("client marker", `juno${start}`);
+            const marker = `juno${start}`;
+
             interactiveElements.push({
               marker,
               attrs: interactiveAttrs.filter(attr => !getName(attr).match(/^on[A-Z]/)),
