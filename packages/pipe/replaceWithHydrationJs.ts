@@ -103,7 +103,10 @@ export function replaceWithHydrationJs() {
               ),
               events: b.object(
                 Object.fromEntries(
-                  el.events.map(attr => [getName(attr), (attr.value as t.JSXExpressionContainer).expression])
+                  el.events.map(attr => [
+                    getName(attr).replace(/^on/, "").toLowerCase(),
+                    (attr.value as t.JSXExpressionContainer).expression,
+                  ])
                 )
               ),
               children: b.array(

@@ -44,7 +44,9 @@ export function hydrate(root: Document | HTMLElement, directives: Directive[]) {
         const currentText = text.splitText(index);
         text = currentText.splitText(String(child()).length);
         index = 0;
-        effect(() => ((currentText.textContent = String(child())), undefined));
+        effect(() => {
+          currentText.textContent = String(child());
+        });
       }
     }
   });
