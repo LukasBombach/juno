@@ -51,9 +51,15 @@ export function replaceWithHydrationJs() {
               }
               throw new Error(`Cannot handle JSX child type: ${child.type}`);
             })
-            .map(child => {
+            .map((child, i, all) => {
               if (child.type === "JSXText") {
-                return child.value.length;
+                return i === 0
+                  ? child.value.trimStart().length
+                  : i === all.length - 1
+                  ? child.value.trimEnd().length
+                  : /^\s*(\r\n|\r|\n)\s*$/.test(child.value) // only whiltespace including min 1 newline, so 1+ newlines between jsx elements
+                  ? 0
+                  : child.value.length;
               }
               if (child.type === "JSXExpressionContainer") {
                 return child.expression;
