@@ -100,7 +100,9 @@ export function replaceWithHydrationJs() {
                   el.events.map(attr => [getName(attr), (attr.value as t.JSXExpressionContainer).expression])
                 )
               ),
-              children: b.array(el.children.map(child => (typeof child === "number" ? b.number(child) : child))),
+              children: b.array(
+                el.children.map(child => (typeof child === "number" ? b.number(child) : b.arrowFn(child)))
+              ),
             })
           )
         );
@@ -147,6 +149,16 @@ const b = {
       value,
       span,
     })),
+    span,
+  }),
+  arrowFn: (body: t.Expression): t.ArrowFunctionExpression => ({
+    type: "ArrowFunctionExpression",
+    generator: false,
+    async: false,
+    params: [],
+    // @ts-expect-error swc is type wrongfully
+    ctxt: 0,
+    body,
     span,
   }),
   ident: (value: string): t.Identifier => ({
