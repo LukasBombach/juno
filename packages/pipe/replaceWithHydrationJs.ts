@@ -5,7 +5,7 @@ import { flatMap, filter, unique } from "./array";
 import type { Node, t } from "@juno/parse";
 
 type InteractiveElement = {
-  marker: string;
+  // marker: string;
   attrs: t.JSXAttribute[];
   events: t.JSXAttribute[];
   children: (number | t.Expression)[];
@@ -71,12 +71,12 @@ export function replaceWithHydrationJs() {
           const interactiveChildren = serializedChildren.filter(child => typeof child !== "number");
 
           if (interactiveAttrs.length || interactiveChildren.length) {
-            const { start } = node.span;
-            console.log("client marker", `juno${start}`);
-            const marker = `juno${start}`;
+            // const { start } = node.span;
+            // console.log("client marker", `juno${start}`);
+            // const marker = `juno${start}`;
 
             interactiveElements.push({
-              marker,
+              // marker,
               attrs: interactiveAttrs.filter(attr => !getName(attr).match(/^on[A-Z]/)),
               events: interactiveAttrs.filter(attr => getName(attr).match(/^on[A-Z]/)),
               children: serializedChildren,
@@ -87,9 +87,9 @@ export function replaceWithHydrationJs() {
 
       if (parent.type === "ParenthesisExpression") {
         parent.expression = b.array(
-          interactiveElements.map(el =>
+          interactiveElements.map((el, i) =>
             b.object({
-              marker: b.string(el.marker),
+              marker: b.string(`juno-${i}`),
               attrs: b.object(
                 Object.fromEntries(
                   el.attrs.map(attr => [getName(attr), (attr.value as t.JSXExpressionContainer).expression])

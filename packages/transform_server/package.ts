@@ -11,7 +11,6 @@ import {
 } from "@juno/pipe";
 
 export async function transformServer(src: string): Promise<string> {
-  console.log(`transformServer\n===\n${src}\n===\n`);
   const module = await parse(src);
 
   // prettier-ignore
@@ -27,7 +26,6 @@ export async function transformServer(src: string): Promise<string> {
 }
 
 export async function transformClient(src: string): Promise<string> {
-  console.log(`transformClient\n===\n${src}\n===\n`);
   const module = await parse(src);
 
   // prettier-ignore

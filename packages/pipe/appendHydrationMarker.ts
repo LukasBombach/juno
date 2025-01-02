@@ -2,11 +2,11 @@ import type { Node, t } from "@juno/parse";
 
 export function appendHydrationMarker() {
   return (nodes: [el: Node<"JSXElement">, parents: Node[]][]): void => {
-    nodes.forEach(([node, parents]) => {
+    nodes.forEach(([node, parents], i) => {
       const parent = parents[0];
-      const { start } = node.span;
-      console.log("server marker", `juno${start}`);
-      const marker = createMarker(`juno${start}`);
+      // const { start } = node.span;
+      // console.log("server marker", `juno${i}`);
+      const marker = createMarker(`juno-${i}`);
       const newline = jsxNewline();
       const isJsx = parent.type === "JSXElement";
       if (isJsx) {
