@@ -7,6 +7,7 @@ import type { Node, t } from "@juno/parse";
 type InteractiveElement = {
   marker: string;
   attrs: t.JSXAttribute[];
+  events: t.JSXAttribute[];
   children: (number | t.Expression)[];
 };
 
@@ -75,7 +76,8 @@ export function replaceWithHydrationJs() {
           if (interactiveAttrs.length || interactiveChildren.length) {
             interactiveElements.push({
               marker,
-              attrs: interactiveAttrs,
+              attrs: interactiveAttrs.filter(attr => !getName(attr).match(/^on[A-Z]/)),
+              events: interactiveAttrs.filter(attr => getName(attr).match(/^on[A-Z]/)),
               children: serializedChildren,
             });
           }
@@ -90,6 +92,11 @@ export function replaceWithHydrationJs() {
               attrs: b.object(
                 Object.fromEntries(
                   el.attrs.map(attr => [getName(attr), (attr.value as t.JSXExpressionContainer).expression])
+                )
+              ),
+              events: b.object(
+                Object.fromEntries(
+                  el.events.map(attr => [getName(attr), (attr.value as t.JSXExpressionContainer).expression])
                 )
               ),
               children: b.array(el.children.map(child => (typeof child === "number" ? b.number(child) : child))),

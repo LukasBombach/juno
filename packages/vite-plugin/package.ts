@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "path";
 import { renderToString } from "@juno/ssr";
 // import { transform } from "@juno/transform";
-import { transformClient } from "@juno/transform_server";
+import { transformServer, transformClient } from "@juno/transform_server";
 
 import type { Plugin } from "vite";
 
@@ -42,7 +42,7 @@ export default function juno(): Plugin {
       }
 
       if (options?.ssr) {
-        return null;
+        return await transformServer(code);
       }
 
       return await transformClient(code);

@@ -1,23 +1,19 @@
 import { effect } from "@maverick-js/signals";
 
 type Directive = {
-  path: number[];
+  marker: string;
   attrs?: (() => unknown)[];
   events?: (() => unknown)[];
   children?: ((() => unknown) | number)[];
 };
 
 export function hydrate(root: Document | HTMLElement, directives: Directive[]) {
-  directives.forEach((directive) => {
-    const { path, attrs, events, children } = directive;
-    const selector = `& > ${path
-      .slice(1)
-      .map((n) => `*:nth-child(${n})`)
-      .join(" > ")}`;
-    const el = root.querySelector(selector);
+  directives.forEach(directive => {
+    const { marker, attrs, events, children } = directive;
+    const el = document.getElementById(marker)?.previousElementSibling;
 
     if (!el) {
-      throw new Error(`Element not found: ${selector}`);
+      throw new Error(`Marker with ID "${marker}" not found`);
     }
 
     console.debug(
