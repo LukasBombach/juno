@@ -13,6 +13,8 @@
     "vite-plugin-inspect": "0.8.7"
   },
   "dependencies": {
-    "@maverick-js/signals": "6.0.0"
+    "@maverick-js/signals": "6.0.0",
+    "@tailwindcss/vite": "4.0.0-beta.8",
+    "tailwindcss": "4.0.0-beta.8"
   }
 }

@@ -1,5 +1,6 @@
 import { signal } from "@maverick-js/signals";
 import { Page } from "./components/Page";
+import "./tailwind.css";
 
 export default function ReactiveAssignments() {
   const count = signal(1);
