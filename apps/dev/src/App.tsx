@@ -4,7 +4,7 @@ import type { FC, ReactNode } from "react";
 
 function getExamples(): [string, string][] {
   return fs
-    .readdirSync(process.cwd() + "/src")
+    .readdirSync(process.cwd() + "/src/examples")
     .filter((file) => file !== "App.tsx")
     .filter((file) => file.endsWith(".tsx"))
     .map((file) => file.replace(/\.tsx$/, ""))
