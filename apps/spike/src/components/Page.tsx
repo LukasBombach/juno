@@ -13,7 +13,7 @@ export const Page: FC<{ children?: ReactNode; title?: string }> = (props) => {
         <title>{props.title} - juno</title>
       </head>
       <body>
-        <div className="container mx-auto px-4 grid grid-cols-[300px_1fr] gap-4">
+        <div className="container mx-auto px-4 grid grid-cols-[400px_1fr] gap-4">
           <nav>
             <ListOfExamples />
           </nav>
