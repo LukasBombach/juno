@@ -18,7 +18,7 @@ export default function DynamicChildren() {
       <script type="module">
         {`
           import { hydrate } from "@juno/hydrate";
-          import Page from "/src/3._Dynamic_Children.tsx";
+          import Page from "/src/2._Dynamic_Children.tsx";
 
           console.debug(Page.toString());
 
