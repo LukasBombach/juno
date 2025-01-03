@@ -5,11 +5,6 @@
   "main": "package.ts",
   "dependencies": {
     "@juno/parse": "workspace:*",
-    "@swc/core": "1.9.1",
-    "lodash-es": "4.17.21"
-  },
-  "devDependencies": {
-    "@swc/types": "0.1.12",
-    "@types/lodash-es": "4.17.12"
+    "@juno/pipe": "workspace:*"
   }
 }

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "path";
 import { renderToString } from "@juno/ssr";
 // import { transform } from "@juno/transform";
-import { transformServer, transformClient } from "@juno/transform_server";
+import { transformServer, transformClient } from "@juno/transform";
 
 import type { Plugin } from "vite";
 

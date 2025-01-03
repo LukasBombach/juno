@@ -78,25 +78,6 @@ importers:
       '@juno/parse':
         specifier: workspace:*
         version: link:../parse
-      '@swc/core':
-        specifier: 1.9.1
-        version: 1.9.1
-      lodash-es:
-        specifier: 4.17.21
-        version: 4.17.21
-    devDependencies:
-      '@swc/types':
-        specifier: 0.1.12
-        version: 0.1.12
-      '@types/lodash-es':
-        specifier: 4.17.12
-        version: 4.17.12
-
-  packages/transform_server:
-    dependencies:
-      '@juno/parse':
-        specifier: workspace:*
-        version: link:../parse
       '@juno/pipe':
         specifier: workspace:*
         version: link:../pipe
@@ -115,9 +96,25 @@ importers:
       '@juno/transform':
         specifier: workspace:*
         version: link:../transform
-      '@juno/transform_server':
+
+  packages/xold_transform:
+    dependencies:
+      '@juno/parse':
         specifier: workspace:*
-        version: link:../transform_server
+        version: link:../parse
+      '@swc/core':
+        specifier: 1.9.1
+        version: 1.9.1
+      lodash-es:
+        specifier: 4.17.21
+        version: 4.17.21
+    devDependencies:
+      '@swc/types':
+        specifier: 0.1.12
+        version: 0.1.12
+      '@types/lodash-es':
+        specifier: 4.17.12
+        version: 4.17.12
 
 packages:
 
