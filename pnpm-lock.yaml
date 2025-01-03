@@ -27,7 +27,7 @@ importers:
         specifier: 5.4.10
         version: 5.4.10(@types/node@22.9.0)(lightningcss@1.28.2)
 
-  apps/spike:
+  apps/dev:
     dependencies:
       '@maverick-js/signals':
         specifier: 6.0.0
