@@ -29,7 +29,7 @@ export function renderToString(node: ReactNode | ((ctx: RenderContext) => ReactN
   }
 
   if (Array.isArray(node)) {
-    throw new Error("not yet implemented");
+    return node.map(renderToString).join("");
   }
 
   if (isReactElement(node)) {
