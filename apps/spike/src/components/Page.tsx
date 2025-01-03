@@ -12,8 +12,8 @@ export const Page: FC<{ children?: ReactNode; title?: string }> = (props) => {
         <link rel="stylesheet" href="/src/tailwind.css" />
         <title>{props.title} - juno</title>
       </head>
-      <body>
-        <div className="container mx-auto px-4 grid grid-cols-[400px_1fr] gap-4">
+      <body className="bg-one-dark text-white">
+        <div className="container mx-auto px-4 py-24 grid grid-cols-[400px_1fr] gap-4">
           <nav>
             <ListOfExamples />
           </nav>
