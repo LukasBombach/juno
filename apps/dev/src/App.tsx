@@ -36,7 +36,7 @@ const App: FC<{ children?: ReactNode; title?: string }> = (props) => {
             ))}
           </ul>
         </nav>
-        <hr className="row-start-2 col-span-1 bg-zinc-800 h-[calc(100%-theme(space.16))] self-center border-none transition-colors hover:bg-zinc-600 cursor-grab" />
+        <hr className="row-start-2 col-span-1 bg-zinc-800 h-[calc(100%-theme(space.16))] rounded-full self-center border-none transition-colors hover:bg-zinc-600 cursor-grab" />
         <main className="row-start-2 col-start-3 col-span-1">{props.children}</main>
       </body>
     </html>
