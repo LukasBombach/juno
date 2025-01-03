@@ -29,6 +29,16 @@ export default function ConditionalChildrenWithLotsOfJsx() {
     <Page title="Conditional Children with lots of JSX">
       {toggle() ? <ChildA /> : <ChildB />}
       <button onClick={switchToggle}>Swtich</button>
+      <script type="module">
+        {`
+          import { hydrate } from "@juno/hydrate";
+          import Page from "/src/3._Conditional_Children_With_Lots_Of_JSX.tsx";
+
+          console.debug(Page.toString());
+
+          hydrate(document.querySelector("main"), Page());
+        `}
+      </script>
     </Page>
   );
 }

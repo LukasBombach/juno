@@ -10,8 +10,9 @@ export default function DynamicChildren() {
   return (
     <Page title="Dynamic Children vs Path vs Hydraition">
       {randomLengthArray.map((i) => (
-        <div key={i}>{i}</div>
+        <span key={i}>{i}</span>
       ))}
+      <br />
       <button onClick={() => count.set(count() + 1)}>
         Clicked {count()} {count() === 1 ? "time" : "times"}
       </button>
