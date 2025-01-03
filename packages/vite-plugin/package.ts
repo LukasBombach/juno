@@ -21,6 +21,7 @@ export default function juno(): Plugin {
         try {
           const page = await vite.ssrLoadModule(pagePath);
           const html = renderToString(page.default);
+
           const viteHtml = await vite.transformIndexHtml(req.originalUrl!, html);
           res.end(viteHtml);
         } catch (e) {
@@ -50,7 +51,7 @@ export default function juno(): Plugin {
 }
 
 function resolvePage(url: string | undefined): string | null {
-  const page = !url ? "/index" : url === "/" ? "/index" : url;
+  const page = !url || url === "/" ? "App" : url;
   const filePath = path.resolve(`src/${page}.tsx`);
   const exists = fs.existsSync(filePath);
   return exists ? filePath : null;
