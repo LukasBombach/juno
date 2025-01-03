@@ -8,7 +8,7 @@ type Directive = {
 };
 
 export function hydrate(root: Document | HTMLElement, directives: Directive[]) {
-  directives.forEach(directive => {
+  directives.forEach((directive) => {
     const { marker, attrs, events, children } = directive;
     const el = document.getElementById(marker)?.previousElementSibling;
 
