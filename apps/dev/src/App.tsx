@@ -23,7 +23,7 @@ const App: FC<{ children?: ReactNode; title?: string }> = (props) => {
         <link rel="stylesheet" href="/src/tailwind.css" />
         <title>{props.title} - juno</title>
       </head>
-      <body className="bg-zinc-900 text-white grid grid-rows-[80px_1fr] grid-cols-[400px_1fr] w-screen h-screen">
+      <body className="bg-zinc-900 text-white grid grid-rows-[80px_1fr] grid-cols-[400px_4px_1fr] w-screen h-screen">
         <header className="row-start-1 row-span-1 col-span-full bg-zinc-800 grid content-center px-8">
           <h1 className="text-2xl font-medium">juno</h1>
         </header>
@@ -36,7 +36,8 @@ const App: FC<{ children?: ReactNode; title?: string }> = (props) => {
             ))}
           </ul>
         </nav>
-        <main className="row-start-2 col-start-2 col-span-1">{props.children}</main>
+        <hr className="row-start-2 col-span-1 bg-zinc-800 h-[calc(100%-theme(space.16))] self-center border-none transition-colors hover:bg-zinc-600 cursor-grab" />
+        <main className="row-start-2 col-start-3 col-span-1">{props.children}</main>
       </body>
     </html>
   );
