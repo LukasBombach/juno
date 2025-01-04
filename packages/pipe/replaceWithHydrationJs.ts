@@ -101,7 +101,7 @@ export function replaceWithHydrationJs() {
           if (el.attrs.length) {
             obj.attrs = b.object(
               Object.fromEntries(
-                el.attrs.map((attr) => [getName(attr), (attr.value as t.JSXExpressionContainer).expression])
+                el.attrs.map((attr) => [getName(attr), b.arrowFn((attr.value as t.JSXExpressionContainer).expression)])
               )
             );
           }
