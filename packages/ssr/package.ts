@@ -56,6 +56,11 @@ export function renderToString(node: ReactNode | ((ctx: RenderContext) => ReactN
         if (key === "children") {
           const vals = Array.isArray(val) ? val : [val];
           children.push(...vals.map(renderToString));
+        } else if (key === "style" && typeof val === "object") {
+          const style = Object.entries(val)
+            .map(([k, v]) => `${k.replace(/[A-Z]/g, "-$&").toLowerCase()}:${v}`)
+            .join(";");
+          attrs.push(`style="${style}"`);
         } else {
           attrs.push(`${key}="${val}"`);
         }
@@ -65,8 +70,7 @@ export function renderToString(node: ReactNode | ((ctx: RenderContext) => ReactN
         return `${docType}<${[node.type, ...attrs].join(" ")}>${children.join("")}</${node.type}>`;
       } else if (node.type === "script") {
         return `${docType}<${[node.type, ...attrs].join(" ")}></${node.type}>`;
-      }
-      {
+      } else {
         return `${docType}<${[node.type, ...attrs].join(" ")} />`;
       }
     }
