@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import { signal } from "@maverick-js/signals";
 
 import type { FC, ReactNode } from "react";
 
@@ -14,7 +13,6 @@ function getExamples(): [string, string][] {
 
 const App: FC<{ children?: ReactNode }> = props => {
   const examples = getExamples();
-  const sidebarWidth = signal(400);
 
   return (
     <html lang="en">
@@ -25,10 +23,7 @@ const App: FC<{ children?: ReactNode }> = props => {
         <link rel="stylesheet" href="/src/tailwind.css" />
         <title>juno</title>
       </head>
-      <body
-        className="bg-zinc-900 text-white grid grid-rows-[80px_1fr] grid-cols-[calc(var(--sidebar-width,400)*1px)_4px_1fr] w-screen h-screen"
-        style={{ "--sidebar-width": sidebarWidth() }}
-      >
+      <body className="bg-zinc-900 text-white grid grid-rows-[80px_1fr] grid-cols-[400px_4px_1fr] w-screen h-screen">
         <header className="row-start-1 row-span-1 col-span-full bg-zinc-800 grid content-center px-8">
           <h1 className="text-2xl font-medium">juno</h1>
         </header>

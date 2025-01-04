@@ -56,8 +56,10 @@ export function renderToString(node: ReactNode | ((ctx: RenderContext) => ReactN
         if (key === "children") {
           const vals = Array.isArray(val) ? val : [val];
           children.push(...vals.map(renderToString));
+
+          // todo reactivity
         } else if (key === "style" && typeof val === "object") {
-          const style = Object.entries(val)
+          const style = Object.entries(val as any)
             .map(([k, v]) => `${k.replace(/[A-Z]/g, "-$&").toLowerCase()}:${v}`)
             .join(";");
           attrs.push(`style="${style}"`);
