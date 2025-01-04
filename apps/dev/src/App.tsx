@@ -1,6 +1,7 @@
 import fs from "node:fs";
+import { signal } from "@maverick-js/signals";
 
-import type { FC, ReactNode } from "react";
+import type { FC } from "react";
 
 function getExamples(): [string, string][] {
   return fs
@@ -24,8 +25,13 @@ const Hydrate: FC<{ path: string }> = ({ path }) => {
   );
 };
 
-const App: FC<{ children?: ReactNode }> = (props) => {
+const LoadExample: FC<{ path: string | null }> = ({ path }) => {
+  return path;
+};
+
+const App: FC = () => {
   const examples = getExamples();
+  const selectedExample = signal<string | null>(null);
 
   return (
     <html lang="en">
@@ -44,13 +50,15 @@ const App: FC<{ children?: ReactNode }> = (props) => {
           <ul>
             {examples.map(([path, name]) => (
               <li key={path}>
-                <a href={path}>{name}</a>
+                <button onClick={() => selectedExample.set(path)}>{name}</button>
               </li>
             ))}
           </ul>
         </nav>
         <hr className="row-start-2 col-span-1 bg-zinc-800 h-[calc(100%-theme(space.16))] rounded-full self-center border-none transition-colors hover:bg-zinc-600 cursor-grab" />
-        <main className="row-start-2 col-start-3 col-span-1">{props.children}</main>
+        <main className="row-start-2 col-start-3 col-span-1">
+          <LoadExample path={selectedExample()} />
+        </main>
         <Hydrate path="App" />
       </body>
     </html>
