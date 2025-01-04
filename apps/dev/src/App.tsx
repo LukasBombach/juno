@@ -1,16 +1,6 @@
-import fs from "node:fs";
 import { signal } from "@maverick-js/signals";
 
 import type { FC } from "react";
-
-function getExamples(): [string, string][] {
-  return fs
-    .readdirSync(process.cwd() + "/src/examples")
-    .filter((file) => file !== "App.tsx")
-    .filter((file) => file.endsWith(".tsx"))
-    .map((file) => file.replace(/\.tsx$/, ""))
-    .map((file) => ["/" + file, file.replace(/_/g, " ")]);
-}
 
 const Hydrate: FC<{ path: string }> = ({ path }) => {
   return (
@@ -30,7 +20,6 @@ const LoadExample: FC<{ path: string | null }> = ({ path }) => {
 };
 
 const App: FC = () => {
-  const examples = getExamples();
   const selectedExample = signal<string | null>(null);
 
   return (
@@ -48,11 +37,9 @@ const App: FC = () => {
         </header>
         <nav className="row-start-2 col-span-1 p-8">
           <ul>
-            {examples.map(([path, name]) => (
-              <li key={path}>
-                <button onClick={() => selectedExample.set(path)}>{name}</button>
-              </li>
-            ))}
+            <li>
+              <button onClick={() => selectedExample.set("reactive_assignments")}>Reactive Assignments</button>
+            </li>
           </ul>
         </nav>
         <hr className="row-start-2 col-span-1 bg-zinc-800 h-[calc(100%-theme(space.16))] rounded-full self-center border-none transition-colors hover:bg-zinc-600 cursor-grab" />
