@@ -5,13 +5,26 @@ import type { FC, ReactNode } from "react";
 function getExamples(): [string, string][] {
   return fs
     .readdirSync(process.cwd() + "/src/examples")
-    .filter(file => file !== "App.tsx")
-    .filter(file => file.endsWith(".tsx"))
-    .map(file => file.replace(/\.tsx$/, ""))
-    .map(file => ["/" + file, file.replace(/_/g, " ")]);
+    .filter((file) => file !== "App.tsx")
+    .filter((file) => file.endsWith(".tsx"))
+    .map((file) => file.replace(/\.tsx$/, ""))
+    .map((file) => ["/" + file, file.replace(/_/g, " ")]);
 }
 
-const App: FC<{ children?: ReactNode }> = props => {
+const Hydrate: FC<{ path: string }> = ({ path }) => {
+  return (
+    <script type="module">
+      {`
+        import { hydrate } from "@juno/hydrate";
+        import Page from "/src/${path}.tsx";
+        console.debug(Page.toString());
+        hydrate(document.querySelector("main"), Page());
+      `}
+    </script>
+  );
+};
+
+const App: FC<{ children?: ReactNode }> = (props) => {
   const examples = getExamples();
 
   return (
@@ -41,19 +54,6 @@ const App: FC<{ children?: ReactNode }> = props => {
         <Hydrate path="App" />
       </body>
     </html>
-  );
-};
-
-const Hydrate: FC<{ path: string }> = ({ path }) => {
-  return (
-    <script type="module">
-      {`
-        import { hydrate } from "@juno/hydrate";
-        import Page from "/src/${path}.tsx";
-        console.debug(Page.toString());
-        hydrate(document.querySelector("main"), Page());
-      `}
-    </script>
   );
 };
 
