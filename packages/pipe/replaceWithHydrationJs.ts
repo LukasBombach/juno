@@ -93,27 +93,38 @@ export function replaceWithHydrationJs() {
       }
 
       const hydrationArray = b.array(
-        interactiveElements.map((el, i) =>
-          b.object({
+        interactiveElements.map((el, i) => {
+          const obj: Record<string, t.Expression> = {
             marker: b.string(`juno-${i}`),
-            attrs: b.object(
+          };
+
+          if (el.attrs.length) {
+            obj.attrs = b.object(
               Object.fromEntries(
                 el.attrs.map((attr) => [getName(attr), (attr.value as t.JSXExpressionContainer).expression])
               )
-            ),
-            events: b.object(
+            );
+          }
+
+          if (el.events.length) {
+            obj.events = b.object(
               Object.fromEntries(
                 el.events.map((attr) => [
                   getName(attr).replace(/^on/, "").toLowerCase(),
                   (attr.value as t.JSXExpressionContainer).expression,
                 ])
               )
-            ),
-            children: b.array(
+            );
+          }
+
+          if (el.children.length) {
+            obj.children = b.array(
               el.children.map((child) => (typeof child === "number" ? b.number(child) : b.arrowFn(child)))
-            ),
-          })
-        )
+            );
+          }
+
+          return b.object(obj);
+        })
       );
 
       switch (parent.type) {
