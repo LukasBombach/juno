@@ -16,7 +16,7 @@ const Hydrate: FC<{ path: string }> = ({ path }) => {
 };
 
 const LoadExample: FC<{ path: string | null }> = ({ path }) => {
-  return path;
+  return <p>The path is {path}</p>;
 };
 
 const App: FC = () => {

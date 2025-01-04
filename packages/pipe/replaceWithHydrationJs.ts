@@ -24,10 +24,10 @@ export function replaceWithHydrationJs() {
       const isInteractive = pipe(
         element,
         getJSXElements(),
-        flatMap(el => el.opening.attributes),
-        filter(attr => attr.type === "JSXAttribute"),
-        filter(attr => !!getName(attr)?.match(/^on[A-Z]/)),
-        flatMap(attr => getIdentifiers(attr)),
+        flatMap((el) => el.opening.attributes),
+        filter((attr) => attr.type === "JSXAttribute"),
+        filter((attr) => !!getName(attr)?.match(/^on[A-Z]/)),
+        flatMap((attr) => getIdentifiers(attr)),
         unique(),
         toRegex()
       );
@@ -35,16 +35,16 @@ export function replaceWithHydrationJs() {
       for (const [node] of traverse(element)) {
         if (node.type === "JSXElement") {
           const interactiveAttrs = node.opening.attributes
-            .filter(attr => attr.type === "JSXAttribute")
-            .filter(attr => getIdentifiers(attr).some(id => isInteractive.test(id.value)));
+            .filter((attr) => attr.type === "JSXAttribute")
+            .filter((attr) => getIdentifiers(attr).some((id) => isInteractive.test(id.value)));
 
           const serializedChildren = node.children
-            .filter(child => {
+            .filter((child) => {
               if (child.type === "JSXText") {
                 return true;
               }
               if (child.type === "JSXExpressionContainer") {
-                return getIdentifiers(child.expression).some(id => isInteractive.test(id.value));
+                return getIdentifiers(child.expression).some((id) => isInteractive.test(id.value));
               }
               if (child.type === "JSXElement") {
                 return false;
@@ -70,11 +70,12 @@ export function replaceWithHydrationJs() {
               // filtering out static text nodes after the last expression
               // because they are not needed and we can might have children
               // arrays that are not interactive, just text nodes
-              const lastExpression = all.findLastIndex(c => typeof c !== "number");
+              // @ts-expect-error ah, fuck off
+              const lastExpression = all.findLastIndex((c) => typeof c !== "number");
               return typeof child !== "number" || i < lastExpression;
             });
 
-          const interactiveChildren = serializedChildren.filter(child => typeof child !== "number");
+          const interactiveChildren = serializedChildren.filter((child) => typeof child !== "number");
 
           if (interactiveAttrs.length || interactiveChildren.length) {
             // const { start } = node.span;
@@ -83,40 +84,47 @@ export function replaceWithHydrationJs() {
 
             interactiveElements.push({
               // marker,
-              attrs: interactiveAttrs.filter(attr => !getName(attr).match(/^on[A-Z]/)),
-              events: interactiveAttrs.filter(attr => getName(attr).match(/^on[A-Z]/)),
+              attrs: interactiveAttrs.filter((attr) => !getName(attr).match(/^on[A-Z]/)),
+              events: interactiveAttrs.filter((attr) => getName(attr).match(/^on[A-Z]/)),
               children: serializedChildren,
             });
           }
         }
       }
 
-      if (parent.type === "ParenthesisExpression") {
-        parent.expression = b.array(
-          interactiveElements.map((el, i) =>
-            b.object({
-              marker: b.string(`juno-${i}`),
-              attrs: b.object(
-                Object.fromEntries(
-                  el.attrs.map(attr => [getName(attr), (attr.value as t.JSXExpressionContainer).expression])
-                )
-              ),
-              events: b.object(
-                Object.fromEntries(
-                  el.events.map(attr => [
-                    getName(attr).replace(/^on/, "").toLowerCase(),
-                    (attr.value as t.JSXExpressionContainer).expression,
-                  ])
-                )
-              ),
-              children: b.array(
-                el.children.map(child => (typeof child === "number" ? b.number(child) : b.arrowFn(child)))
-              ),
-            })
-          )
-        );
-      } else {
-        throw new Error(`Cannot handle parent type: ${parent.type}`);
+      const hydrationArray = b.array(
+        interactiveElements.map((el, i) =>
+          b.object({
+            marker: b.string(`juno-${i}`),
+            attrs: b.object(
+              Object.fromEntries(
+                el.attrs.map((attr) => [getName(attr), (attr.value as t.JSXExpressionContainer).expression])
+              )
+            ),
+            events: b.object(
+              Object.fromEntries(
+                el.events.map((attr) => [
+                  getName(attr).replace(/^on/, "").toLowerCase(),
+                  (attr.value as t.JSXExpressionContainer).expression,
+                ])
+              )
+            ),
+            children: b.array(
+              el.children.map((child) => (typeof child === "number" ? b.number(child) : b.arrowFn(child)))
+            ),
+          })
+        )
+      );
+
+      switch (parent.type) {
+        case "ParenthesisExpression":
+          parent.expression = hydrationArray;
+          break;
+        case "ReturnStatement":
+          parent.argument = hydrationArray;
+          break;
+        default:
+          throw new Error(`Cannot handle parent type: ${parent.type}`);
       }
     });
   };
@@ -129,11 +137,11 @@ function getName(attr: t.JSXAttribute): string {
 function getIdentifiers(current: Node): t.Identifier[] {
   return Array.from(traverse(current))
     .map(([n]) => n)
-    .filter(n => n.type === "Identifier");
+    .filter((n) => n.type === "Identifier");
 }
 
 function toRegex(): (ids: t.Identifier[]) => RegExp {
-  return ids => (ids.length ? new RegExp(`^(${ids.map(id => id.value).join("|")})$`) : /never-match^/);
+  return (ids) => (ids.length ? new RegExp(`^(${ids.map((id) => id.value).join("|")})$`) : /never-match^/);
 }
 
 function getJSXElements() {
@@ -147,7 +155,7 @@ function getJSXElements() {
 const b = {
   array: (expressions: t.Expression[]): t.ArrayExpression => ({
     type: "ArrayExpression",
-    elements: expressions.map(expression => ({ expression })),
+    elements: expressions.map((expression) => ({ expression })),
     span,
   }),
   object: (properties: Record<string, t.Expression>): t.ObjectExpression => ({
