@@ -10,7 +10,8 @@
   "devDependencies": {
     "@juno/hydrate": "workspace:*",
     "@juno/vite-plugin-juno": "workspace:*",
-    "vite-plugin-inspect": "0.8.7"
+    "vite-plugin-inspect": "0.8.7",
+    "vite-plugin-restart": "0.4.2"
   },
   "dependencies": {
     "@maverick-js/signals": "6.0.0",
