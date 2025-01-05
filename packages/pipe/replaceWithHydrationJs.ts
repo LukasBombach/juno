@@ -78,6 +78,11 @@ export function replaceWithHydrationJs() {
           const interactiveChildren = serializedChildren.filter(child => typeof child !== "number");
 
           if (interactiveAttrs.length || interactiveChildren.length) {
+            console.log(
+              /^[A-Z]/.test((node.opening.name as t.Identifier).value),
+              (node.opening.name as t.Identifier).value
+            );
+
             interactiveElements.push({
               attrs: interactiveAttrs.filter(attr => !getName(attr).match(/^on[A-Z]/)),
               events: interactiveAttrs.filter(attr => getName(attr).match(/^on[A-Z]/)),
