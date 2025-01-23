@@ -47,7 +47,11 @@ export function replaceWithHydrationJs() {
                 return getIdentifiers(child.expression).some(id => isInteractive.test(id.value));
               }
               if (child.type === "JSXElement") {
-                return false;
+                return (
+                  child.opening.name.type === "Identifier" &&
+                  child.opening.name.value.match(/^[A-Z]/) &&
+                  getIdentifiers(child.opening).some(id => isInteractive.test(id.value))
+                );
               }
               throw new Error(`Cannot handle JSX child type: ${child.type}`);
             })
@@ -63,6 +67,9 @@ export function replaceWithHydrationJs() {
               }
               if (child.type === "JSXExpressionContainer") {
                 return child.expression;
+              }
+              if (child.type === "JSXElement") {
+                return child;
               }
               throw new Error(`Cannot handle JSX child type: ${child.type}`);
             })
@@ -205,6 +212,12 @@ const b = {
     type: "NumericLiteral",
     raw: JSON.stringify(value),
     value,
+    span,
+  }),
+  callExpression: (callee: string, args: t.Argument[]): t.CallExpression => ({
+    type: "CallExpression",
+    callee: b.ident(callee),
+    arguments: args,
     span,
   }),
 };
