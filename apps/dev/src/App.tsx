@@ -21,10 +21,10 @@ const LoadExample: FC<{ path: string | null; titleOrSomething?: string }> = ({ p
       <h3>{titleOrSomething}</h3>
       {/*there should be no marker here because there is no reactivity */}
       <p>The path is {path}</p>
-      <script
+      {/* <script
         data-type="juno/h"
         data-comment="marker should be here because a reactive var is coming in from the props"
-      />
+      /> */}
     </section>
   );
 };
