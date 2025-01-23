@@ -100,6 +100,12 @@ export function replaceWithHydrationJs() {
               throw new Error(`Cannot handle JSX child type: ${child.type}`);
             })
             .filter((child, i, all) => {
+              // todo weird that 0s occur, they should not event be here
+              // todo as a quick fix we're gonna filter them out
+              if (child === 0) {
+                return false;
+              }
+
               // filtering out static text nodes after the last expression
               // because they are not needed and we can might have children
               // arrays that are not interactive, just text nodes
@@ -121,8 +127,6 @@ export function replaceWithHydrationJs() {
               events: interactiveAttrs.filter((attr) => getName(attr).match(/^on[A-Z]/)),
               children: serializedChildren,
             });
-
-            console.dir(serializedChildren, { depth: null });
           }
         }
       }
