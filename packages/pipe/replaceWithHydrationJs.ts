@@ -24,33 +24,37 @@ export function replaceWithHydrationJs() {
       const isInteractive = pipe(
         element,
         getJSXElements(),
-        flatMap((el) => el.opening.attributes),
-        filter((attr) => attr.type === "JSXAttribute"),
-        filter((attr) => !!getName(attr)?.match(/^on[A-Z]/)),
-        flatMap((attr) => getIdentifiers(attr)),
+        flatMap(el => el.opening.attributes),
+        filter(attr => attr.type === "JSXAttribute"),
+        filter(attr => !!getName(attr)?.match(/^on[A-Z]/)),
+        flatMap(attr => getIdentifiers(attr)),
         unique(),
         toRegex()
       );
 
       for (const [node] of traverse(element)) {
-        if (node.type === "JSXElement") {
+        if (
+          node.type === "JSXElement" &&
+          node.opening.name.type === "Identifier" &&
+          node.opening.name.value.match(/^[a-z]/)
+        ) {
           const interactiveAttrs = node.opening.attributes
-            .filter((attr) => attr.type === "JSXAttribute")
-            .filter((attr) => getIdentifiers(attr).some((id) => isInteractive.test(id.value)));
+            .filter(attr => attr.type === "JSXAttribute")
+            .filter(attr => getIdentifiers(attr).some(id => isInteractive.test(id.value)));
 
           const serializedChildren = node.children
-            .filter((child) => {
+            .filter(child => {
               if (child.type === "JSXText") {
                 return true;
               }
               if (child.type === "JSXExpressionContainer") {
-                return getIdentifiers(child.expression).some((id) => isInteractive.test(id.value));
+                return getIdentifiers(child.expression).some(id => isInteractive.test(id.value));
               }
               if (child.type === "JSXElement") {
                 return (
                   child.opening.name.type === "Identifier" &&
                   child.opening.name.value.match(/^[A-Z]/) &&
-                  getIdentifiers(child.opening).some((id) => isInteractive.test(id.value))
+                  getIdentifiers(child.opening).some(id => isInteractive.test(id.value))
                 );
               }
               throw new Error(`Cannot handle JSX child type: ${child.type}`);
@@ -75,7 +79,7 @@ export function replaceWithHydrationJs() {
                 return b.callExpression(child.opening.name, [
                   b.object(
                     Object.fromEntries(
-                      child.opening.attributes.map((attr) => {
+                      child.opening.attributes.map(attr => {
                         if (attr.type !== "JSXAttribute") {
                           throw new Error(`Expected attribute type to be JSXAttribute, got "${attr.type}"`);
                         }
@@ -110,11 +114,11 @@ export function replaceWithHydrationJs() {
               // because they are not needed and we can might have children
               // arrays that are not interactive, just text nodes
               // @ts-expect-error ah, fuck off
-              const lastExpression = all.findLastIndex((c) => typeof c !== "number");
+              const lastExpression = all.findLastIndex(c => typeof c !== "number");
               return typeof child !== "number" || i < lastExpression;
             });
 
-          const interactiveChildren = serializedChildren.filter((child) => typeof child !== "number");
+          const interactiveChildren = serializedChildren.filter(child => typeof child !== "number");
 
           if (interactiveAttrs.length || interactiveChildren.length) {
             console.log(
@@ -123,8 +127,8 @@ export function replaceWithHydrationJs() {
             );
 
             interactiveElements.push({
-              attrs: interactiveAttrs.filter((attr) => !getName(attr).match(/^on[A-Z]/)),
-              events: interactiveAttrs.filter((attr) => getName(attr).match(/^on[A-Z]/)),
+              attrs: interactiveAttrs.filter(attr => !getName(attr).match(/^on[A-Z]/)),
+              events: interactiveAttrs.filter(attr => getName(attr).match(/^on[A-Z]/)),
               children: serializedChildren,
             });
           }
@@ -140,7 +144,7 @@ export function replaceWithHydrationJs() {
           if (el.attrs.length) {
             obj.attrs = b.object(
               Object.fromEntries(
-                el.attrs.map((attr) => [getName(attr), b.arrowFn((attr.value as t.JSXExpressionContainer).expression)])
+                el.attrs.map(attr => [getName(attr), b.arrowFn((attr.value as t.JSXExpressionContainer).expression)])
               )
             );
           }
@@ -148,7 +152,7 @@ export function replaceWithHydrationJs() {
           if (el.events.length) {
             obj.events = b.object(
               Object.fromEntries(
-                el.events.map((attr) => [
+                el.events.map(attr => [
                   getName(attr).replace(/^on/, "").toLowerCase(),
                   (attr.value as t.JSXExpressionContainer).expression,
                 ])
@@ -158,7 +162,7 @@ export function replaceWithHydrationJs() {
 
           if (el.children.length) {
             obj.children = b.array(
-              el.children.map((child) => (typeof child === "number" ? b.number(child) : b.arrowFn(child)))
+              el.children.map(child => (typeof child === "number" ? b.number(child) : b.arrowFn(child)))
             );
           }
 
@@ -187,11 +191,11 @@ function getName(attr: t.JSXAttribute): string {
 function getIdentifiers(current: Node): t.Identifier[] {
   return Array.from(traverse(current))
     .map(([n]) => n)
-    .filter((n) => n.type === "Identifier");
+    .filter(n => n.type === "Identifier");
 }
 
 function toRegex(): (ids: t.Identifier[]) => RegExp {
-  return (ids) => (ids.length ? new RegExp(`^(${ids.map((id) => id.value).join("|")})$`) : /never-match^/);
+  return ids => (ids.length ? new RegExp(`^(${ids.map(id => id.value).join("|")})$`) : /never-match^/);
 }
 
 function getJSXElements() {
@@ -205,7 +209,7 @@ function getJSXElements() {
 const b = {
   array: (expressions: t.Expression[]): t.ArrayExpression => ({
     type: "ArrayExpression",
-    elements: expressions.map((expression) => ({ expression })),
+    elements: expressions.map(expression => ({ expression })),
     span,
   }),
   object: (properties: Record<string, t.Expression>): t.ObjectExpression => ({
@@ -249,7 +253,7 @@ const b = {
   callExpression: (callee: t.Identifier, args: t.Expression[]): t.CallExpression => ({
     type: "CallExpression",
     callee,
-    arguments: args.map((arg) => ({ expression: arg })),
+    arguments: args.map(arg => ({ expression: arg })),
     // @ts-expect-error swc is type wrongfully
     ctxt: 0,
     span,
