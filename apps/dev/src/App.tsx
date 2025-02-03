@@ -4,14 +4,16 @@ import type { FC } from "react";
 
 const Hydrate: FC<{ path: string }> = ({ path }) => {
   return (
-    <script type="module">
-      {`
+    <span>
+      <script type="module">
+        {`
         import { hydrate } from "@juno/hydrate";
         import Page from "/src/${path}.tsx";
         console.debug(Page.toString());
         hydrate(document.querySelector("main"), Page());
       `}
-    </script>
+      </script>
+    </span>
   );
 };
 

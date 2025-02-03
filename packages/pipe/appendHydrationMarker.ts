@@ -8,13 +8,13 @@ export function appendHydrationMarker() {
       // console.log("server marker", `juno${i}`);
       const marker = createMarker(`juno-${i}`);
       const newline = jsxNewline();
-      const isJsx = parent.type === "JSXElement";
-      if (isJsx) {
+
+      if (parent.type === "JSXElement") {
         const index = parent.children.indexOf(node);
         parent.children.splice(index + 1, 0, newline, marker);
         // console.log("appendHydrationMarker", isJsx, index);
       } else {
-        throw new Error("appendHydrationMarker");
+        throw new Error(`Cannot append marker to parent of type: ${parent.type}`);
       }
     });
   };

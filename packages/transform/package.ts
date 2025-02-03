@@ -21,6 +21,17 @@ export async function transformServer(src: string): Promise<string> {
       const interactive = pipe(fn, interactiveIdentifiers());
       const props = pipe(fn, propNames());
       const test = pipe([...interactive, ...props], toRegex());
+
+      console.log(
+        "interactive",
+        interactive.map(id => id.value)
+      );
+      console.log(
+        "props",
+        props.map(id => id.value)
+      );
+      console.log("test", test);
+
       return pipe(fns, getJSXElements(), usesIdentifier(test), appendHydrationMarker());
     });
   });
@@ -78,7 +89,12 @@ function propNames() {
 function usesIdentifier(test: RegExp) {
   return (elements: [el: Node<"JSXElement">, parents: Node[]][]): [el: Node<"JSXElement">, parents: Node[]][] => {
     return elements.filter(([el]) => {
-      const attrs = el.opening.attributes;
+      const attrs = el.opening.attributes
+        .filter(attr => attr.type === "JSXAttribute")
+        .map(attr => attr.value)
+        .filter(val => val !== undefined)
+        .filter(val => val.type === "JSXExpressionContainer");
+
       const ownChildValues = el.children.filter(child => child.type === "JSXExpressionContainer");
 
       return [...attrs, ...ownChildValues].flatMap(attr => getIdentifiers(attr)).some(id => test.test(id.value));
