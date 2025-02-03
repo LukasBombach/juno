@@ -5,6 +5,7 @@
   "main": "package.ts",
   "dependencies": {
     "@juno/parse": "workspace:*",
-    "@juno/pipe": "workspace:*"
+    "@juno/pipe": "workspace:*",
+    "@juno/traverse": "workspace:*"
   }
 }

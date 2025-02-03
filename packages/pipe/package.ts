@@ -5,5 +5,6 @@ export { getFunctions } from "./getFunctions";
 export { getJSXElements } from "./getJSXElements";
 export { getJsxRoots } from "./getJsxRoots";
 export { getReturnStatements } from "./getReturnStatements";
+export { interactiveIdentifiers } from "./interactiveIdentifiers";
 export { pipe } from "./pipe";
 export { replaceWithHydrationJs } from "./replaceWithHydrationJs";

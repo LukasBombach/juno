@@ -90,6 +90,9 @@ importers:
       '@juno/pipe':
         specifier: workspace:*
         version: link:../pipe
+      '@juno/traverse':
+        specifier: workspace:*
+        version: link:../traverse
 
   packages/traverse:
     dependencies:
