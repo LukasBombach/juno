@@ -23,14 +23,11 @@ export async function transformServer(src: string): Promise<string> {
       const test = pipe([...interactive, ...props], toRegex());
 
       console.log(
-        "interactive",
+        "p",
+        props.map(id => id.value),
+        "i",
         interactive.map(id => id.value)
       );
-      console.log(
-        "props",
-        props.map(id => id.value)
-      );
-      console.log("test", test);
 
       return pipe(fns, getJSXElements(), usesIdentifier(test), appendHydrationMarker());
     });
