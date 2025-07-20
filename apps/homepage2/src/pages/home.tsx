@@ -1,6 +1,8 @@
 import { Editor } from "../components/Editor";
 
-function Homepage() {
+const sourcepoint_script = "https://consent.t-online.de/unified/wrapperMessagingWithoutDetection.js";
+
+function Home() {
   return (
     <html lang="en">
       <head>
@@ -8,6 +10,9 @@ function Homepage() {
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width" />
         <title>juno</title>
+        <script inline src="../assets/tcf_api.ts" />
+        <script inline src="../assets/sourcepoint_config.ts" />
+        <script async src={sourcepoint_script} />
       </head>
       <body className="h-screen bg-purple text-white grid grid-cols-12 grid-rows-12">
         <div className="row-start-2 -row-end-2 col-start-2 -col-end-2 rounded-xl shadow-window p-4 bg-white text-zinc-950 text-sm font-mono">
@@ -17,5 +22,3 @@ function Homepage() {
     </html>
   );
 }
-
-export default Homepage;
