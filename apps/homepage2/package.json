@@ -3,5 +3,8 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {},
-  "dependencies": {}
+  "dependencies": {
+    "monaco-editor": "0.52.2",
+    "tailwindcss": "4.1.11"
+  }
 }
