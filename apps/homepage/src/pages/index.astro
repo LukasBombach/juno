@@ -1,5 +1,5 @@
 ---
-
+import "../styles/global.css";
 ---
 
 <html lang="en">
@@ -10,7 +10,11 @@
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro</title>
 	</head>
-	<body>
-		<h1>Astro</h1>
+	<body class="h-screen bg-purple text-white grid grid-cols-12 grid-rows-12">
+
+		<div class="row-start-2 -row-end-2 col-start-2 -col-end-2 rounded-xl shadow-window p-4 bg-white text-zinc-950 text-sm font-mono">
+			code editor
+		</div>
+
 	</body>
 </html>
