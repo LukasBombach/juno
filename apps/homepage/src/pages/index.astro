@@ -1,6 +1,7 @@
 ---
 import { Editor } from "../components/Editor";
 import junoLogo from '../assets/juno.svg';
+import bgImage from '../assets/background.svg';
 import "../styles/global.css";
 ---
 
@@ -12,7 +13,7 @@ import "../styles/global.css";
 		<meta name="generator" content={Astro.generator} />
 		<title>juno</title>
 	</head>
-	<body class="h-screen bg-purple text-white grid grid-cols-[120px_380px_1fr_120px] grid-rows-[100px_1fr_100px]">
+	<body class="h-screen bg-purple text-white grid grid-cols-[120px_380px_1fr_120px] grid-rows-[100px_1fr_100px] bg-(image:--background)" style={{"--background": `url(${bgImage.src})`}}>
 		<img src={junoLogo.src} width="124" height="82" alt="Juno Logo" class="row-start-2 row-end-3 col-start-2" />
 		<Editor client:only className="row-start-2 row-end-3 col-start-3 col-end-4 w-full h-full rounded-xl shadow-window p-4 bg-editor-light dark:bg-editor-dark text-zinc-950 text-sm font-mono" />
 	</body>
