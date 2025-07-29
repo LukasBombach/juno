@@ -5,6 +5,9 @@ import react from "@astrojs/react";
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
+    ssr: {
+      noExternal: ["monaco-editor"],
+    },
   },
   integrations: [react()],
 });

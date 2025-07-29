@@ -1,6 +1,6 @@
 ---
 import {Editor} from "../components/Editor";
-import {Test} from "../components/Test";
+import {Editor2} from "../components/Editor2";
 import "../styles/global.css";
 ---
 
@@ -15,8 +15,8 @@ import "../styles/global.css";
 	<body class="h-screen bg-purple text-white grid grid-cols-12 grid-rows-12">
 
 		<div class="row-start-2 -row-end-2 col-start-2 -col-end-2 rounded-xl shadow-window p-4 bg-white text-zinc-950 text-sm font-mono">
-			<Editor />
-			 <Test />
+			<!-- <Editor /> -->
+			 <Editor2 client:only />
 		</div>
 
 	</body>
