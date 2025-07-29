@@ -3,21 +3,15 @@ import { editor } from "monaco-editor/esm/vs/editor/editor.api";
 
 export interface EditorProps {
   value?: string;
-  language?: string;
-  theme?: string;
-  height?: string;
-  onChange?: (value: string) => void;
+  className?: string;
 }
 
-export const Editor: React.FC<EditorProps> = ({
-  value = "",
-  language = "typescript",
-  theme = "vs-dark",
-  height = "100%",
-  onChange,
-}) => {
+export const Editor: React.FC<EditorProps> = ({ value = "", className }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+
+  const theme = "vs-dark";
+  const language = "typescript";
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -31,12 +25,7 @@ export const Editor: React.FC<EditorProps> = ({
       scrollBeyondLastLine: false,
     });
 
-    const disposable = editorRef.current.onDidChangeModelContent(() => {
-      onChange && onChange(editorRef.current!.getValue());
-    });
-
     return () => {
-      disposable.dispose();
       editorRef.current?.dispose();
     };
   }, []);
@@ -54,5 +43,5 @@ export const Editor: React.FC<EditorProps> = ({
     }
   }, [language, theme]);
 
-  return <div ref={containerRef} style={{ height, width: "100%" }} />;
+  return <code ref={containerRef} className={className} />;
 };
