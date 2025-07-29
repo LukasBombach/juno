@@ -3,6 +3,9 @@ import * as monaco from "monaco-editor";
 import { editor } from "monaco-editor/esm/vs/editor/editor.api";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+import GitHubDark from "monaco-themes/themes/GitHub Dark.json";
+import GitHubLight from "monaco-themes/themes/GitHub Light.json";
+import { useColorScheme } from "../hooks/useColorScheme";
 
 export interface EditorProps {
   value?: string;
@@ -17,15 +20,19 @@ self.MonacoEnvironment = {
 };
 
 monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+monaco.editor.defineTheme("GitHubDark", GitHubDark as editor.IStandaloneThemeData);
+monaco.editor.defineTheme("GitHubLight", GitHubLight as editor.IStandaloneThemeData);
 
 export const Editor: React.FC<EditorProps> = ({
   value = ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
   className,
 }) => {
+  const colorScheme = useColorScheme();
+
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
-  const theme = "vs-dark";
+  const theme = colorScheme === "dark" ? "GitHubDark" : "GitHubLight";
   const language = "typescript";
 
   useEffect(() => {
