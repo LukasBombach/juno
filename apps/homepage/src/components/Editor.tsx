@@ -1,36 +1,58 @@
-import Monaco from "@monaco-editor/react";
+import React, { useRef, useEffect } from "react";
+import { editor } from "monaco-editor/esm/vs/editor/editor.api";
 
-import type { FC } from "react";
-import type { OnChange, EditorProps as MonacoEditorProps } from "@monaco-editor/react";
-
-export interface EditorProps extends MonacoEditorProps {
+export interface EditorProps {
   value?: string;
-  onChange?: (value: string | undefined) => void;
+  language?: string;
+  theme?: string;
+  height?: string;
+  onChange?: (value: string) => void;
 }
 
-export const Editor: FC<EditorProps> = ({
+export const Editor: React.FC<EditorProps> = ({
   value = "",
   language = "typescript",
   theme = "vs-dark",
   height = "100%",
   onChange,
-  ...rest
 }) => {
-  const handleChange: OnChange = val => onChange?.(val);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
-  return (
-    <Monaco
-      value={value}
-      defaultLanguage={language}
-      theme={theme}
-      height={height}
-      onChange={handleChange}
-      options={{
-        automaticLayout: true,
-        minimap: { enabled: false },
-        scrollBeyondLastLine: false,
-      }}
-      {...rest}
-    />
-  );
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    editorRef.current = editor.create(containerRef.current, {
+      value,
+      language,
+      theme,
+      automaticLayout: true,
+      minimap: { enabled: false },
+      scrollBeyondLastLine: false,
+    });
+
+    const disposable = editorRef.current.onDidChangeModelContent(() => {
+      onChange && onChange(editorRef.current!.getValue());
+    });
+
+    return () => {
+      disposable.dispose();
+      editorRef.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.getValue() !== value) {
+      editorRef.current.setValue(value);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editor.setModelLanguage(editorRef.current.getModel()!, language!);
+      editor.setTheme(theme!);
+    }
+  }, [language, theme]);
+
+  return <div ref={containerRef} style={{ height, width: "100%" }} />;
 };
