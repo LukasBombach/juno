@@ -11,9 +11,7 @@ export interface EditorProps {
 
 self.MonacoEnvironment = {
   getWorker(_: any, label: string) {
-    if (label === "typescript" || label === "javascript") {
-      return new tsWorker();
-    }
+    if (label === "typescript") return new tsWorker();
     return new editorWorker();
   },
 };
