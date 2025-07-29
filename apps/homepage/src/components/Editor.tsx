@@ -29,7 +29,7 @@ export const Editor: React.FC<EditorProps> = ({
 }) => {
   const colorScheme = useColorScheme();
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
   const theme = colorScheme === "dark" ? "GitHubDark" : "GitHubLight";
