@@ -6,6 +6,7 @@ import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
 import GitHubDark from "monaco-themes/themes/GitHub Dark.json";
 import GitHubLight from "monaco-themes/themes/GitHub Light.json";
 import { useColorScheme } from "../hooks/useColorScheme";
+import { useElementSize } from "../hooks/useElementSize";
 
 export interface EditorProps {
   value?: string;
@@ -27,10 +28,11 @@ export const Editor: React.FC<EditorProps> = ({
   value = ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
   className,
 }) => {
-  const colorScheme = useColorScheme();
-
   const containerRef = useRef<HTMLElement | null>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+
+  const colorScheme = useColorScheme();
+  const { width, height } = useElementSize(containerRef);
 
   const theme = colorScheme === "dark" ? "GitHubDark" : "GitHubLight";
   const language = "typescript";
@@ -64,6 +66,10 @@ export const Editor: React.FC<EditorProps> = ({
       editor.setTheme(theme!);
     }
   }, [language, theme]);
+
+  useEffect(() => {
+    editorRef.current?.layout({ width, height });
+  }, [width, height]);
 
   return <code ref={containerRef} className={className} />;
 };
