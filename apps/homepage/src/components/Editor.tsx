@@ -53,9 +53,7 @@ export const Editor: React.FC<EditorProps> = ({
       folding: false,
       renderLineHighlight: "none",
       matchBrackets: "never",
-      guides: {
-        indentation: false,
-      },
+      guides: { indentation: false },
       minimap: { enabled: false },
       scrollBeyondLastLine: false,
     });
