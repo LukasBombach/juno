@@ -8,21 +8,21 @@ import GitHubLight from "monaco-themes/themes/GitHub Light.json";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { useElementSize } from "../hooks/useElementSize";
 
-export interface EditorProps {
-  value?: string;
-  className?: string;
-}
+monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+monaco.editor.defineTheme("GitHubDark", GitHubDark as editor.IStandaloneThemeData);
+monaco.editor.defineTheme("GitHubLight", GitHubLight as editor.IStandaloneThemeData);
 
 self.MonacoEnvironment = {
-  getWorker(_: any, label: string) {
+  getWorker(_workerId, label) {
     if (label === "typescript") return new tsWorker();
     return new editorWorker();
   },
 };
 
-monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
-monaco.editor.defineTheme("GitHubDark", GitHubDark as editor.IStandaloneThemeData);
-monaco.editor.defineTheme("GitHubLight", GitHubLight as editor.IStandaloneThemeData);
+export interface EditorProps {
+  value?: string;
+  className?: string;
+}
 
 export const Editor: React.FC<EditorProps> = ({
   value = ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
@@ -30,9 +30,8 @@ export const Editor: React.FC<EditorProps> = ({
 }) => {
   const containerRef = useRef<HTMLElement | null>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-
-  const colorScheme = useColorScheme();
   const { width, height } = useElementSize(containerRef);
+  const colorScheme = useColorScheme();
 
   const theme = colorScheme === "dark" ? "GitHubDark" : "GitHubLight";
   const language = "typescript";
@@ -44,32 +43,16 @@ export const Editor: React.FC<EditorProps> = ({
       value,
       language,
       theme,
-      automaticLayout: true,
       minimap: { enabled: false },
       scrollBeyondLastLine: false,
     });
 
-    return () => {
-      editorRef.current?.dispose();
-    };
+    return () => editorRef.current?.dispose();
   }, []);
 
-  useEffect(() => {
-    if (editorRef.current && editorRef.current.getValue() !== value) {
-      editorRef.current.setValue(value);
-    }
-  }, [value]);
-
-  useEffect(() => {
-    if (editorRef.current) {
-      editor.setModelLanguage(editorRef.current.getModel()!, language!);
-      editor.setTheme(theme!);
-    }
-  }, [language, theme]);
-
-  useEffect(() => {
-    editorRef.current?.layout({ width, height });
-  }, [width, height]);
+  useEffect(() => editorRef.current?.setValue(value), [value]);
+  useEffect(() => editor.setTheme(theme), [theme]);
+  useEffect(() => editorRef.current?.layout({ width, height }), [width, height]);
 
   return <code ref={containerRef} className={className} />;
 };
