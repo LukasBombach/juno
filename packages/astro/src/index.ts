@@ -1,4 +1,4 @@
-import type { AstroIntegration, AstroRenderer, ContainerRenderer, ViteUserConfig } from "astro";
+import type { AstroIntegration, AstroRenderer } from "astro";
 
 export default function (): AstroIntegration {
   const renderer: AstroRenderer = {
