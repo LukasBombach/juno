@@ -1,5 +1,6 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
+import react from "@astrojs/react";
 import juno from "juno-astro";
 
 export default defineConfig({
@@ -9,5 +10,10 @@ export default defineConfig({
       noExternal: ["monaco-editor"],
     },
   },
-  integrations: [juno()],
+  integrations: [
+    react({
+      include: ["**/react/*"],
+    }),
+    juno(),
+  ],
 });
