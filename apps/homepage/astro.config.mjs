@@ -1,6 +1,6 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
-import juno from "../../packages/astro";
+import juno from "juno-astro";
 
 export default defineConfig({
   vite: {
