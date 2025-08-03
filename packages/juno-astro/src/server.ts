@@ -1,23 +1,20 @@
 import type { NamedSSRLoadedRendererValue, AsyncRendererComponentFn } from "astro";
 
-const check: AsyncRendererComponentFn<boolean> = async (...args) => {
-  console.log("juno check called", ...args);
+const check: AsyncRendererComponentFn<boolean> = async function () {
   return true;
 };
 
 const renderToStaticMarkup: AsyncRendererComponentFn<{
   html: string;
   attrs?: Record<string, string>;
-}> = async (...args) => {
-  console.log("juno renderToStaticMarkup called", ...args);
+}> = async function (Component, props, slots, metadata) {
+  console.log("juno renderToStaticMarkup called", Component, props, slots, metadata);
   return { html: "<div>Hello, Juno!</div>" };
 };
 
-const renderer: NamedSSRLoadedRendererValue = {
+export default {
   name: "juno-astro",
   check,
   renderToStaticMarkup,
   supportsAstroStaticSlot: true,
-};
-
-export default renderer;
+} satisfies NamedSSRLoadedRendererValue;
