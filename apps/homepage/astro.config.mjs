@@ -9,9 +9,5 @@ export default defineConfig({
       noExternal: ["monaco-editor"],
     },
   },
-  integrations: [
-    juno({
-      include: ["**/juno/*"],
-    }),
-  ],
+  integrations: [juno()],
 });
