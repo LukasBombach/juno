@@ -1,19 +1,25 @@
-import type { AstroIntegration, AstroRenderer } from "astro";
+import type { AstroIntegration, AstroRenderer, ContainerRenderer } from "astro";
 
 export default function (): AstroIntegration {
   const renderer: AstroRenderer = {
-    /** renderer name shown in <component client:only="juno" /> */
-    name: "juno",
-    serverEntrypoint: "juno-astro/server",
-    clientEntrypoint: "juno-astro/client",
+    name: "juno-astro",
+    serverEntrypoint: "juno-astro/server.ts",
+    clientEntrypoint: "juno-astro/client.ts",
   };
 
   return {
-    name: "juno",
+    name: "juno-astro",
     hooks: {
       "astro:config:setup"({ addRenderer }) {
         addRenderer(renderer);
       },
     },
+  };
+}
+
+export function getContainerRenderer(): ContainerRenderer {
+  return {
+    name: "juno-astro",
+    serverEntrypoint: "juno-astro/server.ts",
   };
 }

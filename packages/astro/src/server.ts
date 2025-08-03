@@ -14,7 +14,7 @@ const renderToStaticMarkup: AsyncRendererComponentFn<{
 };
 
 const renderer: NamedSSRLoadedRendererValue = {
-  name: "juno",
+  name: "juno-astro",
   check,
   renderToStaticMarkup,
   supportsAstroStaticSlot: true,

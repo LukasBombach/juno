@@ -1,7 +1,6 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
-import react from "@astrojs/react";
-import juno from "juno-astro";
+import juno from "../../packages/astro";
 
 export default defineConfig({
   vite: {
@@ -11,9 +10,8 @@ export default defineConfig({
     },
   },
   integrations: [
-    react({
-      include: ["**/react/*"],
+    juno({
+      include: ["**/juno/*"],
     }),
-    juno(),
   ],
 });
