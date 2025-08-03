@@ -1,18 +1,11 @@
+import { Test } from "./Test";
+
 export function Demo() {
   return (
-    <div className="row-start-2 -row-end-2 -col-start-3 -col-end-2 rounded-xl shadow-window grid grid-rows-1 grid-cols-[minmax(200px,14%)_1fr] overflow-hidden">
-      <nav className="p-5 py-7 flex flex-col gap-2 bg-neutral-200/80 border-r-1 border-r-neutral-950/10 ">
-        <a href="#" className="text-sm text-neutral-700 hover:underline">
-          Link 1
-        </a>
-        <a href="#" className="text-sm text-neutral-700 hover:underline">
-          Link 2
-        </a>
-        <a href="#" className="text-sm text-neutral-700 hover:underline">
-          Link 3
-        </a>
-      </nav>
-      <section className="p-5 py-7 bg-editor-light dark:bg-editor-dark"></section>
+    <div>
+      <section className="p-5 py-7">
+        <Test prop="value">child</Test>
+      </section>
     </div>
   );
 }
