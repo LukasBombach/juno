@@ -5,13 +5,16 @@
  * - jsxs(type, props, key)
  * - jsxDEV(type, props, key, __source, __self)
  *
- * Types are gratefully copied from preact/jsx-runtime
+ * Types are gratefully copied (and altered) from preact/jsx-runtime
  */
 
-interface VNode<P = {}> {
-  type: FunctionComponent<P> | string;
+export const vnode = Symbol("vnode");
+
+export interface VNode<P = Record<string, unknown>> {
+  type: string;
   props: P & { children: ComponentChildren };
   key: Key;
+  [vnode]: true;
 }
 
 interface FunctionComponent<P = {}> {
@@ -54,7 +57,7 @@ function createVNode<P = {}>(
   _isStaticChildren: boolean,
   _source: Source
 ): VNode<P> {
-  return typeof type === "function" ? type(props) : { type, key, props };
+  return typeof type === "function" ? type(props) : { type, key, props, [vnode]: true };
 }
 
 /**

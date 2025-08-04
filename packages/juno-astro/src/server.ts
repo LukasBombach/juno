@@ -1,3 +1,4 @@
+import { renderToStaticMarkup as junoRenderToStaticMarkup } from "./renderToStaticMarkup";
 import type { NamedSSRLoadedRendererValue, AsyncRendererComponentFn } from "astro";
 
 const check: AsyncRendererComponentFn<boolean> = async function () {
@@ -8,9 +9,7 @@ const renderToStaticMarkup: AsyncRendererComponentFn<{
   html: string;
   attrs?: Record<string, string>;
 }> = async function (Component, props, slots, metadata) {
-  //console.log("juno renderToStaticMarkup called", Component, props, slots, metadata);
-  console.dir(Component(props), { depth: Infinity });
-  return { html: `<div>Hello, Juno!</div><pre>${JSON.stringify(Component(props), null, 2)}</pre>` };
+  return { html: junoRenderToStaticMarkup(Component(props)) };
 };
 
 export default {
