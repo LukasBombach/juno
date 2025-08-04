@@ -8,8 +8,8 @@ const renderToStaticMarkup: AsyncRendererComponentFn<{
   html: string;
   attrs?: Record<string, string>;
 }> = async function (Component, props, slots, metadata) {
-  console.log("juno renderToStaticMarkup called", Component, props, slots, metadata);
-  //console.log("juno renderToStaticMarkup called", Component.toString());
+  //console.log("juno renderToStaticMarkup called", Component, props, slots, metadata);
+  console.log("juno renderToStaticMarkup called", Component());
   return { html: "<div>Hello, Juno!</div>" };
 };
 

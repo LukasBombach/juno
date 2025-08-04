@@ -1,4 +1,4 @@
-import type { FC, ReactNode, ReactElement } from "react";
+import type { ReactNode, ReactElement } from "react";
 
 /*
 function Demo() {
@@ -25,10 +25,13 @@ function Demo() {
 
 */
 
-type Component = (props: Props) => ReactElement;
+type VirtualDom = ReactElement;
+
+type TagOrComponent = string | Component;
+type Component = (props: Props) => VirtualDom;
 type Props = Record<string, any>;
 
-export function createElement(type: string | Component, props: Props, ...children: ReactNode[]): ReactElement {
+export function createElement(type: TagOrComponent, props: Props, ...children: ReactNode[]): VirtualDom {
   if (typeof type === "function") {
     return type({ ...props, children });
   } else {
@@ -42,6 +45,8 @@ export function createElement(type: string | Component, props: Props, ...childre
     };
   }
 }
+
+export const jsxDEV = createElement;
 
 /*
 
