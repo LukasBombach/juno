@@ -1,37 +1,22 @@
 import type { ReactNode, ReactElement } from "react";
 
 /*
-function Demo() {
-  return (
-    <div>
-      <section className="p-5 py-7">
-        <Test prop="value">child</Test>
-      </section>
-    </div>
-  );
-}
-
-function Demo() {
-  return createElement(
-    "div",
-    null,
-    createElement(
-      "section",
-      { className: "p-5 py-7" },
-      createElement(Test, { prop: "value" }, "child")
-    )
-  );
-}
-
-*/
-
+ * Aliases to make how react / jsx provides / needs as inputs
+ * and outputs more explicit
+ */
+type TagOrComponent = string | Component;
 type VirtualDom = ReactElement;
 
-type TagOrComponent = string | Component;
 type Component = (props: Props) => VirtualDom;
 type Props = Record<string, any>;
 
-export function createElement(type: TagOrComponent, props: Props, ...children: ReactNode[]): VirtualDom {
+/**
+ * Part of the JSX runtime paradigm.
+ *
+ * Factory function that will receive a transpiled JSX element
+ * and returns virtual DOM.
+ */
+function createElement(type: TagOrComponent, props: Props, ...children: ReactNode[]): VirtualDom {
   if (typeof type === "function") {
     return type({ ...props, children });
   } else {
@@ -46,30 +31,7 @@ export function createElement(type: TagOrComponent, props: Props, ...children: R
   }
 }
 
+/**
+ * Expected export by vite/esbuild setting jsx: automatic
+ */
 export const jsxDEV = createElement;
-
-/*
-
-
-{
-  "type": "div",
-  "key": null,
-  "props": {
-    "children": {
-      "type": "section",
-      "key": null,
-      "props": {
-        "className": "p-5 py-7",
-        "children": {
-          "key": null,
-          "props": {
-            "prop": "value",
-            "children": "child"
-          }
-        }
-      }
-    }
-  }
-}
-  
-*/
