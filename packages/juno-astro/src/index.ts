@@ -1,4 +1,4 @@
-import type { AstroIntegration, AstroRenderer, ContainerRenderer } from "astro";
+import type { AstroIntegration, AstroRenderer } from "astro";
 
 export default function (): AstroIntegration {
   const renderer: AstroRenderer = {
@@ -23,12 +23,5 @@ export default function (): AstroIntegration {
         });
       },
     },
-  };
-}
-
-export function getContainerRenderer(): ContainerRenderer {
-  return {
-    name: "juno-astro",
-    serverEntrypoint: "juno-astro/server.ts",
   };
 }
