@@ -1,4 +1,6 @@
+console.log("juno hydration script initialized");
+
 export default (element: HTMLElement) =>
   async (...args: unknown[]) => {
-    console.log("juno hydrate aaa", element, ...args);
+    console.log("hydrating", element, ...args);
   };
