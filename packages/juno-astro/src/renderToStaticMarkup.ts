@@ -14,12 +14,9 @@ export function renderToStaticMarkup(node: VNode): string {
 
   const innerHTML = ensureArray(children)
     .map(child => {
-      if (typeof child === "string" || typeof child === "number") {
-        return String(child);
-      } else if (isVNode(child)) {
-        return renderToStaticMarkup(child);
-      }
-      return undefined;
+      if (isVNode(child)) return renderToStaticMarkup(child);
+      if (shouldBeRenderedToString(child)) return String(child);
+      return String(child);
     })
     .filter(child => child !== undefined)
     .join("");
@@ -33,4 +30,8 @@ function ensureArray<V>(value: V | V[]): V[] {
 
 function isVNode(node: VNode["props"]["children"]): node is VNode {
   return Boolean(node) && typeof node === "object" && node !== null && vnode in node;
+}
+
+function shouldBeRenderedToString(value: unknown): boolean {
+  return ["string", "number", "bigint", "object", "function"].includes(typeof value);
 }
