@@ -16,7 +16,7 @@ export function renderToStaticMarkup(node: VNode): string {
     .map(child => {
       if (isVNode(child)) return renderToStaticMarkup(child);
       if (shouldBeRenderedToString(child)) return String(child);
-      return String(child);
+      return undefined;
     })
     .filter(child => child !== undefined)
     .join("");
