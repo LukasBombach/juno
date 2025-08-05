@@ -73,15 +73,6 @@ importers:
         specifier: 4.1.11
         version: 4.1.11
 
-  apps/homepage2:
-    dependencies:
-      monaco-editor:
-        specifier: 0.52.2
-        version: 0.52.2
-      tailwindcss:
-        specifier: 4.1.11
-        version: 4.1.11
-
   packages/hydrate:
     dependencies:
       '@maverick-js/signals':
