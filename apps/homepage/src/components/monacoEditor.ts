@@ -39,6 +39,7 @@ const defaultOptions: MonacoOptions = {
 };
 
 export function setupMonaco() {
+  if (window.MonacoEnvironment) return;
   window.MonacoEnvironment = monacoEnvironment;
 
   defineTheme("GitHubDark", GitHubDark as MonacoTheme);
