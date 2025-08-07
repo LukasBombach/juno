@@ -16,5 +16,9 @@
     "monaco-editor": "0.52.2",
     "monaco-themes": "0.4.6",
     "tailwindcss": "4.1.11"
+  },
+  "devDependencies": {
+    "vite-plugin-restart": "0.4.2",
+    "vite-plugin-watch-node-modules": "0.1.0"
   }
 }

@@ -7,5 +7,5 @@ export default (element: HTMLElement) =>
     { default: children, ...slotted }: Record<string, any>,
     { client }: Record<string, string>
   ) => {
-    console.log("hydrating", element, Component({ ...props, children }), Component, props, children, slotted, client);
+    console.log("a", element, Component({ ...props, children }), Component, props, children, slotted, client);
   };
