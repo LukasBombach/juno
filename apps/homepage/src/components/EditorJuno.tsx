@@ -1,5 +1,5 @@
 import { signal, effect } from "@maverick-js/signals";
-import { type MonacoEditor, type createEditor } from "./monacoEditor";
+import type { MonacoEditor, createEditor } from "./monacoEditor";
 
 export interface EditorProps {
   value?: string;
