@@ -6,13 +6,11 @@ export interface EditorProps {
   className?: string;
 }
 
+setupMonaco();
+
 export const Editor: React.FC<EditorProps> = ({ value, className }) => {
   const container = signal<HTMLElement | null>(null);
   const editor = signal<MonacoEditor | null>(null);
-
-  effect(() => {
-    setupMonaco();
-  });
 
   effect(() => {
     editor.set(createEditor(container(), { value }));

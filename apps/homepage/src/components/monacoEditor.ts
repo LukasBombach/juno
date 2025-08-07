@@ -5,6 +5,7 @@ import GitHubDark from "monaco-themes/themes/GitHub Dark.json";
 import GitHubLight from "monaco-themes/themes/GitHub Light.json";
 
 export type MonacoEditor = monaco.editor.IStandaloneCodeEditor;
+
 type MonacoOptions = monaco.editor.IStandaloneEditorConstructionOptions;
 type MonacoTheme = monaco.editor.IStandaloneThemeData;
 type MonacoEnvironment = monaco.Environment;
