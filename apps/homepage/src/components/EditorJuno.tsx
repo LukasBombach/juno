@@ -1,19 +1,23 @@
 import { signal, effect } from "@maverick-js/signals";
-import { setupMonaco, createEditor, type MonacoEditor } from "./monacoEditor";
+import { type MonacoEditor, type createEditor } from "./monacoEditor";
 
 export interface EditorProps {
   value?: string;
   className?: string;
 }
 
-setupMonaco();
-
 export const Editor: React.FC<EditorProps> = ({ value, className }) => {
   const container = signal<HTMLElement | null>(null);
   const editor = signal<MonacoEditor | null>(null);
+  const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
+
+  import("./monacoEditor").then(({ setupMonaco, createEditor }) => {
+    setupMonaco();
+    monaco.set({ createEditor });
+  });
 
   effect(() => {
-    editor.set(createEditor(container(), { value }));
+    editor.set(monaco()?.createEditor(container(), { value }) ?? null);
     return () => editor()?.dispose();
   });
 
