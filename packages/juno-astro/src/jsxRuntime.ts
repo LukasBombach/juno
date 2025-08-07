@@ -13,7 +13,7 @@ export const vnode = Symbol("vnode");
 export interface VNode<P = Record<string, unknown>> {
   type: string;
   props: P & { children: ComponentChildren };
-  key: Key;
+  key?: Key;
   [vnode]: true;
 }
 
@@ -53,11 +53,11 @@ type RenderableProps<P, RefType = any> = P &
 function createVNode<P = {}>(
   type: FunctionComponent<P> | string,
   props: P & { children: ComponentChildren },
-  key: Key,
+  _key: Key,
   _isStaticChildren: boolean,
   _source: Source
 ): VNode<P> {
-  return typeof type === "function" ? type(props) : { type, key, props, [vnode]: true };
+  return typeof type === "function" ? type(props) : { type, props, [vnode]: true };
 }
 
 /**
