@@ -57,6 +57,7 @@ function createVNode<P = {}>(
   _isStaticChildren: boolean,
   _source: Source
 ): VNode<P> {
+  // todo: hide vnode prop in prototype
   return typeof type === "function" ? type(props) : { type, props, [vnode]: true };
 }
 

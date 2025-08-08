@@ -7,5 +7,8 @@ export default (element: HTMLElement) =>
     { default: children, ...slotted }: Record<string, any>,
     { client }: Record<string, string>
   ) => {
-    console.log("still works", element, Component({ ...props, children }), Component, props, children, slotted, client);
+    console.log({
+      element,
+      jsx: Component({ ...props, children }),
+    });
   };
