@@ -7,9 +7,9 @@ export interface EditorProps {
 }
 
 export const Editor: React.FC<EditorProps> = ({ value, className }) => {
+  const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
   const container = signal<HTMLElement | null>(null);
   const editor = signal<MonacoEditor | null>(null);
-  const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
 
   if (typeof window !== "undefined") {
     import("./monacoEditor").then(({ setupMonaco, createEditor }) => {
