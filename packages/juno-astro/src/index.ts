@@ -26,8 +26,8 @@ export default function (): AstroIntegration {
                 enforce: "pre",
                 async transform(code, id, options) {
                   if (options?.ssr === false && id.endsWith(".tsx") && !id.includes("/node_modules/")) {
-                    if (id.includes("Demo.tsx")) {
-                      const result = await oxc.parseAsync("Demo.tsx", code, {
+                    if (id.includes("Editor.tsx")) {
+                      const result = await oxc.parseAsync("Editor.tsx", code, {
                         sourceType: "module",
                         lang: "tsx",
                         astType: "js",

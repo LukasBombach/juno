@@ -1,4 +1,4 @@
-import { Editor } from "./EditorJuno";
+import { Editor } from "./Editor";
 
 export function Demo() {
   return (
