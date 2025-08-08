@@ -3,8 +3,8 @@ import type { AstroIntegration, AstroRenderer } from "astro";
 export default function (): AstroIntegration {
   const renderer: AstroRenderer = {
     name: "juno-astro",
-    serverEntrypoint: "juno-astro/server.ts",
-    clientEntrypoint: "juno-astro/client.ts",
+    serverEntrypoint: `${import.meta.dirname}/server.ts`,
+    clientEntrypoint: `${import.meta.dirname}/client.ts`,
   };
 
   return {
