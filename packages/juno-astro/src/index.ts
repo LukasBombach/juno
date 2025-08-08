@@ -1,4 +1,5 @@
 import type { AstroIntegration, AstroRenderer } from "astro";
+import oxc from "oxc-parser";
 
 export default function (): AstroIntegration {
   const renderer: AstroRenderer = {
@@ -19,6 +20,27 @@ export default function (): AstroIntegration {
               jsxFactory: "createElement",
               jsxImportSource: "juno-astro",
             },
+            plugins: [
+              {
+                name: "juno-astro-transform",
+                enforce: "pre",
+                async transform(code, id, options) {
+                  if (options?.ssr === false && id.endsWith(".tsx") && !id.includes("/node_modules/")) {
+                    if (id.includes("Demo.tsx")) {
+                      const result = await oxc.parseAsync("Demo.tsx", code, {
+                        sourceType: "module",
+                        lang: "tsx",
+                        astType: "js",
+                        range: true,
+                      });
+                      console.log(result.program);
+                      debugger;
+                    }
+                  }
+                  return code;
+                },
+              },
+            ],
           },
         });
       },
