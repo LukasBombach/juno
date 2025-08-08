@@ -11,10 +11,12 @@ export const Editor: React.FC<EditorProps> = ({ value, className }) => {
   const editor = signal<MonacoEditor | null>(null);
   const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
 
-  import("./monacoEditor").then(({ setupMonaco, createEditor }) => {
-    setupMonaco();
-    monaco.set({ createEditor });
-  });
+  if (typeof window !== "undefined") {
+    import("./monacoEditor").then(({ setupMonaco, createEditor }) => {
+      setupMonaco();
+      monaco.set({ createEditor });
+    });
+  }
 
   effect(() => {
     editor.set(monaco()?.createEditor(container(), { value }) ?? null);
