@@ -20,6 +20,7 @@
     "typescript": "5.6.2"
   },
   "dependencies": {
+    "juno-ast": "file:../juno-ast",
     "oxc-parser": "0.81.0"
   }
 }
