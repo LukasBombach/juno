@@ -8,6 +8,8 @@ export type NodeByType = {
   [K in NodeType]: Extract<Node, { type: K }>;
 };
 
+export const functionTypes = ["FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"] as const;
+
 export function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
 }
