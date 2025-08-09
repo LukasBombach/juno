@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "type": "module",
   "exports": {
-    "./pipe.ts": "./src/pipe.ts"
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "oxc-parser": "0.81.0"
+  },
+  "dependencies": {
+    "fp-ts": "2.16.10",
+    "lodash": "4.17.21"
   }
 }

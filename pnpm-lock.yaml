@@ -82,8 +82,24 @@ importers:
         specifier: 6.0.0
         version: 6.0.0
 
+  packages/juno-ast:
+    dependencies:
+      fp-ts:
+        specifier: 2.16.10
+        version: 2.16.10
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
+    devDependencies:
+      oxc-parser:
+        specifier: 0.81.0
+        version: 0.81.0
+
   packages/juno-astro:
     dependencies:
+      juno-ast:
+        specifier: file:../juno-ast
+        version: link:../juno-ast
       oxc-parser:
         specifier: 0.81.0
         version: 0.81.0
@@ -1794,6 +1810,9 @@ packages:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
     engines: {node: '>=14'}
 
+  fp-ts@2.16.10:
+    resolution: {integrity: sha512-vuROzbNVfCmUkZSUbnWSltR1sbheyQbTzug7LB/46fEa1c0EucLeBaCEUE0gF3ZGUGBt9lVUiziGOhhj6K1ORA==}
+
   fs-extra@11.2.0:
     resolution: {integrity: sha512-PmDi3uwK5nFuXh7XDTlVnS17xJS7vW36is2+w3xcv8SVxiB4NyATf4ctkVY5bkSjX0Y4nbvZCq1/EjtEyr9ktw==}
     engines: {node: '>=14.14'}
@@ -2073,6 +2092,9 @@ packages:
 
   lodash.sortby@4.7.0:
     resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
+
+  lodash@4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
@@ -4348,6 +4370,8 @@ snapshots:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
 
+  fp-ts@2.16.10: {}
+
   fs-extra@11.2.0:
     dependencies:
       graceful-fs: 4.2.11
@@ -4631,6 +4655,8 @@ snapshots:
   lodash-es@4.17.21: {}
 
   lodash.sortby@4.7.0: {}
+
+  lodash@4.17.21: {}
 
   longest-streak@3.1.0: {}
 
