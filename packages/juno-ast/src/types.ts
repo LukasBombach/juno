@@ -6,8 +6,6 @@ export type NodeType = Node["type"];
 
 export type NodeByType<T extends NodeType, N extends Node = Node> = N extends { type: T } ? N : never;
 
-type Y = NodeByType<"BinaryExpression" | "ArrowFunctionExpression">;
-
 export function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
 }
