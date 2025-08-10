@@ -1,4 +1,4 @@
-import { traverse } from "./traverse";
+import { traverse, traverseWithControl } from "./traverse";
 import { isNodeOfType } from "./types";
 import type { Node, NodeType, NodeOfType } from "./types";
 
@@ -19,6 +19,14 @@ export function findAllByType<T extends readonly [NodeType, ...NodeType[]]>(...t
 export function findAllByTypeShallow<T extends readonly [NodeType, ...NodeType[]]>(...types: T) {
   return (root: Node): NodeOfType<T[number]>[] => {
     const results: NodeOfType<T[number]>[] = [];
+
+    for (const { node, skipDescend } of traverseWithControl(root)) {
+      if (isNodeOfType(node, ...types)) {
+        results.push(node);
+        skipDescend();
+      }
+    }
+
     return results;
   };
 }

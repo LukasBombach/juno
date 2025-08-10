@@ -1,6 +1,6 @@
 import { basename } from "node:path";
-import oxc from "oxc-parser";
 import * as A from "fp-ts/Array";
+import oxc from "oxc-parser";
 import { pipe, findAllByType, findAllByTypeShallow } from "juno-ast";
 
 export function transformComponents(code: string, id: string) {
