@@ -8,13 +8,7 @@ export function transformComponents(code: string, id: string) {
 
   pipe(
     program,
-    findAllByType(
-      "FunctionDeclaration",
-      "FunctionExpression",
-      "TSDeclareFunction",
-      "TSEmptyBodyFunctionExpression",
-      "ArrowFunctionExpression"
-    ),
+    findAllByType("FunctionDeclaration", "FunctionExpression", "TSDeclareFunction", "TSEmptyBodyFunctionExpression"),
     result => {
       console.log(result);
     }
