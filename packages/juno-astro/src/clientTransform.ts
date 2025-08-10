@@ -3,8 +3,10 @@ import * as A from "fp-ts/Array";
 import oxc from "oxc-parser";
 import { pipe, findAllByType, findAllByTypeShallow } from "juno-ast";
 
-export function transformComponents(code: string, id: string) {
+export function transformJsx(code: string, id: string) {
   const { program } = oxc.parseSync(basename(id), code, { sourceType: "module", lang: "tsx", astType: "js" });
+
+  console.log(id);
 
   pipe(
     program,

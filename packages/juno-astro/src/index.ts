@@ -1,5 +1,5 @@
 import type { AstroIntegration, AstroRenderer } from "astro";
-import { transformComponents } from "./transformClient";
+import { transformJsx } from "./clientTransform";
 
 export default function (): AstroIntegration {
   const renderer: AstroRenderer = {
@@ -26,9 +26,7 @@ export default function (): AstroIntegration {
                 enforce: "pre",
                 transform(code, id, options) {
                   if (options?.ssr === false && id.endsWith(".tsx") && !id.includes("/node_modules/")) {
-                    if (id.includes("Editor.tsx")) {
-                      return transformComponents(code, id);
-                    }
+                    return transformJsx(code, id);
                   }
                   return code;
                 },
