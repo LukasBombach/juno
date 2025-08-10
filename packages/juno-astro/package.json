@@ -15,10 +15,11 @@
     "build": "tsup src/*.ts --dts --clean --format esm"
   },
   "dependencies": {
-    "juno-ast": "file:../juno-ast",
-    "oxc-parser": "0.81.0",
+    "estree-toolkit": "1.7.13",
     "fp-ts": "2.16.10",
-    "lodash": "4.17.21"
+    "juno-ast": "file:../juno-ast",
+    "lodash": "4.17.21",
+    "oxc-parser": "0.81.0"
   },
   "devDependencies": {
     "astro": "5.12.0",
