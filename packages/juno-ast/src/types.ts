@@ -4,12 +4,17 @@ export * from "oxc-parser";
 
 export type NodeType = Node["type"];
 
-export type NodeByType<T extends NodeType> = Extract<Node, { type: T }>;
+export type NodeByType<T extends NodeType, N extends Node = Node> = N extends { type: T } ? N : never;
+
+type Y = NodeByType<"BinaryExpression" | "ArrowFunctionExpression">;
 
 export function isNode(value: unknown): value is Node {
   return typeof value === "object" && value !== null && "type" in value;
 }
 
-export function isNodeOfType<T extends NodeType>(node: Node, type: T): node is NodeByType<T> {
-  return node.type === type;
+export function isNodeOfType<T extends readonly [NodeType | undefined, ...(NodeType | undefined)[]]>(
+  node: Node,
+  ...types: T
+): node is NodeByType<NonNullable<T[number]>> {
+  return types.some(t => t === node.type);
 }
