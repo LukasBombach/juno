@@ -8,7 +8,7 @@ export function transformComponents(code: string, id: string) {
 
   const results = pipe(
     program,
-    findAllByType(["FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"])
+    findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression")
     // Add your transformation functions here
   );
 

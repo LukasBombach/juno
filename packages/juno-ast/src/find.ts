@@ -2,6 +2,8 @@ import { traverse } from "./traverse";
 import { isNodeOfType } from "./types";
 import type { Node, NodeType, NodeByType } from "./types";
 
+type NodesByType<K extends NodeType> = Extract<Node, { type: K }>;
+
 /* type NodeOf<T extends NodeType | readonly NodeType[]> = T extends readonly NodeType[]
   ? NodeByType[T[number]]
   : T extends NodeType
@@ -30,13 +32,17 @@ export function findAllByType<T extends NodeType | readonly NodeType[]>(
   };
 } */
 
-export function findAllByType<A extends NodeType>(a: A): (node: Node) => NodeByType[A][];
-export function findAllByType<A extends NodeType, B extends NodeType>(a: A, b: B): (node: Node) => NodeByType[A | B][];
+type x = NodesByType<
+  "FunctionDeclaration" | "FunctionExpression" | "TSDeclareFunction" | "TSEmptyBodyFunctionExpression"
+>;
+
 export function findAllByType<A extends NodeType, B extends NodeType, C extends NodeType>(
   a: A,
   b: B,
   c: C
 ): (node: Node) => NodeByType[A | B | C][];
+export function findAllByType<A extends NodeType, B extends NodeType>(a: A, b: B): (node: Node) => NodeByType[A | B][];
+export function findAllByType<A extends NodeType>(a: A): (node: Node) => NodeByType[A][];
 export function findAllByType<A extends NodeType, B extends NodeType | undefined, C extends NodeType | undefined>(
   a: A,
   b: B,
