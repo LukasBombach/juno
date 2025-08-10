@@ -97,9 +97,15 @@ importers:
 
   packages/juno-astro:
     dependencies:
+      fp-ts:
+        specifier: 2.16.10
+        version: 2.16.10
       juno-ast:
         specifier: file:../juno-ast
         version: link:../juno-ast
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
       oxc-parser:
         specifier: 0.81.0
         version: 0.81.0

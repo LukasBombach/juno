@@ -14,13 +14,15 @@
   "scripts": {
     "build": "tsup src/*.ts --dts --clean --format esm"
   },
+  "dependencies": {
+    "juno-ast": "file:../juno-ast",
+    "oxc-parser": "0.81.0",
+    "fp-ts": "2.16.10",
+    "lodash": "4.17.21"
+  },
   "devDependencies": {
     "astro": "5.12.0",
     "tsup": "8.5.0",
     "typescript": "5.6.2"
-  },
-  "dependencies": {
-    "juno-ast": "file:../juno-ast",
-    "oxc-parser": "0.81.0"
   }
 }
