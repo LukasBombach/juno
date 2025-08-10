@@ -6,7 +6,7 @@ export function transformComponents(code: string, id: string) {
   const { program } = oxc.parseSync(basename(id), code, { sourceType: "module", lang: "tsx", astType: "js" });
 
   pipe(program, findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"), result => {
-    console.log(result);
+    console.log(result.map(f => f.type).join("\n"));
   });
 
   return code;
