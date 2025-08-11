@@ -31,9 +31,9 @@ function createHydration(jxElement: JSXElement) {
     A.findFirst(attr => is.jsxIdentifier(attr.name) && attr.name.name === "ref"),
     O.map(findFirstByType("JSXExpressionContainer")),
     O.chain(O.fromNullable),
-    O.map(v => b.prop("ref", is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
+    O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
     O.toUndefined
   );
 
-  return b.array([b.object({ path: b.array(path.map(b.number)) })]);
+  return b.array([b.object({ path: b.array(path.map(b.number)), ref })]);
 }

@@ -8,9 +8,12 @@ export const build = {
     elements,
     ...span,
   }),
-  object: (properties: Record<string, t.Expression>): t.ObjectExpression => ({
+  object: (properties: Record<string, t.Expression | undefined>): t.ObjectExpression => ({
     type: "ObjectExpression",
-    properties: Object.entries(properties).map(([key, value]) => build.prop(key, value)),
+    properties: Object.entries(properties)
+      .map(([key, value]) => [key, value])
+      .filter((e): e is [string, t.Expression] => e[1] !== undefined)
+      .map(([key, value]) => build.prop(key, value)),
     ...span,
   }),
   prop: (key: string, value: t.Expression): t.ObjectProperty => ({
@@ -23,11 +26,6 @@ export const build = {
     computed: false,
     ...span,
   }),
-  /* ident: (name: string): t.IdentifierName => ({
-    type: "Identifier",
-    name,
-    ...span,
-  }), */
   identName: (name: string): t.IdentifierName => ({
     type: "Identifier",
     name,
