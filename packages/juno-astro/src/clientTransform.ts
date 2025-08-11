@@ -2,7 +2,7 @@ import { basename } from "node:path";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
-import { pipe, findAllByType, findAllByTypeShallow, is, not, build as b } from "juno-ast";
+import { pipe, findAllByType, findAllByTypeShallow, is, not, build as b, findFirstByType } from "juno-ast";
 import type { JSXElement } from "juno-ast";
 
 export function transformJsx(code: string, id: string) {
@@ -29,11 +29,9 @@ function createHydration(jxElement: JSXElement) {
     jxElement.openingElement,
     findAllByType("JSXAttribute"),
     A.findFirst(attr => is.jsxIdentifier(attr.name) && attr.name.name === "ref"),
-    O.map(attr => attr.value),
-    O.filter(is.JSXExpressionContainer),
-    O.map(v => v.expression),
-    O.filter(not.JSXEmptyExpression),
-    O.map(v => b.prop("ref", v)),
+    O.map(findFirstByType("JSXExpressionContainer")),
+    O.chain(O.fromNullable),
+    O.map(v => b.prop("ref", is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
     O.toUndefined
   );
 

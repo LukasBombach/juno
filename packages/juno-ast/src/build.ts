@@ -23,6 +23,11 @@ export const build = {
     computed: false,
     ...span,
   }),
+  /* ident: (name: string): t.IdentifierName => ({
+    type: "Identifier",
+    name,
+    ...span,
+  }), */
   identName: (name: string): t.IdentifierName => ({
     type: "Identifier",
     name,
