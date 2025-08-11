@@ -1,4 +1,4 @@
-import { isNode } from "./types";
+import { isNode } from "./guards";
 import type { Node } from "./types";
 
 export function* traverse<T extends Node>(current: T, parents: Node[] = []): Generator<[node: Node, parents: Node[]]> {

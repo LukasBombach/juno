@@ -1,5 +1,5 @@
 import { traverse, traverseWithControl } from "./traverse";
-import { isNodeOfType } from "./types";
+import { isNodeOfType } from "./guards";
 import type { Node, NodeType, NodeOfType } from "./types";
 
 export function findAllByType<T extends readonly [NodeType, ...NodeType[]]>(...types: T) {

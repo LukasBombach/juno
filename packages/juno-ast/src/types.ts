@@ -22,20 +22,3 @@ export type Node = OxcNode | FunctionDeclaration | FunctionExpression;
  */
 export type NodeType = Node["type"];
 export type NodeOfType<T extends NodeType, N extends Node = Node> = N extends { type: T } ? N : never;
-
-/**
- * Type guard for Node
- */
-export function isNode(value: unknown): value is Node {
-  return typeof value === "object" && value !== null && "type" in value;
-}
-
-/**
- * Type guard for checking if a node is of a specific type.
- */
-export function isNodeOfType<T extends readonly [NodeType | undefined, ...(NodeType | undefined)[]]>(
-  node: Node,
-  ...types: T
-): node is NodeOfType<NonNullable<T[number]>> {
-  return types.some(t => t === node.type);
-}
