@@ -2,9 +2,8 @@ import { basename } from "node:path";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
-import { builders as b, is } from "estree-toolkit";
-import { pipe, findAllByType, findAllByTypeShallow } from "juno-ast";
-import type { JSXElement, JSXExpressionContainer, Expression } from "juno-ast";
+import { pipe, findAllByType, findAllByTypeShallow, build as b } from "juno-ast";
+import type { JSXElement, JSXExpressionContainer } from "juno-ast";
 
 export function transformJsx(code: string, id: string) {
   const { program } = oxc.parseSync(basename(id), code, { sourceType: "module", lang: "tsx", astType: "js" });
@@ -33,11 +32,9 @@ function createHydration(jxElement: JSXElement) {
     O.filter((v): v is JSXExpressionContainer => v?.type === "JSXExpressionContainer"),
     O.map(v => v.expression),
     O.filter(v => v.type !== "JSXEmptyExpression"),
-    O.map(v => b.property("init", b.identifier("ref"), v as any)),
+    O.map(v => b.prop("ref", v)),
     O.toUndefined
   );
 
-  return b.arrayExpression([
-    b.objectExpression([b.property("init", b.identifier("path"), b.arrayExpression(path.map(b.literal)))]),
-  ]);
+  return b.array([b.object({ path: b.array(path.map(b.number)) })]);
 }
