@@ -2,7 +2,7 @@ import { basename } from "node:path";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
-import { pipe, findAllByType, findAllByTypeShallow, build as b } from "juno-ast";
+import { pipe, findAllByType, findAllByTypeShallow, is, build as b } from "juno-ast";
 import type { JSXElement, JSXExpressionContainer } from "juno-ast";
 
 export function transformJsx(code: string, id: string) {
