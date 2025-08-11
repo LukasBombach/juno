@@ -15,6 +15,10 @@ export const not = {
     node.type !== "JSXEmptyExpression",
 };
 
+export const as = {
+  JSXIdentifier: (node: MaybeNode): t.JSXIdentifier | undefined => (is.JSXIdentifier(node) ? node : undefined),
+};
+
 /**
  * legacy type guard
  * @deprecated use is.Node
