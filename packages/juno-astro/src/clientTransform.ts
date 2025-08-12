@@ -23,7 +23,6 @@ export function transformJsx(code: string, id: string) {
           const parent = findParent(jsxRoot, returnStatement);
           const hydration = createHydration(jsxRoot);
           replaceChild(parent!, hydration, jsxRoot);
-          console.log("jsxRoot", jsxRoot);
         })
       );
     })
