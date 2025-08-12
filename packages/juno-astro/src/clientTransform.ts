@@ -2,6 +2,8 @@ import { basename } from "node:path";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
+import { print } from "esrap";
+import tsx from "esrap/languages/tsx";
 import { pipe, is, as, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import type { JSXElement } from "juno-ast";
@@ -27,6 +29,8 @@ export function transformJsx(code: string, id: string) {
       );
     })
   );
+
+  console.log(print(program, tsx()).code);
 
   return code;
 }
