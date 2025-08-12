@@ -2,7 +2,8 @@ import { basename } from "node:path";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
-import { pipe, findAllByType, findAllByTypeShallow, findParent, is, as, b, findFirstByType } from "juno-ast";
+import { pipe, is, as, b, replaceChild } from "juno-ast";
+import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import type { JSXElement } from "juno-ast";
 
 export function transformJsx(code: string, id: string) {
@@ -21,6 +22,7 @@ export function transformJsx(code: string, id: string) {
         A.map(jsxRoot => {
           const parent = findParent(jsxRoot, returnStatement);
           const hydration = createHydration(jsxRoot);
+          replaceChild(parent!, hydration, jsxRoot);
           console.log("jsxRoot", jsxRoot);
         })
       );
