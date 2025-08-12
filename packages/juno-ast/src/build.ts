@@ -13,13 +13,13 @@ export const build = {
     properties: Object.entries(properties)
       .map(([key, value]) => [key, value])
       .filter((e): e is [string, t.Expression] => e[1] !== undefined)
-      .map(([key, value]) => build.prop(key, value)),
+      .map(([key, value]) => b.prop(key, value)),
     ...span,
   }),
   prop: (key: string, value: t.Expression): t.ObjectProperty => ({
     type: "Property",
     kind: "init",
-    key: build.identName(key),
+    key: b.identName(key),
     value,
     method: false,
     shorthand: false,
@@ -38,3 +38,8 @@ export const build = {
     ...span,
   }),
 };
+
+/**
+ * A shorthand for the build functions because they are used frequently like this
+ */
+export const b = build;

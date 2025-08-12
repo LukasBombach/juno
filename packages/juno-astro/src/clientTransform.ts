@@ -2,7 +2,7 @@ import { basename } from "node:path";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
-import { pipe, findAllByType, findAllByTypeShallow, is, as, build as b, findFirstByType } from "juno-ast";
+import { pipe, findAllByType, findAllByTypeShallow, findParent, is, as, b, findFirstByType } from "juno-ast";
 import type { JSXElement } from "juno-ast";
 
 export function transformJsx(code: string, id: string) {
@@ -13,9 +13,17 @@ export function transformJsx(code: string, id: string) {
   pipe(
     program,
     findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
-    A.flatMap(findAllByTypeShallow("JSXElement")),
-    A.map(jsxReturnRoot => {
-      console.log(jsxReturnRoot);
+    A.flatMap(findAllByTypeShallow("ReturnStatement")),
+    A.map(returnStatement => {
+      pipe(
+        returnStatement,
+        findAllByTypeShallow("JSXElement"),
+        A.map(jsxRoot => {
+          const parent = findParent(jsxRoot, returnStatement);
+          const hydration = createHydration(jsxRoot);
+          console.log("jsxRoot", jsxRoot);
+        })
+      );
     })
   );
 

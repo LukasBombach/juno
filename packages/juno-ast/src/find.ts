@@ -40,3 +40,13 @@ export function findFirstByType<T extends NodeType>(type: T) {
     }
   };
 }
+
+export function findParent(child: Node, withinContainer: Node): Node | null {
+  for (const [node, parents] of traverse(withinContainer)) {
+    if (node === child) {
+      return parents[0];
+    }
+  }
+
+  return null;
+}
