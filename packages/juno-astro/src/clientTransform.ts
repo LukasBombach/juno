@@ -1,6 +1,7 @@
 import { basename } from "node:path";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
+import * as R from "fp-ts/ReadonlyRecord";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
@@ -55,7 +56,27 @@ function createHydration(jsxRoot: JSXElement) {
 
       console.log(jsxParents.map(el => as.JSXIdentifier(el.openingElement.name)?.name).join(" > "), path);
 
-      return { path };
+      const attrs = pipe(
+        jsxRoot.openingElement,
+        findAllByType("JSXAttribute"),
+        A.filter(attr => {
+          const name = as.JSXIdentifier(attr.name)?.name;
+          return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
+        }),
+        A.filterMap(attr => {
+          const name = as.JSXIdentifier(attr.name)?.name;
+          const value = pipe(
+            attr,
+            O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+            O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
+            O.toUndefined
+          );
+          return name && value ? O.some([name, value] as const) : O.none;
+        }),
+        R.fromEntries
+      );
+
+      return { path, ...attrs };
     })
   );
 
