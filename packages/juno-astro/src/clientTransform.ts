@@ -46,9 +46,9 @@ function createHydration(jsxRoot: JSXElement) {
       const path = pipe(
         jsxParents,
         A.mapWithIndex((i, el) => {
-          if (i === 0) return 1;
+          if (i === 0) return 0;
           const directParent = jsxParents[i - 1];
-          return pipe(directParent.children, A.filter(is.JSXElement), jsxChildren => jsxChildren.indexOf(el) + 1);
+          return pipe(directParent.children, A.filter(is.JSXElement), jsxChildren => jsxChildren.indexOf(el));
         })
       );
 
