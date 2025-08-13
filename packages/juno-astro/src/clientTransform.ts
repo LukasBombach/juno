@@ -55,7 +55,7 @@ function createHydration(jsxRoot: JSXElement) {
 
       console.log(jsxParents.map(el => as.JSXIdentifier(el.openingElement.name)?.name).join(" > "), path);
 
-      return path;
+      return { path };
     })
   );
 
