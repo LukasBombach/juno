@@ -41,6 +41,11 @@ function createHydration(jsxRoot: JSXElement) {
   const results = pipe(jsxRoot, findAllByTypeWithParents("JSXElement"), results => {
     const path = pipe(
       results,
+      /*
+        A.map(([, parents]) => parents),
+        A.filter(is.JSXElement),
+        A.reverse,
+      */
       A.map(([, parents]) =>
         pipe(parents, A.filter(is.JSXElement), A.reverse, jsxParents =>
           pipe(
