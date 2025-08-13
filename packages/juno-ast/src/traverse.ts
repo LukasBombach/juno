@@ -6,7 +6,7 @@ export function* traverse<T extends Node>(current: T, parents: Node[] = []): Gen
     yield [current, parents];
   }
 
-  const nextParents = isNode(current) ? [current, ...parents] : [...parents];
+  const nextParents = isNode(current) ? [...parents, current] : [...parents];
 
   if (Array.isArray(current)) {
     for (const child of current) {
