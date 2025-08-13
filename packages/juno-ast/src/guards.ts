@@ -4,6 +4,7 @@ type MaybeNode = t.Node | null | undefined;
 
 export const is = {
   Node: (value: unknown): value is t.Node => typeof value === "object" && value !== null && "type" in value,
+  JSXElement: (node: MaybeNode): node is t.JSXElement => node?.type === "JSXElement",
   JSXIdentifier: (node: MaybeNode): node is t.JSXIdentifier => node?.type === "JSXIdentifier",
   JSXEmptyExpression: (node: MaybeNode): node is t.JSXEmptyExpression => node?.type === "JSXEmptyExpression",
   JSXExpressionContainer: (node: MaybeNode): node is t.JSXExpressionContainer =>

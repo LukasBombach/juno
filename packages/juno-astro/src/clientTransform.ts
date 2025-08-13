@@ -5,13 +5,13 @@ import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, b, replaceChild } from "juno-ast";
-import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
+import { findAllByType, findAllByTypeWithParents, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import type { JSXElement } from "juno-ast";
 
 export function transformJsx(code: string, id: string) {
   const { program } = oxc.parseSync(basename(id), code, { sourceType: "module", lang: "tsx", astType: "js" });
 
-  console.log(id);
+  console.log("\n" + id + "\n");
 
   pipe(
     program,
@@ -35,11 +35,31 @@ export function transformJsx(code: string, id: string) {
   return code;
 }
 
-function createHydration(jxElement: JSXElement) {
+function createHydration(jsxRoot: JSXElement) {
   const path = [1];
 
+  const results = pipe(jsxRoot, findAllByTypeWithParents("JSXElement"), results => {
+    const path = pipe(
+      results,
+      A.map(([, parents]) =>
+        pipe(parents, A.filter(is.JSXElement), A.reverse, jsxParents =>
+          pipe(
+            jsxParents,
+            A.mapWithIndex((i, el) => {
+              if (i === 0) return 1;
+              return pipe(el.children, A.filter(is.JSXElement), jsxChildren => jsxChildren.indexOf(el) + 1);
+            })
+          )
+        )
+      )
+    );
+
+    console.log(results);
+    return results;
+  });
+
   const ref = pipe(
-    jxElement.openingElement,
+    jsxRoot.openingElement,
     findAllByType("JSXAttribute"),
     A.findFirst(attr => as.JSXIdentifier(attr.name)?.name === "ref"),
     O.chainNullableK(findFirstByType("JSXExpressionContainer")),

@@ -16,6 +16,20 @@ export function findAllByType<T extends readonly [NodeType, ...NodeType[]]>(...t
   };
 }
 
+export function findAllByTypeWithParents<T extends readonly [NodeType, ...NodeType[]]>(...types: T) {
+  return (root: Node): [NodeOfType<T[number]>, Node[]][] => {
+    const results: [NodeOfType<T[number]>, Node[]][] = [];
+
+    for (const [node, parents] of traverse(root)) {
+      if (isNodeOfType(node, ...types)) {
+        results.push([node, parents]);
+      }
+    }
+
+    return results;
+  };
+}
+
 export function findAllByTypeShallow<T extends readonly [NodeType, ...NodeType[]]>(...types: T) {
   return (root: Node): NodeOfType<T[number]>[] => {
     const results: NodeOfType<T[number]>[] = [];
