@@ -76,7 +76,7 @@ function createHydration(jsxRoot: JSXElement) {
         R.fromEntries
       );
 
-      return { path, ...attrs };
+      return { ...attrs, path };
     })
   );
 
