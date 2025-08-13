@@ -38,11 +38,11 @@ export function transformJsx(code: string, id: string) {
 function createHydration(jsxRoot: JSXElement) {
   const path = [1];
 
-  const path2 = pipe(
+  const hydration = pipe(
     jsxRoot,
     findAllByTypeWithParents("JSXElement"),
-    A.map(([, parents]) =>
-      pipe(parents, A.filter(is.JSXElement), jsxParents =>
+    A.map(([el, parents]) => {
+      const path = pipe(parents, A.filter(is.JSXElement), A.concat([el]), jsxParents =>
         pipe(
           jsxParents,
           A.mapWithIndex((i, el) => {
@@ -51,8 +51,12 @@ function createHydration(jsxRoot: JSXElement) {
             return pipe(directParent.children, A.filter(is.JSXElement), jsxChildren => jsxChildren.indexOf(el) + 1);
           })
         )
-      )
-    )
+      );
+
+      console.log(as.JSXIdentifier(el.openingElement.name)?.name, path, "\n");
+
+      return path;
+    })
   );
 
   const ref = pipe(
