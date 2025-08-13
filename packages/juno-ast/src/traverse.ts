@@ -30,19 +30,19 @@ type Visit = {
 
 export function* traverseWithControl(current: unknown, parents: Node[] = []): Generator<Visit> {
   if (isNode(current)) {
-    let shouldSkip = false;
+    let skipDescend = false;
     const visit: Visit = {
       node: current,
       parents,
       skipDescend: () => {
-        shouldSkip = true;
+        skipDescend = true;
       },
     };
     yield visit;
-    if (shouldSkip) return; // don't traverse children of this node
+    if (skipDescend) return;
   }
 
-  const nextParents = isNode(current) ? [current as Node, ...parents] : parents;
+  const nextParents = isNode(current) ? [...parents, current as Node] : parents;
 
   if (Array.isArray(current)) {
     for (const child of current) {
