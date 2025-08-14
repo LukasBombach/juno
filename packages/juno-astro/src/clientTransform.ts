@@ -1,5 +1,6 @@
 import { basename } from "node:path";
 import * as A from "fp-ts/Array";
+import * as RA from "fp-ts/ReadOnlyArray";
 import * as O from "fp-ts/Option";
 import * as R from "fp-ts/ReadonlyRecord";
 import oxc from "oxc-parser";
@@ -38,7 +39,7 @@ export function transformJsx(code: string, id: string) {
 }
 
 function createHydration(jsxRoot: JSXElement) {
-  const path = [1];
+  // const path = [1];
 
   const hydration = pipe(
     jsxRoot,
@@ -51,10 +52,12 @@ function createHydration(jsxRoot: JSXElement) {
           if (i === 0) return 0;
           const directParent = jsxParents[i - 1];
           return pipe(directParent.children, A.filter(is.JSXElement), jsxChildren => jsxChildren.indexOf(el));
-        })
+        }),
+        A.map(b.number),
+        astNumbers => b.array(astNumbers)
       );
 
-      console.log(jsxParents.map(el => as.JSXIdentifier(el.openingElement.name)?.name).join(" > "), path);
+      //console.log(jsxParents.map(el => as.JSXIdentifier(el.openingElement.name)?.name).join(" > "), path);
 
       const attrs = pipe(
         jsxRoot.openingElement,
@@ -76,18 +79,20 @@ function createHydration(jsxRoot: JSXElement) {
         R.fromEntries
       );
 
-      return { ...attrs, path };
+      return b.object({ path, ...attrs });
     })
   );
 
-  const ref = pipe(
-    jsxRoot.openingElement,
-    findAllByType("JSXAttribute"),
-    A.findFirst(attr => as.JSXIdentifier(attr.name)?.name === "ref"),
-    O.chainNullableK(findFirstByType("JSXExpressionContainer")),
-    O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
-    O.toUndefined
-  );
+  return b.array(hydration);
 
-  return b.array([b.object({ path: b.array(path.map(b.number)), ref })]);
+  // const ref = pipe(
+  //   jsxRoot.openingElement,
+  //   findAllByType("JSXAttribute"),
+  //   A.findFirst(attr => as.JSXIdentifier(attr.name)?.name === "ref"),
+  //   O.chainNullableK(findFirstByType("JSXExpressionContainer")),
+  //   O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
+  //   O.toUndefined
+  // );
+
+  // return b.array([b.object({ path: b.array(path.map(b.number)), ref })]);
 }
