@@ -1,6 +1,5 @@
 import { basename } from "node:path";
 import * as A from "fp-ts/Array";
-import * as RA from "fp-ts/ReadOnlyArray";
 import * as O from "fp-ts/Option";
 import * as R from "fp-ts/ReadonlyRecord";
 import oxc from "oxc-parser";
