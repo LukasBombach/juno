@@ -44,8 +44,6 @@ export function transformJsx(code: string, id: string) {
 }
 
 function createHydration(jsxRoot: JSXElement) {
-  // const path = [1];
-
   const hydration = pipe(
     jsxRoot,
     findAllByTypeWithParents("JSXElement"),
@@ -61,8 +59,6 @@ function createHydration(jsxRoot: JSXElement) {
         A.map(b.number),
         astNumbers => b.array(astNumbers)
       );
-
-      //console.log(jsxParents.map(el => as.JSXIdentifier(el.openingElement.name)?.name).join(" > "), path);
 
       const attrs = pipe(
         jsxRoot.openingElement,
@@ -89,15 +85,4 @@ function createHydration(jsxRoot: JSXElement) {
   );
 
   return b.array(hydration);
-
-  // const ref = pipe(
-  //   jsxRoot.openingElement,
-  //   findAllByType("JSXAttribute"),
-  //   A.findFirst(attr => as.JSXIdentifier(attr.name)?.name === "ref"),
-  //   O.chainNullableK(findFirstByType("JSXExpressionContainer")),
-  //   O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
-  //   O.toUndefined
-  // );
-
-  // return b.array([b.object({ path: b.array(path.map(b.number)), ref })]);
 }
