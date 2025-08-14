@@ -60,6 +60,14 @@ function createHydration(jsxRoot: JSXElement) {
         astNumbers => b.array(astNumbers)
       );
 
+      const component = pipe(
+        O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
+        O.map(identifier => identifier.name),
+        O.filter(name => Boolean(name.match(/^[A-Z]/))),
+        O.map(name => b.identName(name)),
+        O.toUndefined
+      );
+
       const attrs = pipe(
         jsxRoot.openingElement,
         findAllByType("JSXAttribute"),
@@ -80,7 +88,7 @@ function createHydration(jsxRoot: JSXElement) {
         R.fromEntries
       );
 
-      return b.object({ path, ...attrs });
+      return b.object({ path, component, ...attrs });
     })
   );
 
