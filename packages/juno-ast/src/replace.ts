@@ -1,3 +1,4 @@
+import c from "chalk";
 import type { Node } from "./types";
 
 export function replaceChild<P extends Node, N extends Node, O extends Node>(
@@ -19,6 +20,7 @@ export function replaceChild<P extends Node, N extends Node, O extends Node>(
         }
       }
     }
-    console.warn("Could not find old child in parent");
   }
+
+  console.warn(c.bold.yellow("warn") + " Could not find old child in parent");
 }

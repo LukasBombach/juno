@@ -5,11 +5,11 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "devDependencies": {
-    "oxc-parser": "0.81.0"
-  },
   "dependencies": {
+    "chalk": "5.5.0",
+    "cli-highlight": "2.1.11",
+    "esrap": "2.1.0",
     "fp-ts": "2.16.10",
-    "lodash": "4.17.21"
+    "oxc-parser": "0.81.0"
   }
 }

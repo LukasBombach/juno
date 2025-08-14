@@ -31,6 +31,7 @@ export function transformJsx(code: string, id: string) {
             console.warn("No parent found for JSX root in", id);
             return;
           }
+
           replaceChild(parent, hydration, jsxRoot);
         })
       );
