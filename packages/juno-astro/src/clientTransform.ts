@@ -6,6 +6,7 @@ import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 import { highlight } from "cli-highlight";
+import c from "chalk";
 import { pipe, is, as, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeWithParents, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import type { JSXElement } from "juno-ast";
@@ -13,7 +14,7 @@ import type { JSXElement } from "juno-ast";
 export function transformJsx(code: string, id: string) {
   const { program } = oxc.parseSync(basename(id), code, { sourceType: "module", lang: "tsx", astType: "js" });
 
-  console.log("\n" + id + "\n");
+  console.log("\n" + c.greenBright(id) + "\n");
 
   pipe(
     program,

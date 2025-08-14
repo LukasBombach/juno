@@ -15,6 +15,7 @@
     "build": "tsup src/*.ts --dts --clean --format esm"
   },
   "dependencies": {
+    "chalk": "5.5.0",
     "esrap": "2.1.0",
     "fp-ts": "2.16.10",
     "juno-ast": "file:../juno-ast",

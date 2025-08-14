@@ -106,6 +106,9 @@ importers:
 
   packages/juno-astro:
     dependencies:
+      chalk:
+        specifier: 5.5.0
+        version: 5.5.0
       esrap:
         specifier: 2.1.0
         version: 2.1.0
