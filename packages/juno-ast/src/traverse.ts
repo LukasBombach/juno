@@ -6,7 +6,7 @@ export function* traverse<T extends Node>(current: T, parents: Node[] = []): Gen
     yield [current, parents];
   }
 
-  const nextParents = isNode(current) ? [...parents, current] : [...parents];
+  const nextParents = isNode(current) ? [current, ...parents] : [...parents];
 
   if (Array.isArray(current)) {
     for (const child of current) {
@@ -42,7 +42,7 @@ export function* traverseWithControl(current: unknown, parents: Node[] = []): Ge
     if (skipDescend) return;
   }
 
-  const nextParents = isNode(current) ? [...parents, current as Node] : parents;
+  const nextParents = isNode(current) ? [current as Node, ...parents] : parents;
 
   if (Array.isArray(current)) {
     for (const child of current) {

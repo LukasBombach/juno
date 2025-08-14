@@ -26,7 +26,12 @@ export function transformJsx(code: string, id: string) {
         A.map(jsxRoot => {
           const parent = findParent(jsxRoot, returnStatement);
           const hydration = createHydration(jsxRoot);
-          replaceChild(parent!, hydration, jsxRoot);
+
+          if (!parent) {
+            console.warn("No parent found for JSX root in", id);
+            return;
+          }
+          replaceChild(parent, hydration, jsxRoot);
         })
       );
     })
@@ -43,7 +48,7 @@ function createHydration(jsxRoot: JSXElement) {
   const hydration = pipe(
     jsxRoot,
     findAllByTypeWithParents("JSXElement"),
-    A.map(([el, parents]) => [el, pipe(parents, A.filter(is.JSXElement), A.append(el))] as const),
+    A.map(([el, parents]) => [el, pipe(parents, A.filter(is.JSXElement), A.prepend(el), A.reverse)] as const),
     A.map(([el, jsxParents]) => {
       const path = pipe(
         jsxParents,

@@ -26,7 +26,7 @@ export default function (): AstroIntegration {
                 enforce: "pre",
                 transform(code, id, options) {
                   if (options?.ssr === false && id.endsWith(".tsx") && !id.includes("/node_modules/")) {
-                    if (id.includes("Demo")) return transformJsx(code, id);
+                    return transformJsx(code, id);
                   }
                   return code;
                 },

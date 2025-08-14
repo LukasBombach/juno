@@ -9,13 +9,16 @@ export function replaceChild<P extends Node, N extends Node, O extends Node>(
     const child = parent[prop];
     if (child === oldChild) {
       Object.assign(parent, { [prop]: newChild });
+      return;
     }
     if (Array.isArray(child)) {
       for (let i = 0; i < child.length; i++) {
         if (child[i] === oldChild) {
           child[i] = newChild;
+          return;
         }
       }
     }
+    console.warn("Could not find old child in parent");
   }
 }

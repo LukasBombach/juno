@@ -8,7 +8,7 @@ export default defineConfig({
     plugins: [
       tailwindcss(),
       ViteRestart({
-        restart: ["../../packages/juno-astro/src/(index|clientTransform).ts"],
+        restart: ["../../packages/juno-astro/src/*.ts"],
       }),
     ],
   },
