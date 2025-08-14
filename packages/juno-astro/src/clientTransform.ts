@@ -85,7 +85,7 @@ function createHydration(jsxRoot: JSXElement) {
           );
           return name && value ? O.some([name, value] as const) : O.none;
         }),
-        R.fromEntries
+        A.match(() => undefined, R.fromEntries)
       );
 
       return b.object({ path, component, ...attrs });
