@@ -5,7 +5,7 @@ export function renderToStaticMarkup(node: VNode): string {
   const { children, ...props } = node.props;
 
   const attributes = Object.entries(props)
-    .filter(([, value]) => value !== undefined && value !== null && value !== false)
+    .filter(([, value]) => value !== undefined && value !== null && value !== false && typeof value !== "function")
     .map(([key, value]) => {
       const name = key === "className" ? "class" : key;
       return value === true ? name : `${name}="${value}"`;
