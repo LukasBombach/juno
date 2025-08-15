@@ -1,4 +1,5 @@
 import { basename } from "node:path";
+import { createHash } from "node:crypto";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import * as R from "fp-ts/ReadonlyRecord";
@@ -26,7 +27,7 @@ export function transformJsx(code: string, id: string) {
         findAllByTypeShallow("JSXElement"),
         A.map(jsxRoot => {
           const parent = findParent(jsxRoot, returnStatement);
-          const hydration = createHydration(jsxRoot);
+          const hydration = createHydration(jsxRoot, id);
 
           if (!parent) {
             console.warn("No parent found for JSX root in", id);
@@ -44,22 +45,24 @@ export function transformJsx(code: string, id: string) {
   return code;
 }
 
-function createHydration(jsxRoot: JSXElement) {
+function createHydration(jsxRoot: JSXElement, filename: string) {
   const hydration = pipe(
     jsxRoot,
     findAllByTypeWithParents("JSXElement"),
     A.map(([el, parents]) => [el, pipe(parents, A.filter(is.JSXElement), A.prepend(el), A.reverse)] as const),
     A.filterMap(([el, jsxParents]) => {
-      const path = pipe(
-        jsxParents,
-        A.mapWithIndex((i, el) => {
-          if (i === 0) return 0;
-          const directParent = jsxParents[i - 1];
-          return pipe(directParent.children, A.filter(is.JSXElement), jsxChildren => jsxChildren.indexOf(el));
-        }),
-        A.map(b.number),
-        astNumbers => b.array(astNumbers)
-      );
+      const id = pipe(astId(filename, el.start), b.literal);
+
+      // const path = pipe(
+      //   jsxParents,
+      //   A.mapWithIndex((i, el) => {
+      //     if (i === 0) return 0;
+      //     const directParent = jsxParents[i - 1];
+      //     return pipe(directParent.children, A.filter(is.JSXElement), jsxChildren => jsxChildren.indexOf(el));
+      //   }),
+      //   A.map(b.number),
+      //   astNumbers => b.array(astNumbers)
+      // );
 
       const component = pipe(
         O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
@@ -89,9 +92,13 @@ function createHydration(jsxRoot: JSXElement) {
         A.match(() => undefined, R.fromEntries)
       );
 
-      return component || attrs ? O.some(b.object({ path, component, ...attrs })) : O.none;
+      return component || attrs ? O.some(b.object({ id, component, ...attrs })) : O.none;
     })
   );
 
   return b.array(hydration);
+}
+
+function astId(filename: string, loc: number, length = 4): string {
+  return createHash("md5").update(`${filename}${loc}`).digest("hex").substring(0, length);
 }

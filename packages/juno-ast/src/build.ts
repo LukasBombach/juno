@@ -31,10 +31,16 @@ export const build = {
     name,
     ...span,
   }),
+  literal: (value: string): t.StringLiteral => ({
+    type: "Literal",
+    value,
+    raw: JSON.stringify(value),
+    ...span,
+  }),
   number: (value: number): t.NumericLiteral => ({
     type: "Literal",
     value,
-    raw: value.toString(),
+    raw: JSON.stringify(value),
     ...span,
   }),
 };
