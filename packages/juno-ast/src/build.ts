@@ -43,6 +43,16 @@ export const build = {
     raw: JSON.stringify(value),
     ...span,
   }),
+  jsxAttr: (name: string, value: string): t.JSXAttribute => ({
+    type: "JSXAttribute",
+    name: {
+      type: "JSXIdentifier",
+      name,
+      ...span,
+    },
+    value: b.literal(value),
+    ...span,
+  }),
 };
 
 /**

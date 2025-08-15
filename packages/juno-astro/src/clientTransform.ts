@@ -15,7 +15,7 @@ import type { JSXElement } from "juno-ast";
 export function transformJsx(code: string, id: string) {
   const { program } = oxc.parseSync(basename(id), code, { sourceType: "module", lang: "tsx", astType: "js" });
 
-  console.log("\n" + c.greenBright(id) + "\n");
+  // console.log("\n" + c.greenBright(id) + "\n");
 
   pipe(
     program,
@@ -40,7 +40,7 @@ export function transformJsx(code: string, id: string) {
     })
   );
 
-  console.log(highlight(print(program, tsx()).code, { language: "tsx" }));
+  // console.log(highlight(print(program, tsx()).code, { language: "tsx" }));
 
   return code;
 }

@@ -4,10 +4,12 @@ export function renderToStaticMarkup(node: VNode): string {
   const tag = node.type;
   const { children, ...props } = node.props;
 
-  const attributes = Object.entries(props).map(([key, value]) => {
-    const name = key === "className" ? "class" : key;
-    return value === true ? name : `${name}="${value}"`;
-  });
+  const attributes = Object.entries(props)
+    .filter(([, value]) => value !== undefined && value !== null && value !== false)
+    .map(([key, value]) => {
+      const name = key === "className" ? "class" : key;
+      return value === true ? name : `${name}="${value}"`;
+    });
 
   const openingTag = `<${[tag, ...attributes].join(" ")}>`;
   const closingTag = `</${tag}>`;

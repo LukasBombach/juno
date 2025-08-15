@@ -1,5 +1,6 @@
 import type { AstroIntegration, AstroRenderer } from "astro";
 import { transformJsx } from "./clientTransform";
+import { transformJsxServer } from "./serverTransform";
 
 export default function (): AstroIntegration {
   const renderer: AstroRenderer = {
@@ -25,9 +26,16 @@ export default function (): AstroIntegration {
                 name: "juno-astro-transform",
                 enforce: "pre",
                 transform(code, id, options) {
-                  if (options?.ssr === false && id.endsWith(".tsx") && !id.includes("/node_modules/")) {
-                    return transformJsx(code, id);
+                  if (!id.endsWith(".tsx") || id.includes("/node_modules/")) {
+                    return code;
                   }
+
+                  if (options?.ssr === false) {
+                    return transformJsx(code, id);
+                  } else if (options?.ssr === true) {
+                    return transformJsxServer(code, id);
+                  }
+
                   return code;
                 },
               },
