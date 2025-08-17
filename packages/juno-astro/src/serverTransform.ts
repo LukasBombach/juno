@@ -5,7 +5,7 @@ import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
-import { highlight } from "cli-highlight";
+// import { highlight } from "cli-highlight";
 import c from "chalk";
 import { pipe, is, as, b } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
@@ -33,9 +33,9 @@ export function transformJsxServer(input: string, id: string) {
 
   const { code, map } = print(program, tsx(), { indent: "  " });
 
-  console.log(highlight(code, { language: "tsx" }));
+  // console.log(highlight(code, { language: "tsx" }));
 
-  return { code, map, ast: program };
+  return { code, map };
 }
 
 function addHydrationIds(jsxRoot: JSXElement, filename: string) {

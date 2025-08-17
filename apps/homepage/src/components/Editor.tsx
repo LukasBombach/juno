@@ -1,11 +1,16 @@
 import { signal, effect } from "@maverick-js/signals";
-import type { MonacoEditor, createEditor } from "./monacoEditor";
+// import type { MonacoEditor, createEditor } from "./monacoEditor";
+
+/**
+ * esrap remove type from imports so the actual file will be imported during ssr
+ */
+type MonacoEditor = any;
 
 export const Editor: React.FC<{
   value?: string;
   className?: string;
 }> = ({ value, className }) => {
-  const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
+  const monaco = signal<{ createEditor: any /* typeof createEditor */ } | null>(null);
   const container = signal<HTMLElement | null>(null);
   const editor = signal<MonacoEditor | null>(null);
 
