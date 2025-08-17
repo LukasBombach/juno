@@ -1,12 +1,10 @@
 import { signal, effect } from "@maverick-js/signals";
 import type { MonacoEditor, createEditor } from "./monacoEditor";
 
-export interface EditorProps {
+export const Editor: React.FC<{
   value?: string;
   className?: string;
-}
-
-export const Editor: React.FC<EditorProps> = ({ value, className }) => {
+}> = ({ value, className }) => {
   const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
   const container = signal<HTMLElement | null>(null);
   const editor = signal<MonacoEditor | null>(null);

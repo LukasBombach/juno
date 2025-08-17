@@ -11,10 +11,10 @@ import { pipe, is, as, b } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
 import type { JSXElement } from "juno-ast";
 
-export function transformJsxServer(code: string, id: string) {
-  const { program } = oxc.parseSync(basename(id), code, { sourceType: "module", lang: "tsx", astType: "js" });
+export function transformJsxServer(input: string, id: string) {
+  const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "js" });
 
-  console.log("\n" + c.greenBright(id) + "\n");
+  console.log("\n" + c.blue("[ssr]") + " " + c.greenBright(id) + "\n");
 
   pipe(
     program,
@@ -31,7 +31,11 @@ export function transformJsxServer(code: string, id: string) {
     })
   );
 
-  return code;
+  const { code, map } = print(program, tsx(), { indent: "  " });
+
+  console.log(highlight(code, { language: "tsx" }));
+
+  return { code, map, ast: program };
 }
 
 function addHydrationIds(jsxRoot: JSXElement, filename: string) {
@@ -61,7 +65,6 @@ function addHydrationIds(jsxRoot: JSXElement, filename: string) {
 
       if (shouldBeHydrated) {
         el.openingElement.attributes.unshift(b.jsxAttr("data-juno-id", astId(filename, el.start)));
-        console.log(highlight(print(el, tsx()).code, { language: "tsx" }));
       }
     })
   );
