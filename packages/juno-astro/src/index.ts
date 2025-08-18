@@ -30,10 +30,12 @@ export default function (): AstroIntegration {
                     return code;
                   }
 
+                  if (options?.ssr === true) {
+                    return transformJsxServer(code, id);
+                  }
+
                   if (options?.ssr === false) {
                     return transformJsx(code, id);
-                  } else if (options?.ssr === true) {
-                    return transformJsxServer(code, id);
                   }
 
                   return code;

@@ -1,5 +1,15 @@
 console.log("juno hydration script initialized");
 
+class JunoComponent extends HTMLElement {
+  static tagName = "juno-component";
+
+  connectedCallback() {
+    console.log("juno component connected", this);
+  }
+}
+
+window.customElements.define(JunoComponent.tagName, JunoComponent);
+
 export default (element: HTMLElement) =>
   async (
     Component: any,
