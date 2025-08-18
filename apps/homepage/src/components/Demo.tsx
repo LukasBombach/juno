@@ -5,7 +5,9 @@ function randomNumbers(): number[] {
 }
 
 function ClientCode(props: { num: number; className?: string }) {
-  console.log(`client code ${props.num}`);
+  if (typeof window !== "undefined") {
+    console.log(`client code ${props.num}`);
+  }
   return <pre className={props.className}>console.log('client code {props.num}');</pre>;
 }
 
