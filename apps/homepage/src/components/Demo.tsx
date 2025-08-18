@@ -1,5 +1,12 @@
 import { Editor } from "./Editor";
 
+/**
+ * generates an array of random length with random numbers
+ */
+function randomNumbers(): number[] {
+  return Array.from({ length: Math.floor(Math.random() * 10) + 1 }, () => Math.floor(Math.random() * 100));
+}
+
 export function Demo() {
   return (
     <div className="row-start-2 -row-end-2 -col-start-3 -col-end-2 rounded-xl shadow-window grid grid-rows-1 grid-cols-[minmax(200px,14%)_1fr] overflow-hidden">
@@ -9,9 +16,13 @@ export function Demo() {
         </a>
       </nav>
       <section className="p-5 py-7 bg-editor-light text-neutral-800 dark:bg-editor-dark dark:text-neutral-100">
-        {["hello", "world,", "hello", "moon"].map(text => (
-          <Editor className="block" value={`console.log('${text}');`} />
-        ))}
+        {randomNumbers().map(num =>
+          num % 2 === 0 ? (
+            <Editor className="block" value={`console.log('client code ${num}');`} />
+          ) : (
+            <pre>/* ssr only */</pre>
+          )
+        )}
       </section>
     </div>
   );
