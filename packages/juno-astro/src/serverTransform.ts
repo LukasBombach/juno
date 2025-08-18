@@ -64,12 +64,14 @@ function addHydrationIds(jsxRoot: JSXElement, filename: string) {
       );
 
       if (shouldBeHydrated) {
-        el.openingElement.attributes.unshift(b.jsxAttr("data-juno-id", astId(filename, el.start)));
+        el.openingElement.attributes.unshift(
+          b.jsxAttr("data-juno-id", astId(filename, el.openingElement.start, el.openingElement.end))
+        );
       }
     })
   );
 }
 
-function astId(filename: string, loc: number, length = 4): string {
-  return createHash("md5").update(`${filename}${loc}`).digest("hex").substring(0, length);
+function astId(filename: string, start: number, end: number, length = 4): string {
+  return createHash("md5").update(`${filename}:${start}:${end}`).digest("hex").substring(0, length);
 }
