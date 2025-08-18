@@ -6,7 +6,7 @@ import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 // import { highlight } from "cli-highlight";
-import c from "chalk";
+// import c from "chalk";
 import { pipe, is, as, b } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
 import type { JSXElement } from "juno-ast";
@@ -14,7 +14,7 @@ import type { JSXElement } from "juno-ast";
 export function transformJsxServer(input: string, id: string) {
   const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "js" });
 
-  console.log("\n" + c.blue("[ssr]") + " " + c.greenBright(id) + "\n");
+  // console.log("\n" + c.blue("[ssr]") + " " + c.greenBright(id) + "\n");
 
   pipe(
     program,
