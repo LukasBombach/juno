@@ -44,7 +44,7 @@ function addHydrationIds(jsxRoot: JSXElement, filename: string) {
     findAllByType("JSXElement"),
     A.map(el => {
       const shouldBeHydrated = pipe(
-        jsxRoot.openingElement,
+        el.openingElement,
         findAllByType("JSXAttribute"),
         A.filter(attr => {
           const name = as.JSXIdentifier(attr.name)?.name;

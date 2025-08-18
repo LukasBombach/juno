@@ -73,7 +73,7 @@ function createHydration(jsxRoot: JSXElement, filename: string) {
       );
 
       const attrs = pipe(
-        jsxRoot.openingElement,
+        el.openingElement,
         findAllByType("JSXAttribute"),
         A.filter(attr => {
           const name = as.JSXIdentifier(attr.name)?.name;
