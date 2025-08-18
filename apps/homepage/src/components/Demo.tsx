@@ -9,8 +9,9 @@ export function Demo() {
         </a>
       </nav>
       <section className="p-5 py-7 bg-editor-light text-neutral-800 dark:bg-editor-dark dark:text-neutral-100">
-        <Editor />
-        <Editor />
+        {["hello", "world,", "hello", "moon"].map(text => (
+          <Editor className="block" value={`console.log('${text}');`} />
+        ))}
       </section>
     </div>
   );

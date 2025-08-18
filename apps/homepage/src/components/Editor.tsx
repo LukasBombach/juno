@@ -27,5 +27,9 @@ export const Editor: React.FC<{
   });
 
   // return [{ path: [1], ref: (el: HTMLElement) => container.set(el) }];
-  return <code className={className} ref={el => container.set(el)} />;
+  return (
+    <code className={className} ref={el => container.set(el)}>
+      {value}
+    </code>
+  );
 };
