@@ -1,10 +1,12 @@
 import { Editor } from "./Editor";
 
-/**
- * generates an array of random length with random numbers
- */
 function randomNumbers(): number[] {
   return Array.from({ length: Math.floor(Math.random() * 10) + 1 }, () => Math.floor(Math.random() * 100));
+}
+
+function ClientCode(props: { num: number; className?: string }) {
+  console.log(`client code ${props.num}`);
+  return <pre className={props.className}>console.log('client code {props.num}');</pre>;
 }
 
 export function Demo() {
@@ -18,9 +20,9 @@ export function Demo() {
       <section className="p-5 py-7 bg-editor-light text-neutral-800 dark:bg-editor-dark dark:text-neutral-100">
         {randomNumbers().map(num =>
           num % 2 === 0 ? (
-            <Editor className="block" value={`console.log('client code ${num}');`} />
+            <ClientCode className="text-gray-950" num={num} />
           ) : (
-            <pre>/* ssr only */</pre>
+            <pre className="text-gray-400">/* ssr only */</pre>
           )
         )}
       </section>
