@@ -3,6 +3,8 @@ import type * as t from "./types";
 type MaybeNode = t.Node | null | undefined;
 
 export const is = {
+  BinaryExpression: (node: MaybeNode): node is t.BinaryExpression => node?.type === "BinaryExpression",
+  UnaryExpression: (node: MaybeNode): node is t.UnaryExpression => node?.type === "UnaryExpression",
   Node: (value: unknown): value is t.Node => typeof value === "object" && value !== null && "type" in value,
   JSXElement: (node: MaybeNode): node is t.JSXElement => node?.type === "JSXElement",
   JSXIdentifier: (node: MaybeNode): node is t.JSXIdentifier => node?.type === "JSXIdentifier",
