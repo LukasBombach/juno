@@ -16,7 +16,7 @@ export function renderToStaticMarkup(node: VNode): string {
 
   const innerHTML = ensureArray(children)
     .map(child => {
-      if (isVNode(child)) console.log(child);
+      // if (isVNode(child)) console.log(child);
       if (isVNode(child)) return renderToStaticMarkup(child);
       if (shouldBeRenderedToString(child)) return String(child);
       return undefined;

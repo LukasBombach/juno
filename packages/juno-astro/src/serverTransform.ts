@@ -40,30 +40,27 @@ function addComponentId(jsxRoot: JSXElement, filename: string) {
   const shouldBeHydrated = pipe(
     jsxRoot,
     findAllByType("JSXElement"),
-    A.some(el => {
-      return (
-        Boolean(as.JSXIdentifier(el.openingElement.name)?.name.match(/^[A-Z]/)) ||
-        pipe(
-          el.openingElement,
-          findAllByType("JSXAttribute"),
-          A.filter(attr => {
-            const name = as.JSXIdentifier(attr.name)?.name;
-            return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
-          }),
-          A.reduce(0, (len, attr) => {
-            const name = as.JSXIdentifier(attr.name)?.name;
-            const value = pipe(
-              attr,
-              O.fromNullableK(findFirstByType("JSXExpressionContainer")),
-              O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
-              O.toUndefined
-            );
-            return name && value ? len + 1 : len;
-          }),
-          len => len > 0
-        )
-      );
-    })
+    A.some(el =>
+      pipe(
+        el.openingElement,
+        findAllByType("JSXAttribute"),
+        A.filter(attr => {
+          const name = as.JSXIdentifier(attr.name)?.name;
+          return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
+        }),
+        A.reduce(0, (len, attr) => {
+          const name = as.JSXIdentifier(attr.name)?.name;
+          const value = pipe(
+            attr,
+            O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+            O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
+            O.toUndefined
+          );
+          return name && value ? len + 1 : len;
+        }),
+        len => len > 0
+      )
+    )
   );
 
   if (shouldBeHydrated) {
