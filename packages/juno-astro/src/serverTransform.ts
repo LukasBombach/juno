@@ -24,9 +24,7 @@ export function transformJsxServer(input: string, id: string) {
       pipe(
         returnStatement,
         findAllByTypeShallow("JSXElement"),
-        A.map(jsxRoot => {
-          addHydrationIds(jsxRoot, id);
-        })
+        A.map(jsxRoot => addComponentId(jsxRoot, id))
       );
     })
   );
@@ -38,30 +36,74 @@ export function transformJsxServer(input: string, id: string) {
   return { code, map };
 }
 
+function addComponentId(jsxRoot: JSXElement, filename: string) {
+  const shouldBeHydrated = pipe(
+    jsxRoot,
+    findAllByType("JSXElement"),
+    A.some(el => {
+      return (
+        Boolean(as.JSXIdentifier(el.openingElement.name)?.name.match(/^[A-Z]/)) ||
+        pipe(
+          el.openingElement,
+          findAllByType("JSXAttribute"),
+          A.filter(attr => {
+            const name = as.JSXIdentifier(attr.name)?.name;
+            return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
+          }),
+          A.reduce(0, (len, attr) => {
+            const name = as.JSXIdentifier(attr.name)?.name;
+            const value = pipe(
+              attr,
+              O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+              O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
+              O.toUndefined
+            );
+            return name && value ? len + 1 : len;
+          }),
+          len => len > 0
+        )
+      );
+    })
+  );
+
+  if (shouldBeHydrated) {
+    if (shouldBeHydrated) {
+      jsxRoot.openingElement.attributes.unshift(
+        b.jsxAttr(
+          "data-juno-id",
+          shortHash(`${filename.slice(-16)}:${jsxRoot.openingElement.start}:${jsxRoot.openingElement.end}`)
+        )
+      );
+    }
+  }
+}
+
 function addHydrationIds(jsxRoot: JSXElement, filename: string) {
   pipe(
     jsxRoot,
     findAllByType("JSXElement"),
     A.map(el => {
-      const shouldBeHydrated = pipe(
-        el.openingElement,
-        findAllByType("JSXAttribute"),
-        A.filter(attr => {
-          const name = as.JSXIdentifier(attr.name)?.name;
-          return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
-        }),
-        A.reduce(0, (len, attr) => {
-          const name = as.JSXIdentifier(attr.name)?.name;
-          const value = pipe(
-            attr,
-            O.fromNullableK(findFirstByType("JSXExpressionContainer")),
-            O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
-            O.toUndefined
-          );
-          return name && value ? len + 1 : len;
-        }),
-        len => len > 0
-      );
+      const shouldBeHydrated =
+        as.JSXIdentifier(el.openingElement.name)?.name.match(/^[A-Z]/) ||
+        pipe(
+          el.openingElement,
+          findAllByType("JSXAttribute"),
+          A.filter(attr => {
+            const name = as.JSXIdentifier(attr.name)?.name;
+            return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
+          }),
+          A.reduce(0, (len, attr) => {
+            const name = as.JSXIdentifier(attr.name)?.name;
+            const value = pipe(
+              attr,
+              O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+              O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
+              O.toUndefined
+            );
+            return name && value ? len + 1 : len;
+          }),
+          len => len > 0
+        );
 
       if (shouldBeHydrated) {
         el.openingElement.attributes.unshift(
@@ -74,4 +116,8 @@ function addHydrationIds(jsxRoot: JSXElement, filename: string) {
 
 function astId(filename: string, start: number, end: number, length = 4): string {
   return createHash("md5").update(`${filename}:${start}:${end}`).digest("hex").substring(0, length);
+}
+
+function shortHash(input: string, length = 5): string {
+  return createHash("md5").update(input).digest("hex").substring(0, length);
 }

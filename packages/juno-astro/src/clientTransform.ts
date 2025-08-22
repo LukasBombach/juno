@@ -12,8 +12,8 @@ import { pipe, is, as, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeWithParents, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import type { JSXElement } from "juno-ast";
 
-export function transformJsx(code: string, id: string) {
-  const { program } = oxc.parseSync(basename(id), code, { sourceType: "module", lang: "tsx", astType: "js" });
+export function transformJsx(input: string, id: string) {
+  const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "js" });
 
   // console.log("\n" + c.greenBright(id) + "\n");
 
@@ -42,7 +42,8 @@ export function transformJsx(code: string, id: string) {
 
   // console.log(highlight(print(program, tsx()).code, { language: "tsx" }));
 
-  return code;
+  const { code, map } = print(program, tsx(), { indent: "  " });
+  return { code, map };
 }
 
 function createHydration(jsxRoot: JSXElement, filename: string) {

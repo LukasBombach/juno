@@ -58,7 +58,9 @@ function createVNode<P = {}>(
   _source: Source
 ): VNode<P> {
   // todo: hide vnode prop in prototype
-  return typeof type === "function" ? createJunoComponentVNode(type, props) : { type, props, [vnode]: true };
+  return typeof type === "function"
+    ? type(props) /* createJunoComponentVNode(type, props) */
+    : { type, props, [vnode]: true };
 }
 
 function createJunoComponentVNode<P = {}>(type: FunctionComponent<P>, props: P): VNode<P> {
