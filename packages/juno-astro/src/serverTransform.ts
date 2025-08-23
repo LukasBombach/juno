@@ -5,29 +5,12 @@ import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
-// import { highlight } from "cli-highlight";
-// import c from "chalk";
 import { pipe, is, as, b, matches } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
-import type { JSXElement, NodeOfType } from "juno-ast";
+import type { NodeOfType } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
   const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "js" });
-
-  // console.log("\n" + c.blue("[ssr]") + " " + c.greenBright(id) + "\n");
-
-  /*   pipe(
-    program,
-    findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
-    A.flatMap(findAllByTypeShallow("ReturnStatement")),
-    A.map(returnStatement => {
-      pipe(
-        returnStatement,
-        findAllByTypeShallow("JSXElement"),
-        A.map(jsxRoot => addComponentId(jsxRoot, id))
-      );
-    })
-  ); */
 
   pipe(
     program,
@@ -35,11 +18,7 @@ export function transformJsxServer(input: string, id: string) {
     A.map(fn => addComponentId(fn, id))
   );
 
-  const { code, map } = print(program, tsx(), { indent: "  " });
-
-  // console.log(highlight(code, { language: "tsx" }));
-
-  return { code, map };
+  return print(program, tsx(), { indent: "  " });
 }
 
 function addComponentId(
@@ -110,46 +89,6 @@ function addComponentId(
       )
     );
   }
-}
-
-function addHydrationIds(jsxRoot: JSXElement, filename: string) {
-  pipe(
-    jsxRoot,
-    findAllByType("JSXElement"),
-    A.map(el => {
-      const shouldBeHydrated =
-        as.JSXIdentifier(el.openingElement.name)?.name.match(/^[A-Z]/) ||
-        pipe(
-          el.openingElement,
-          findAllByType("JSXAttribute"),
-          A.filter(attr => {
-            const name = as.JSXIdentifier(attr.name)?.name;
-            return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
-          }),
-          A.reduce(0, (len, attr) => {
-            const name = as.JSXIdentifier(attr.name)?.name;
-            const value = pipe(
-              attr,
-              O.fromNullableK(findFirstByType("JSXExpressionContainer")),
-              O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
-              O.toUndefined
-            );
-            return name && value ? len + 1 : len;
-          }),
-          len => len > 0
-        );
-
-      if (shouldBeHydrated) {
-        el.openingElement.attributes.unshift(
-          b.jsxAttr("data-juno-id", astId(filename, el.openingElement.start, el.openingElement.end))
-        );
-      }
-    })
-  );
-}
-
-function astId(filename: string, start: number, end: number, length = 4): string {
-  return createHash("md5").update(`${filename}:${start}:${end}`).digest("hex").substring(0, length);
 }
 
 function shortHash(input: string, length = 5): string {

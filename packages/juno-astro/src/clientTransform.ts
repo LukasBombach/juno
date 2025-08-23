@@ -6,16 +6,12 @@ import * as R from "fp-ts/ReadonlyRecord";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
-import { highlight } from "cli-highlight";
-import c from "chalk";
 import { pipe, is, as, b, replaceChild } from "juno-ast";
-import { findAllByType, findAllByTypeWithParents, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
+import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import type { JSXElement } from "juno-ast";
 
-export function transformJsx(input: string, id: string) {
+export function transformJsxClient(input: string, id: string) {
   const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "js" });
-
-  // console.log("\n" + c.greenBright(id) + "\n");
 
   pipe(
     program,
@@ -40,30 +36,15 @@ export function transformJsx(input: string, id: string) {
     })
   );
 
-  // console.log(highlight(print(program, tsx()).code, { language: "tsx" }));
-
-  const { code, map } = print(program, tsx(), { indent: "  " });
-  return { code, map };
+  return print(program, tsx(), { indent: "  " });
 }
 
 function createHydration(jsxRoot: JSXElement, filename: string) {
   const hydration = pipe(
     jsxRoot,
-    findAllByTypeWithParents("JSXElement"),
-    A.map(([el, parents]) => [el, pipe(parents, A.filter(is.JSXElement), A.prepend(el), A.reverse)] as const),
-    A.filterMap(([el, jsxParents]) => {
+    findAllByType("JSXElement"),
+    A.filterMap(el => {
       const id = pipe(astId(filename, el.start), b.literal);
-
-      // const path = pipe(
-      //   jsxParents,
-      //   A.mapWithIndex((i, el) => {
-      //     if (i === 0) return 0;
-      //     const directParent = jsxParents[i - 1];
-      //     return pipe(directParent.children, A.filter(is.JSXElement), jsxChildren => jsxChildren.indexOf(el));
-      //   }),
-      //   A.map(b.number),
-      //   astNumbers => b.array(astNumbers)
-      // );
 
       const component = pipe(
         O.fromNullable(as.JSXIdentifier(el.openingElement.name)),

@@ -1,5 +1,5 @@
 import type { AstroIntegration, AstroRenderer } from "astro";
-import { transformJsx } from "./clientTransform";
+import { transformJsxClient } from "./clientTransform";
 import { transformJsxServer } from "./serverTransform";
 
 export default function (): AstroIntegration {
@@ -35,7 +35,7 @@ export default function (): AstroIntegration {
                   }
 
                   if (options?.ssr === false) {
-                    return transformJsx(code, id);
+                    return transformJsxClient(code, id);
                   }
 
                   return code;
