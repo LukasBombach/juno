@@ -53,6 +53,26 @@ export const build = {
     value: b.literal(value),
     ...span,
   }),
+  ExpressionStatement: (expression: t.Expression): t.ExpressionStatement => ({
+    type: "ExpressionStatement",
+    expression,
+    ...span,
+  }),
+  AssignmentExpression: (left: t.MemberExpression, right: t.Expression): t.AssignmentExpression => ({
+    type: "AssignmentExpression",
+    operator: "=",
+    left,
+    right,
+    ...span,
+  }),
+  StaticMemberExpression: (object: t.Expression, property: string): t.StaticMemberExpression => ({
+    type: "MemberExpression",
+    object,
+    property: b.identName(property),
+    optional: false,
+    computed: false,
+    ...span,
+  }),
 };
 
 /**
