@@ -31,6 +31,7 @@ export function transformJsxClient(input: string, id: string) {
         }
 
         const componentId = shortHash(`${id.slice(-16)}:${fn.start}:${fn.end}`);
+        // console.log(`client ${id.slice(-16)}:${fn.start}:${fn.end}`, componentId);
 
         const x = b.ExpressionStatement(
           b.AssignmentExpression(

@@ -79,11 +79,15 @@ function addComponentId(
     pipe(
       fn,
       findAllByTypeShallow("JSXElement"),
-      A.map(jsxRoot =>
+      A.map(jsxRoot => {
+        // console.log(
+        //   `server ${filename.slice(-16)}:${fn.start}:${fn.end}`,
+        //   shortHash(`${filename.slice(-16)}:${fn.start}:${fn.end}`)
+        // );
         jsxRoot.openingElement.attributes.unshift(
-          b.jsxAttr("data-component-id", shortHash(`${filename.slice(-16)}:${fn.start}:${fn.end}`))
-        )
-      )
+          b.jsxAttr("data-component-id", "_" + shortHash(`${filename.slice(-16)}:${fn.start}:${fn.end}`))
+        );
+      })
     );
   }
 }
