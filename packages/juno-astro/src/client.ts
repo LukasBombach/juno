@@ -1,4 +1,4 @@
-console.log("juno hydration script initialized");
+/* console.log("juno hydration script initialized");
 
 class JunoComponent extends HTMLElement {
   static tagName = "juno-component";
@@ -8,7 +8,7 @@ class JunoComponent extends HTMLElement {
   }
 }
 
-window.customElements.define(JunoComponent.tagName, JunoComponent);
+window.customElements.define(JunoComponent.tagName, JunoComponent); */
 
 export default (element: HTMLElement) =>
   async (
@@ -17,8 +17,6 @@ export default (element: HTMLElement) =>
     { default: children, ...slotted }: Record<string, any>,
     { client }: Record<string, string>
   ) => {
-    console.log({
-      element,
-      jsx: Component({ ...props, children }),
-    });
+    console.log(element);
+    console.log(Component({ ...props, children }));
   };
