@@ -6,6 +6,7 @@ import * as R from "fp-ts/ReadonlyRecord";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
+import { highlight } from "cli-highlight";
 import { pipe, is, as, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import type { JSXElement } from "juno-ast";
@@ -17,7 +18,42 @@ export function transformJsxClient(input: string, id: string) {
     pipe(
       fn,
       A.map(fn => {
+        const hasJsxReturn = pipe(
+          fn,
+          findAllByType("ReturnStatement"),
+          A.some(returnStatement => {
+            return pipe(returnStatement, findAllByType("JSXElement"), A.isNonEmpty);
+          })
+        );
+
+        if (!hasJsxReturn) {
+          return fn;
+        }
+
         const componentId = shortHash(`${id.slice(-16)}:${fn.start}:${fn.end}`);
+
+        const x = b.ExpressionStatement(
+          b.AssignmentExpression(
+            b.StaticMemberExpression(
+              b.StaticMemberExpression(b.identName("window"), "JUNO_COMPONENTS"),
+              "_" + componentId
+            ),
+            // @ts-expect-error wip
+            b.identName(fn.id?.name)
+          )
+        );
+
+        program.body.push(x);
+
+        try {
+          highlight(print(x, tsx()).code, { language: "tsx" });
+        } catch (error) {
+          console.error("Error highlighting code:", error);
+          //console.dir(x, { depth: null });
+          console.log(fn.type);
+          console.log(highlight(print(fn, tsx()).code, { language: "tsx" }));
+        }
+
         return fn;
       }),
       A.flatMap(findAllByTypeShallow("ReturnStatement")),

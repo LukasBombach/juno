@@ -1,3 +1,11 @@
+declare global {
+  interface Window {
+    JUNO_COMPONENTS: Record<string, Function>;
+  }
+}
+
+window.JUNO_COMPONENTS = {};
+
 export default (element: HTMLElement) =>
   async (
     Component: any,

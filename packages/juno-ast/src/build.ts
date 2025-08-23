@@ -73,6 +73,14 @@ export const build = {
     computed: false,
     ...span,
   }),
+  ObjectExpression: (properties: Record<string, t.Expression | undefined>): t.ObjectExpression => ({
+    type: "ObjectExpression",
+    properties: Object.entries(properties)
+      .map(([key, value]) => [key, value])
+      .filter((e): e is [string, t.Expression] => e[1] !== undefined)
+      .map(([key, value]) => b.prop(key, value)),
+    ...span,
+  }),
 };
 
 /**
