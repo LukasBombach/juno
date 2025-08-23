@@ -7,16 +7,16 @@ import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 // import { highlight } from "cli-highlight";
 // import c from "chalk";
-import { pipe, is, as, b } from "juno-ast";
+import { pipe, is, as, b, matches } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
-import type { JSXElement } from "juno-ast";
+import type { JSXElement, NodeOfType } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
   const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "js" });
 
   // console.log("\n" + c.blue("[ssr]") + " " + c.greenBright(id) + "\n");
 
-  pipe(
+  /*   pipe(
     program,
     findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
     A.flatMap(findAllByTypeShallow("ReturnStatement")),
@@ -27,6 +27,12 @@ export function transformJsxServer(input: string, id: string) {
         A.map(jsxRoot => addComponentId(jsxRoot, id))
       );
     })
+  ); */
+
+  pipe(
+    program,
+    findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
+    A.map(fn => addComponentId(fn, id))
   );
 
   const { code, map } = print(program, tsx(), { indent: "  " });
@@ -36,42 +42,73 @@ export function transformJsxServer(input: string, id: string) {
   return { code, map };
 }
 
-function addComponentId(jsxRoot: JSXElement, filename: string) {
-  const shouldBeHydrated = pipe(
-    jsxRoot,
-    findAllByType("JSXElement"),
-    A.some(el =>
-      pipe(
-        el.openingElement,
-        findAllByType("JSXAttribute"),
-        A.filter(attr => {
-          const name = as.JSXIdentifier(attr.name)?.name;
-          return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
-        }),
-        A.reduce(0, (len, attr) => {
-          const name = as.JSXIdentifier(attr.name)?.name;
-          const value = pipe(
-            attr,
-            O.fromNullableK(findFirstByType("JSXExpressionContainer")),
-            O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
-            O.toUndefined
-          );
-          return name && value ? len + 1 : len;
-        }),
-        len => len > 0
+function addComponentId(
+  fn: NodeOfType<"FunctionDeclaration" | "FunctionExpression" | "ArrowFunctionExpression">,
+  filename: string
+) {
+  const shouldBeHydrated =
+    pipe(
+      fn,
+      findAllByType("JSXElement"),
+      A.some(el =>
+        pipe(
+          el.openingElement,
+          findAllByType("JSXAttribute"),
+          A.filter(attr => {
+            const name = as.JSXIdentifier(attr.name)?.name;
+            return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
+          }),
+          A.reduce(0, (len, attr) => {
+            const name = as.JSXIdentifier(attr.name)?.name;
+            const value = pipe(
+              attr,
+              O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+              O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
+              O.toUndefined
+            );
+            return name && value ? len + 1 : len;
+          }),
+          len => len > 0
+        )
       )
-    )
-  );
+    ) ||
+    pipe(
+      fn,
+      findAllByType("BinaryExpression"),
+      A.some(node => {
+        const typeofWindow = {
+          type: "UnaryExpression",
+          operator: "typeof",
+          argument: {
+            type: "Identifier",
+            name: "window",
+          },
+        };
+
+        const undef = {
+          type: "Literal",
+          value: "undefined",
+        };
+        return (
+          [node.left, node.right].some(el => matches(typeofWindow)(el)) &&
+          [node.left, node.right].some(el => matches(undef)(el))
+        );
+      })
+    );
 
   if (shouldBeHydrated) {
-    if (shouldBeHydrated) {
-      jsxRoot.openingElement.attributes.unshift(
-        b.jsxAttr(
-          "data-juno-id",
-          shortHash(`${filename.slice(-16)}:${jsxRoot.openingElement.start}:${jsxRoot.openingElement.end}`)
+    pipe(
+      fn,
+      findAllByTypeShallow("JSXElement"),
+      A.map(jsxRoot =>
+        jsxRoot.openingElement.attributes.unshift(
+          b.jsxAttr(
+            "data-component-id",
+            shortHash(`${filename.slice(-16)}:${jsxRoot.openingElement.start}:${jsxRoot.openingElement.end}`)
+          )
         )
-      );
-    }
+      )
+    );
   }
 }
 
