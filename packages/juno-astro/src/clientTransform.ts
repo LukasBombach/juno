@@ -13,28 +13,33 @@ import type { JSXElement } from "juno-ast";
 export function transformJsxClient(input: string, id: string) {
   const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "js" });
 
-  pipe(
-    program,
-    findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
-    A.flatMap(findAllByTypeShallow("ReturnStatement")),
-    A.map(returnStatement => {
-      pipe(
-        returnStatement,
-        findAllByTypeShallow("JSXElement"),
-        A.map(jsxRoot => {
-          const parent = findParent(jsxRoot, returnStatement);
-          const hydration = createHydration(jsxRoot, id);
+  pipe(program, findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"), fn => {
+    pipe(
+      fn,
+      A.map(fn => {
+        const componentId = shortHash(`${id.slice(-16)}:${fn.start}:${fn.end}`);
+        return fn;
+      }),
+      A.flatMap(findAllByTypeShallow("ReturnStatement")),
+      A.map(returnStatement => {
+        pipe(
+          returnStatement,
+          findAllByTypeShallow("JSXElement"),
+          A.map(jsxRoot => {
+            const parent = findParent(jsxRoot, returnStatement);
+            const hydration = createHydration(jsxRoot, id);
 
-          if (!parent) {
-            console.warn("No parent found for JSX root in", id);
-            return;
-          }
+            if (!parent) {
+              console.warn("No parent found for JSX root in", id);
+              return;
+            }
 
-          replaceChild(parent, hydration, jsxRoot);
-        })
-      );
-    })
-  );
+            replaceChild(parent, hydration, jsxRoot);
+          })
+        );
+      })
+    );
+  });
 
   return print(program, tsx(), { indent: "  " });
 }
@@ -83,4 +88,8 @@ function createHydration(jsxRoot: JSXElement, filename: string) {
 
 function astId(filename: string, loc: number, length = 4): string {
   return createHash("md5").update(`${filename}${loc}`).digest("hex").substring(0, length);
+}
+
+function shortHash(input: string, length = 5): string {
+  return createHash("md5").update(input).digest("hex").substring(0, length);
 }

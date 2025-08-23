@@ -81,10 +81,7 @@ function addComponentId(
       findAllByTypeShallow("JSXElement"),
       A.map(jsxRoot =>
         jsxRoot.openingElement.attributes.unshift(
-          b.jsxAttr(
-            "data-component-id",
-            shortHash(`${filename.slice(-16)}:${jsxRoot.openingElement.start}:${jsxRoot.openingElement.end}`)
-          )
+          b.jsxAttr("data-component-id", shortHash(`${filename.slice(-16)}:${fn.start}:${fn.end}`))
         )
       )
     );
