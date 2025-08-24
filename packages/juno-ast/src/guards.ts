@@ -6,6 +6,7 @@ export const is = {
   BinaryExpression: (node: MaybeNode): node is t.BinaryExpression => node?.type === "BinaryExpression",
   UnaryExpression: (node: MaybeNode): node is t.UnaryExpression => node?.type === "UnaryExpression",
   Node: (value: unknown): value is t.Node => typeof value === "object" && value !== null && "type" in value,
+  JSXAttribute: (node: MaybeNode): node is t.JSXAttribute => node?.type === "JSXAttribute",
   JSXElement: (node: MaybeNode): node is t.JSXElement => node?.type === "JSXElement",
   JSXIdentifier: (node: MaybeNode): node is t.JSXIdentifier => node?.type === "JSXIdentifier",
   JSXEmptyExpression: (node: MaybeNode): node is t.JSXEmptyExpression => node?.type === "JSXEmptyExpression",

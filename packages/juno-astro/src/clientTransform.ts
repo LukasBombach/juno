@@ -35,12 +35,9 @@ export function transformJsxClient(input: string, id: string) {
 
         const x = b.ExpressionStatement(
           b.AssignmentExpression(
-            b.StaticMemberExpression(
-              b.StaticMemberExpression(b.identName("window"), "JUNO_COMPONENTS"),
-              "_" + componentId
-            ),
+            b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), "_" + componentId),
             // @ts-expect-error wip
-            b.identName(fn.id?.name)
+            b.ident(fn.id?.name)
           )
         );
 
@@ -92,7 +89,7 @@ function createHydration(jsxRoot: JSXElement, filename: string) {
         O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
         O.map(identifier => identifier.name),
         O.filter(name => Boolean(name.match(/^[A-Z]/))),
-        O.map(name => b.identName(name)),
+        O.map(name => b.ident(name)),
         O.toUndefined
       );
 
@@ -108,7 +105,7 @@ function createHydration(jsxRoot: JSXElement, filename: string) {
           const value = pipe(
             attr,
             O.fromNullableK(findFirstByType("JSXExpressionContainer")),
-            O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
+            O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
             O.toUndefined
           );
           return name && value ? O.some([name, value] as const) : O.none;

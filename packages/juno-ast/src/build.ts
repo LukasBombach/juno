@@ -19,14 +19,14 @@ export const build = {
   prop: (key: string, value: t.Expression): t.ObjectProperty => ({
     type: "Property",
     kind: "init",
-    key: b.identName(key),
+    key: b.ident(key),
     value,
     method: false,
     shorthand: false,
     computed: false,
     ...span,
   }),
-  identName: (name: string): t.IdentifierName => ({
+  ident: (name: string): t.IdentifierName => ({
     type: "Identifier",
     name,
     ...span,
@@ -43,14 +43,15 @@ export const build = {
     raw: JSON.stringify(value),
     ...span,
   }),
-  jsxAttr: (name: string, value: string): t.JSXAttribute => ({
+  jsxAttr: (name: string, value: string | t.Expression): t.JSXAttribute => ({
     type: "JSXAttribute",
     name: {
       type: "JSXIdentifier",
       name,
       ...span,
     },
-    value: b.literal(value),
+    value:
+      typeof value === "string" ? b.literal(value) : { type: "JSXExpressionContainer", expression: value, ...span },
     ...span,
   }),
   ExpressionStatement: (expression: t.Expression): t.ExpressionStatement => ({
@@ -65,20 +66,19 @@ export const build = {
     right,
     ...span,
   }),
-  StaticMemberExpression: (object: t.Expression, property: string): t.StaticMemberExpression => ({
+  MemberExpression: (object: t.Expression, property: string): t.StaticMemberExpression => ({
     type: "MemberExpression",
     object,
-    property: b.identName(property),
+    property: b.ident(property),
     optional: false,
     computed: false,
     ...span,
   }),
-  ObjectExpression: (properties: Record<string, t.Expression | undefined>): t.ObjectExpression => ({
-    type: "ObjectExpression",
-    properties: Object.entries(properties)
-      .map(([key, value]) => [key, value])
-      .filter((e): e is [string, t.Expression] => e[1] !== undefined)
-      .map(([key, value]) => b.prop(key, value)),
+  CallExpression: (callee: t.Expression, args: t.Expression[]): t.CallExpression => ({
+    type: "CallExpression",
+    callee,
+    arguments: args,
+    optional: false,
     ...span,
   }),
 };

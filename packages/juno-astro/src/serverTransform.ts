@@ -42,7 +42,7 @@ function addComponentId(
             const value = pipe(
               attr,
               O.fromNullableK(findFirstByType("JSXExpressionContainer")),
-              O.map(v => (is.JSXEmptyExpression(v.expression) ? b.identName("undefined") : v.expression)),
+              O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
               O.toUndefined
             );
             return name && value ? len + 1 : len;
@@ -84,6 +84,37 @@ function addComponentId(
         //   `server ${filename.slice(-16)}:${fn.start}:${fn.end}`,
         //   shortHash(`${filename.slice(-16)}:${fn.start}:${fn.end}`)
         // );
+
+        // console.dir(jsxRoot.openingElement.attributes, { depth: null });
+
+        const props = pipe(
+          jsxRoot.openingElement.attributes,
+          A.filter(is.JSXAttribute),
+          A.filter(attr => attr.value?.type === "JSXExpressionContainer"),
+          A.map(
+            attr =>
+              [
+                (attr.name as NodeOfType<"JSXIdentifier">).name,
+                (attr.value as NodeOfType<"JSXExpressionContainer">).expression,
+              ] as const
+          ),
+          // @ts-expect-error wip
+          entries => b.object(Object.fromEntries(entries))
+        );
+
+        /* jsxRoot.openingElement.attributes.unshift(
+          b.jsxAttr(
+            "data-component-props",
+            b.CallExpression(
+              b.MemberExpression(
+                b.CallExpression(b.MemberExpression(b.ident("JSON"), "stringify"), [props]),
+                "replaceAll"
+              ),
+              [b.literal('"'), b.literal("&quot;")]
+            )
+          )
+        ); */
+
         jsxRoot.openingElement.attributes.unshift(
           b.jsxAttr("data-component-id", "_" + shortHash(`${filename.slice(-16)}:${fn.start}:${fn.end}`))
         );
