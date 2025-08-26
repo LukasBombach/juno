@@ -7,7 +7,7 @@ import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, b, matches } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
-import type { NodeOfType } from "juno-ast";
+import type { NodeOfType, JSXElement } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
   const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "js" });
@@ -16,6 +16,21 @@ export function transformJsxServer(input: string, id: string) {
     program,
     findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
     A.map(fn => addComponentId(fn, id))
+  );
+
+  pipe(
+    program,
+    findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
+    A.flatMap(findAllByTypeShallow("ReturnStatement")),
+    A.map(returnStatement => {
+      pipe(
+        returnStatement,
+        findAllByTypeShallow("JSXElement"),
+        A.map(jsxRoot => {
+          addHydrationIds(jsxRoot, id);
+        })
+      );
+    })
   );
 
   return print(program, tsx(), { indent: "  " });
@@ -121,6 +136,46 @@ function addComponentId(
       })
     );
   }
+}
+
+function addHydrationIds(jsxRoot: JSXElement, filename: string) {
+  pipe(
+    jsxRoot,
+    findAllByType("JSXElement"),
+    A.map(el => {
+      const shouldBeHydrated =
+        as.JSXIdentifier(el.openingElement.name)?.name.match(/^[A-Z]/) ||
+        pipe(
+          el.openingElement,
+          findAllByType("JSXAttribute"),
+          A.filter(attr => {
+            const name = as.JSXIdentifier(attr.name)?.name;
+            return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
+          }),
+          A.reduce(0, (len, attr) => {
+            const name = as.JSXIdentifier(attr.name)?.name;
+            const value = pipe(
+              attr,
+              O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+              O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
+              O.toUndefined
+            );
+            return name && value ? len + 1 : len;
+          }),
+          len => len > 0
+        );
+
+      if (shouldBeHydrated) {
+        el.openingElement.attributes.unshift(
+          b.jsxAttr("data-element-id", astId(filename, el.openingElement.start, el.openingElement.end))
+        );
+      }
+    })
+  );
+}
+
+function astId(filename: string, start: number, end: number): string {
+  return shortHash(`${filename.slice(-16)}:${start}:${end}`);
 }
 
 function shortHash(input: string, length = 5): string {
