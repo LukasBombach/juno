@@ -20,13 +20,7 @@ export function Demo() {
         </a>
       </nav>
       <section className="p-5 py-7 bg-editor-light text-neutral-800 dark:bg-editor-dark dark:text-neutral-100">
-        {randomNumbers().map(num =>
-          num % 2 === 0 ? (
-            <ClientCode className="text-gray-950" num={num} />
-          ) : (
-            <pre className="text-gray-400">/* ssr only */</pre>
-          )
-        )}
+        <Editor />
       </section>
     </div>
   );

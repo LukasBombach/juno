@@ -25,7 +25,7 @@ function addComponentId(
   fn: NodeOfType<"FunctionDeclaration" | "FunctionExpression" | "ArrowFunctionExpression">,
   filename: string
 ) {
-  const shouldBeHydrated =
+  const componentShouldBeHydrated =
     pipe(
       fn,
       findAllByType("JSXElement"),
@@ -75,7 +75,7 @@ function addComponentId(
       })
     );
 
-  if (shouldBeHydrated) {
+  if (componentShouldBeHydrated) {
     pipe(
       fn,
       findAllByTypeShallow("JSXElement"),
