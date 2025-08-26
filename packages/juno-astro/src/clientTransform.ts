@@ -83,7 +83,7 @@ function createHydration(jsxRoot: JSXElement, filename: string) {
     jsxRoot,
     findAllByType("JSXElement"),
     A.filterMap(el => {
-      const id = pipe(astId(filename, el), b.literal);
+      const id = pipe(astId(filename, el.openingElement), b.literal);
 
       const component = pipe(
         O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
