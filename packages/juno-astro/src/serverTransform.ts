@@ -1,5 +1,4 @@
 import { basename } from "node:path";
-import { createHash } from "node:crypto";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
@@ -7,6 +6,7 @@ import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, b, matches } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
+import { astId } from "./sharedTransform";
 import type { NodeOfType, JSXElement } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
@@ -130,9 +130,7 @@ function addComponentId(
           )
         ); */
 
-        jsxRoot.openingElement.attributes.unshift(
-          b.jsxAttr("data-component-id", "_" + shortHash(`${filename.slice(-16)}:${fn.start}:${fn.end}`))
-        );
+        jsxRoot.openingElement.attributes.unshift(b.jsxAttr("data-component-id", astId(filename, fn)));
       })
     );
   }
@@ -166,18 +164,8 @@ function addHydrationIds(jsxRoot: JSXElement, filename: string) {
         );
 
       if (shouldBeHydrated) {
-        el.openingElement.attributes.unshift(
-          b.jsxAttr("data-element-id", astId(filename, el.openingElement.start, el.openingElement.end))
-        );
+        el.openingElement.attributes.unshift(b.jsxAttr("data-element-id", astId(filename, el.openingElement)));
       }
     })
   );
-}
-
-function astId(filename: string, start: number, end: number): string {
-  return shortHash(`${filename.slice(-16)}:${start}:${end}`);
-}
-
-function shortHash(input: string, length = 5): string {
-  return createHash("md5").update(input).digest("hex").substring(0, length);
 }

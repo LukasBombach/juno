@@ -20,7 +20,7 @@ export default (element: HTMLElement) =>
     console.log(...componentRoots);
 
     for (const root of componentRoots) {
-      const id = root.getAttribute("data-component-id");
+      const id = "_" + root.getAttribute("data-component-id");
       if (id && window.JUNO_COMPONENTS[id]) {
         const Comp = window.JUNO_COMPONENTS[id];
         const comp = await Comp({ ...props, children, ...slotted });
