@@ -1,9 +1,66 @@
 import { createHash } from "node:crypto";
-import { Node } from "juno-ast";
+import * as A from "fp-ts/Array";
+import * as O from "fp-ts/Option";
+import { is, as, b } from "juno-ast";
+import { pipe, matches, findAllByType, findFirstByType, type Node } from "juno-ast";
 
 export function astId(filename: string, node: Node): string {
   return createHash("md5")
     .update(`${filename.slice(-16)}:${node.start}:${node.end}`)
     .digest("hex")
     .substring(0, 5);
+}
+
+export function containsWindowDefinedCheck(fn: Node): boolean {
+  return pipe(
+    fn,
+    findAllByType("BinaryExpression"),
+    A.some(node => {
+      const typeofWindow = {
+        type: "UnaryExpression",
+        operator: "typeof",
+        argument: {
+          type: "Identifier",
+          name: "window",
+        },
+      };
+
+      const undef = {
+        type: "Literal",
+        value: "undefined",
+      };
+      return (
+        [node.left, node.right].some(el => matches(typeofWindow)(el)) &&
+        [node.left, node.right].some(el => matches(undef)(el))
+      );
+    })
+  );
+}
+
+export function containsInteractiveJsx(fn: Node): boolean {
+  return pipe(
+    fn,
+    findAllByType("JSXElement"),
+    A.some(el =>
+      pipe(
+        el.openingElement,
+        findAllByType("JSXAttribute"),
+        A.filter(attr => {
+          const name = as.JSXIdentifier(attr.name)?.name;
+          return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
+        }),
+        A.reduce(0, (len, attr) => {
+          const name = as.JSXIdentifier(attr.name)?.name;
+          const value = pipe(
+            attr,
+            O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+            O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
+            O.toUndefined
+          );
+          return name && value ? len + 1 : len;
+        }),
+        len => len > 0
+      )
+    )
+  );
 }

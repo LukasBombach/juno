@@ -4,9 +4,9 @@ import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
-import { pipe, is, as, b, matches } from "juno-ast";
+import { pipe, is, as, b } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
-import { astId } from "./sharedTransform";
+import { astId, containsInteractiveJsx, containsWindowDefinedCheck } from "./sharedTransform";
 import type { NodeOfType, JSXElement } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
@@ -40,68 +40,14 @@ function addComponentId(
   fn: NodeOfType<"FunctionDeclaration" | "FunctionExpression" | "ArrowFunctionExpression">,
   filename: string
 ) {
-  const componentShouldBeHydrated =
-    pipe(
-      fn,
-      findAllByType("JSXElement"),
-      A.some(el =>
-        pipe(
-          el.openingElement,
-          findAllByType("JSXAttribute"),
-          A.filter(attr => {
-            const name = as.JSXIdentifier(attr.name)?.name;
-            return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
-          }),
-          A.reduce(0, (len, attr) => {
-            const name = as.JSXIdentifier(attr.name)?.name;
-            const value = pipe(
-              attr,
-              O.fromNullableK(findFirstByType("JSXExpressionContainer")),
-              O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
-              O.toUndefined
-            );
-            return name && value ? len + 1 : len;
-          }),
-          len => len > 0
-        )
-      )
-    ) ||
-    pipe(
-      fn,
-      findAllByType("BinaryExpression"),
-      A.some(node => {
-        const typeofWindow = {
-          type: "UnaryExpression",
-          operator: "typeof",
-          argument: {
-            type: "Identifier",
-            name: "window",
-          },
-        };
-
-        const undef = {
-          type: "Literal",
-          value: "undefined",
-        };
-        return (
-          [node.left, node.right].some(el => matches(typeofWindow)(el)) &&
-          [node.left, node.right].some(el => matches(undef)(el))
-        );
-      })
-    );
+  const componentShouldBeHydrated = containsInteractiveJsx(fn) || containsWindowDefinedCheck(fn);
 
   if (componentShouldBeHydrated) {
     pipe(
       fn,
       findAllByTypeShallow("JSXElement"),
       A.map(jsxRoot => {
-        // console.log(
-        //   `server ${filename.slice(-16)}:${fn.start}:${fn.end}`,
-        //   shortHash(`${filename.slice(-16)}:${fn.start}:${fn.end}`)
-        // );
-
-        // console.dir(jsxRoot.openingElement.attributes, { depth: null });
-
+        /*
         const props = pipe(
           jsxRoot.openingElement.attributes,
           A.filter(is.JSXAttribute),
@@ -113,11 +59,11 @@ function addComponentId(
                 (attr.value as NodeOfType<"JSXExpressionContainer">).expression,
               ] as const
           ),
-          // @ts-expect-error wip
+          // @ ts-expect-error wip
           entries => b.object(Object.fromEntries(entries))
         );
 
-        /* jsxRoot.openingElement.attributes.unshift(
+        jsxRoot.openingElement.attributes.unshift(
           b.jsxAttr(
             "data-component-props",
             b.CallExpression(
