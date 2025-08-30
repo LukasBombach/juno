@@ -30,7 +30,13 @@ export function Editor({ value, className }: { value?: string; className?: strin
 
   // return [{ path: [1], ref: (el: HTMLElement) => container.set(el) }];
   return (
-    <code className={className} ref={el => container.set(el)}>
+    <code
+      className={className}
+      ref={el => {
+        console.log("Editor", "got ref", el);
+        container.set(el);
+      }}
+    >
       {value}
     </code>
   );

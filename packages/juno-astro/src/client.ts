@@ -6,6 +6,11 @@ declare global {
 
 window.JUNO_COMPONENTS = {};
 
+interface Hydration {
+  id: string;
+  ref?: (el: Element) => void;
+}
+
 export default (element: HTMLElement) =>
   async (
     Component: any,
@@ -23,8 +28,16 @@ export default (element: HTMLElement) =>
       const id = "_" + root.getAttribute("data-component-id");
       if (id && window.JUNO_COMPONENTS[id]) {
         const Comp = window.JUNO_COMPONENTS[id];
-        const comp = await Comp({ ...props, children, ...slotted });
-        console.log(comp);
+        const hydrations: Hydration[] = await Comp({ ...props, children, ...slotted });
+        console.log(...hydrations);
+
+        for (const h of hydrations) {
+          const el =
+            root.getAttribute("data-element-id") === h.id ? root : root.querySelector(`[data-element-id="${h.id}"]`);
+          if (el && h.ref) {
+            h.ref(el);
+          }
+        }
       } else {
         console.warn("No component found for id", id, window.JUNO_COMPONENTS, root);
       }
