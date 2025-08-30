@@ -1,0 +1,19 @@
+{
+  "name": "juno-ast",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "chalk": "5.5.0",
+    "cli-highlight": "2.1.11",
+    "esrap": "2.1.0",
+    "fp-ts": "2.16.10",
+    "lodash": "4.17.21",
+    "oxc-parser": "0.81.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "4.17.20"
+  }
+}

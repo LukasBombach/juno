@@ -1,0 +1,18 @@
+import { defineConfig } from "astro/config";
+import tailwindcss from "@tailwindcss/vite";
+import ViteRestart from "vite-plugin-restart";
+import Inspect from "vite-plugin-inspect";
+import juno from "juno-astro";
+
+export default defineConfig({
+  vite: {
+    plugins: [
+      tailwindcss(),
+      ViteRestart({
+        restart: ["../../packages/juno-astro/src/**/*.ts", "../../packages/juno-ast/src/**/*.ts"],
+      }),
+      Inspect(),
+    ],
+  },
+  integrations: [juno()],
+});

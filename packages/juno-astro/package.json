@@ -1,0 +1,31 @@
+{
+  "name": "juno-astro",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server.ts": "./src/server.ts",
+    "./client.ts": "./src/client.ts",
+    "./jsx-runtime": "./src/jsxRuntime.ts",
+    "./jsx-dev-runtime": "./src/jsxRuntime.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup src/*.ts --dts --clean --format esm"
+  },
+  "dependencies": {
+    "chalk": "5.5.0",
+    "esrap": "2.1.0",
+    "fp-ts": "2.16.10",
+    "juno-ast": "file:../juno-ast",
+    "oxc-parser": "0.81.0"
+  },
+  "devDependencies": {
+    "astro": "5.12.0",
+    "cli-highlight": "2.1.11",
+    "tsup": "8.5.0",
+    "typescript": "5.6.2"
+  }
+}
