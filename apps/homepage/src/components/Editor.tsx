@@ -11,7 +11,14 @@ type MonacoEditor = any;
   className?: string;
 }> = ({ value, className }) => { */
 
-export function Editor({ value, className }: { value?: string; className?: string }) {
+const counterCode = `let count = 0;
+
+const increment = () => {
+  count++;
+  console.log('Counter:', count);
+};`;
+
+export function Editor({ value = counterCode, className }: { value?: string; className?: string }) {
   const monaco = signal<{ createEditor: any /* typeof createEditor */ } | null>(null);
   const container = signal<HTMLElement | null>(null);
   const editor = signal<MonacoEditor | null>(null);
@@ -28,16 +35,5 @@ export function Editor({ value, className }: { value?: string; className?: strin
     return () => editor()?.dispose();
   });
 
-  // return [{ path: [1], ref: (el: HTMLElement) => container.set(el) }];
-  return (
-    <code
-      className={className}
-      ref={el => {
-        console.log("Editor", "got ref", el);
-        container.set(el);
-      }}
-    >
-      {value}
-    </code>
-  );
+  return <code className={className} ref={el => container.set(el)} />;
 }
