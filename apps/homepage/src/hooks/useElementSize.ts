@@ -1,4 +1,4 @@
-import { useRef, useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 import type { RefObject } from "react";
 
 export function useElementSize<T extends HTMLElement>(ref: RefObject<T | null>) {

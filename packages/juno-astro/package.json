@@ -19,10 +19,12 @@
     "chalk": "5.5.0",
     "esrap": "2.1.0",
     "fp-ts": "2.16.10",
-    "juno-ast": "file:../juno-ast",
-    "oxc-parser": "0.81.0"
+    "oxc-parser": "0.86.0",
+    "juno-ast": "file:../juno-ast"
   },
   "devDependencies": {
+    "@sveltejs/acorn-typescript": "1.0.5",
+    "acorn": "8.15.0",
     "astro": "5.12.0",
     "cli-highlight": "2.1.11",
     "tsup": "8.5.0",

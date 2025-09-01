@@ -10,7 +10,7 @@ import { astId, containsInteractiveJsx, containsWindowDefinedCheck } from "./sha
 import type { NodeOfType, JSXElement } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
-  const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "js" });
+  const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
   pipe(
     program,
