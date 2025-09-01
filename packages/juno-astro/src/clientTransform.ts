@@ -12,7 +12,7 @@ import { astId } from "./sharedTransform";
 import type { JSXElement } from "juno-ast";
 
 export function transformJsxClient(input: string, id: string) {
-  const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "js" });
+  const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
   pipe(program, findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"), fn => {
     pipe(

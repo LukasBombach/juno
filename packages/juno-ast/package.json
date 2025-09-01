@@ -11,7 +11,7 @@
     "esrap": "2.1.0",
     "fp-ts": "2.16.10",
     "lodash": "4.17.21",
-    "oxc-parser": "0.81.0"
+    "oxc-parser": "0.86.0"
   },
   "devDependencies": {
     "@types/lodash": "4.17.20"

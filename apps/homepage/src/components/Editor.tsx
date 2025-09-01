@@ -1,15 +1,10 @@
 import { signal, effect } from "@maverick-js/signals";
-// import type { MonacoEditor, createEditor } from "./monacoEditor";
+import type { MonacoEditor, createEditor } from "./monacoEditor";
 
-/**
- * esrap remove type from imports so the actual file will be imported during ssr
- */
-type MonacoEditor = any;
-
-/* export const Editor: React.FC<{
+type Props = {
   value?: string;
   className?: string;
-}> = ({ value, className }) => { */
+};
 
 const counterCode = `let count = 0;
 
@@ -25,8 +20,8 @@ const getColorScheme = (): "dark" | "light" => {
   return "light";
 };
 
-export function Editor({ value = counterCode, className }: { value?: string; className?: string }) {
-  const monaco = signal<{ createEditor: any /* typeof createEditor */ } | null>(null);
+export function Editor({ value = counterCode, className }: Props) {
+  const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
   const container = signal<HTMLElement | null>(null);
   const editor = signal<MonacoEditor | null>(null);
 
