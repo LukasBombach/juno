@@ -1,6 +1,6 @@
 import { Editor } from "./Editor";
 
-export function Demo() {
+export function Playground() {
   return (
     <div className="row-start-2 -row-end-2 -col-start-3 -col-end-2 rounded-xl shadow-window grid grid-rows-1 grid-cols-[minmax(200px,14%)_1fr] overflow-hidden">
       <nav className="p-5 py-7 flex flex-col gap-2 bg-neutral-200/80 border-r-1 border-r-neutral-950/10 ">
