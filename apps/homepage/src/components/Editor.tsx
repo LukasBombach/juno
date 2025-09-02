@@ -15,8 +15,8 @@ const increment = () => {
 
 export function Editor({ value = counterCode, className }: Props) {
   const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
-  const container = signal<HTMLElement | null>(null);
   const editor = signal<MonacoEditor | null>(null);
+  const container = signal<HTMLElement | null>(null);
 
   if (typeof window !== "undefined") {
     import("./monacoEditor").then(({ setupMonaco, createEditor }) => {
