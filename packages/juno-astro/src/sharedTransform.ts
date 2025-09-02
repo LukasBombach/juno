@@ -25,13 +25,20 @@ export function containsWindowDefinedCheck(fn: Node): boolean {
         },
       };
 
+      const def = {
+        type: "Literal",
+        value: "defined",
+      };
+
       const undef = {
         type: "Literal",
         value: "undefined",
       };
+
       return (
         [node.left, node.right].some(el => matches(typeofWindow)(el)) &&
-        [node.left, node.right].some(el => matches(undef)(el))
+        ((["!=", "!=="].includes(node.operator) && [node.left, node.right].some(el => matches(undef)(el))) ||
+          (["==", "==="].includes(node.operator) && [node.left, node.right].some(el => matches(def)(el))))
       );
     })
   );

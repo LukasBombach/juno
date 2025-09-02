@@ -18,7 +18,7 @@ export function Editor({ value = counterCode, className }: Props) {
   const editor = signal<MonacoEditor | null>(null);
   const container = signal<HTMLElement | null>(null);
 
-  if (typeof window !== "undefined") {
+  if (typeof window === "object") {
     import("./monacoEditor").then(({ setupMonaco, createEditor }) => {
       setupMonaco();
       monaco.set({ createEditor });
