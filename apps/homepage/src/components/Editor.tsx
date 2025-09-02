@@ -13,19 +13,10 @@ const increment = () => {
   console.log('Counter:', count);
 };`;
 
-const getColorScheme = (): "dark" | "light" => {
-  if (typeof window !== "undefined") {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-  return "light";
-};
-
 export function Editor({ value = counterCode, className }: Props) {
   const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
   const container = signal<HTMLElement | null>(null);
   const editor = signal<MonacoEditor | null>(null);
-
-  const theme = getColorScheme() === "dark" ? "GitHubDark" : "GitHubLight";
 
   if (typeof window !== "undefined") {
     import("./monacoEditor").then(({ setupMonaco, createEditor }) => {
@@ -35,7 +26,7 @@ export function Editor({ value = counterCode, className }: Props) {
   }
 
   effect(() => {
-    editor.set(monaco()?.createEditor(container(), { value, theme }) ?? null);
+    editor.set(monaco()?.createEditor(container(), { value }) ?? null);
     return () => editor()?.dispose();
   });
 

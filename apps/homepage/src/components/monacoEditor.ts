@@ -51,5 +51,14 @@ export function setupMonaco() {
 }
 
 export function createEditor(el: HTMLElement | null, options?: MonacoOptions): MonacoEditor | null {
-  return el ? create(el, { ...defaultOptions, ...options }) : null;
+  const colorPrefs = window.matchMedia("(prefers-color-scheme: dark)");
+  const theme = colorPrefs.matches ? "GitHubDark" : "GitHubLight";
+
+  const editor = el ? create(el, { ...defaultOptions, theme, ...options }) : null;
+
+  colorPrefs.addEventListener("change", e => {
+    editor?.updateOptions({ theme: e.matches ? "GitHubDark" : "GitHubLight" });
+  });
+
+  return editor;
 }
