@@ -93,6 +93,8 @@ function createHydration(jsxRoot: JSXElement, filename: string) {
         O.toUndefined
       );
 
+      const isComponent = Boolean(component);
+
       const attrs = pipe(
         el.openingElement,
         findAllByType("JSXAttribute"),
@@ -113,7 +115,7 @@ function createHydration(jsxRoot: JSXElement, filename: string) {
         A.match(() => undefined, R.fromEntries)
       );
 
-      return component || attrs ? O.some(b.object({ id, component, ...attrs })) : O.none;
+      return isComponent || attrs ? O.some(b.object({ id, component, ...attrs })) : O.none;
     })
   );
 
