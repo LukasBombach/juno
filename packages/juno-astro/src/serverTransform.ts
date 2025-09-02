@@ -22,15 +22,8 @@ export function transformJsxServer(input: string, id: string) {
     program,
     findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
     A.flatMap(findAllByTypeShallow("ReturnStatement")),
-    A.map(returnStatement => {
-      pipe(
-        returnStatement,
-        findAllByTypeShallow("JSXElement"),
-        A.map(jsxRoot => {
-          addHydrationIds(jsxRoot, id);
-        })
-      );
-    })
+    A.flatMap(findAllByTypeShallow("JSXElement")),
+    A.map(jsxRoot => addHydrationIds(jsxRoot, id))
   );
 
   return print(program, tsx(), { indent: "  " });
