@@ -8,13 +8,13 @@ import tsx from "esrap/languages/tsx";
 import { highlight } from "cli-highlight";
 import { pipe, is, as, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import { astId } from "./sharedTransform";
+import { astId, findComponents } from "./sharedTransform";
 import type { JSXElement } from "juno-ast";
 
 export function transformJsxClient(input: string, id: string) {
   const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
-  pipe(program, findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"), fn => {
+  pipe(program, findComponents, fn => {
     pipe(
       fn,
       A.map(fn => {
