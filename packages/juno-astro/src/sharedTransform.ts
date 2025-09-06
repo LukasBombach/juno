@@ -5,13 +5,32 @@ import { highlight } from "cli-highlight";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import { is, as, b } from "juno-ast";
-import { pipe, matches, findAllByType, findFirstByType, type Node } from "juno-ast";
+import { pipe, matches, findAllByType, findFirstByType, findAllByTypeWithParents } from "juno-ast";
+import { contains } from "juno-ast";
+import type { Node, NodeOfType } from "juno-ast";
 
 export function astId(filename: string, node: Node): string {
   return createHash("md5")
     .update(`${filename.slice(-16)}:${node.start}:${node.end}`)
     .digest("hex")
     .substring(0, 5);
+}
+
+export function findComponents(
+  root: Node
+): NodeOfType<"FunctionDeclaration" | "FunctionExpression" | "ArrowFunctionExpression">[] {
+  return pipe(
+    root,
+    findAllByTypeWithParents("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
+    A.filter(([fn, parents]) => {
+      // 1.  should contain (actually return) a jsx element, so it's a component
+      // 2.  but sometimes we have {arr.map(x => <JSXElement />)} inside others jsx,
+      //     so we don't want to return these inner functions.
+      // 2a. the outer function will already be returned.
+      return pipe(fn, contains("JSXElement")) && !parents.some(p => is.JSXElement(p));
+    }),
+    A.map(([fn]) => fn)
+  );
 }
 
 export function containsWindowDefinedCheck(fn: Node): boolean {

@@ -7,7 +7,7 @@ import tsx from "esrap/languages/tsx";
 import { pipe, is, as, b } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
 import { astId, containsInteractiveJsx, containsWindowDefinedCheck } from "./sharedTransform";
-import { printHighlighted } from "./sharedTransform";
+import { findComponents } from "./sharedTransform";
 import type { NodeOfType, JSXElement } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
@@ -15,13 +15,13 @@ export function transformJsxServer(input: string, id: string) {
 
   pipe(
     program,
-    findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
+    findComponents,
     A.map(fn => addComponentId(fn, id))
   );
 
   pipe(
     program,
-    findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"),
+    findComponents,
     A.flatMap(findAllByTypeShallow("ReturnStatement")),
     A.flatMap(findAllByTypeShallow("JSXElement")),
     A.map(jsxRoot => addHydrationIds(jsxRoot, id))
@@ -72,7 +72,6 @@ function addComponentId(
 
         // a2517
         const id = astId(filename, fn);
-        console.debug("\n" + id + "\n", printHighlighted(fn), "\n");
         jsxRoot.openingElement.attributes.unshift(b.jsxAttr("data-component-id", id));
       })
     );

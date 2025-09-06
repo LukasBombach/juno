@@ -32,8 +32,7 @@ export function isNode(value: unknown): value is t.Node {
 }
 
 /**
- * legacy type guard
- * @deprecated
+ * is.* for mutlple types
  */
 export function isNodeOfType<T extends readonly [t.NodeType | undefined, ...(t.NodeType | undefined)[]]>(
   node: t.Node,

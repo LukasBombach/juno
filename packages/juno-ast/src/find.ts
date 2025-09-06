@@ -45,6 +45,21 @@ export function findAllByTypeShallow<T extends readonly [NodeType, ...NodeType[]
   };
 }
 
+export function findAllByTypeShallowWithParents<T extends readonly [NodeType, ...NodeType[]]>(...types: T) {
+  return (root: Node): [NodeOfType<T[number]>, Node[]][] => {
+    const results: [NodeOfType<T[number]>, Node[]][] = [];
+
+    for (const { node, parents, skipDescend } of traverseWithControl(root)) {
+      if (isNodeOfType(node, ...types)) {
+        results.push([node, parents]);
+        skipDescend();
+      }
+    }
+
+    return results;
+  };
+}
+
 export function findFirstByType<T extends NodeType>(type: T) {
   return (root: Node): NodeOfType<T> | undefined => {
     for (const [node] of traverse(root)) {
@@ -63,4 +78,10 @@ export function findParent(child: Node, withinContainer: Node): Node | null {
   }
 
   return null;
+}
+
+export function contains<T extends NodeType>(type: T) {
+  return (root: Node): boolean => {
+    return findFirstByType(type)(root) !== undefined;
+  };
 }
