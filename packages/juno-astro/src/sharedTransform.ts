@@ -1,4 +1,7 @@
 import { createHash } from "node:crypto";
+import { print } from "esrap";
+import tsx from "esrap/languages/tsx";
+import { highlight } from "cli-highlight";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import { is, as, b } from "juno-ast";
@@ -70,4 +73,8 @@ export function containsInteractiveJsx(fn: Node): boolean {
       )
     )
   );
+}
+
+export function printHighlighted(node: Node) {
+  return highlight(print(node, tsx(), { indent: "  " }).code, { language: "tsx", ignoreIllegals: true });
 }

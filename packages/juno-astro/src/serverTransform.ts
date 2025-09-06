@@ -7,6 +7,7 @@ import tsx from "esrap/languages/tsx";
 import { pipe, is, as, b } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
 import { astId, containsInteractiveJsx, containsWindowDefinedCheck } from "./sharedTransform";
+import { printHighlighted } from "./sharedTransform";
 import type { NodeOfType, JSXElement } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
@@ -69,7 +70,10 @@ function addComponentId(
           )
         ); */
 
-        jsxRoot.openingElement.attributes.unshift(b.jsxAttr("data-component-id", astId(filename, fn)));
+        // a2517
+        const id = astId(filename, fn);
+        console.debug("\n" + id + "\n", printHighlighted(fn), "\n");
+        jsxRoot.openingElement.attributes.unshift(b.jsxAttr("data-component-id", id));
       })
     );
   }
