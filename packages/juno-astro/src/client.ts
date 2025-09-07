@@ -21,7 +21,7 @@ export default (element: HTMLElement) =>
     const componentRoots = element.querySelectorAll(`[data-component-id]`);
 
     for (const root of componentRoots) {
-      const id = "_" + root.getAttribute("data-component-id");
+      const id = root.getAttribute("data-component-id");
       if (id && window.JUNO_COMPONENTS[id]) {
         const Comp = window.JUNO_COMPONENTS[id];
         const hydrations: Hydration[] = await Comp({ ...props, children, ...slotted });
@@ -37,7 +37,8 @@ export default (element: HTMLElement) =>
           }
         }
       } else {
-        console.warn("No component found for id", id, window.JUNO_COMPONENTS, root);
+        console.warn("Cannot find component", id, "in window.JUNO_COMPONENTS");
+        console.dir(window.JUNO_COMPONENTS);
       }
     }
   };

@@ -22,7 +22,7 @@ export function transformJsxClient(input: string, id: string) {
 
         const x = b.ExpressionStatement(
           b.AssignmentExpression(
-            b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), "_" + componentId),
+            b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), componentId),
             // @ts-expect-error wip
             b.ident(fn.id?.name)
           )
@@ -30,14 +30,14 @@ export function transformJsxClient(input: string, id: string) {
 
         program.body.push(x);
 
-        try {
-          highlight(print(x, tsx()).code, { language: "tsx" });
-        } catch (error) {
-          console.error("Error highlighting code:", error);
-          //console.dir(x, { depth: null });
-          console.log(fn.type);
-          console.log(highlight(print(fn, tsx()).code, { language: "tsx" }));
-        }
+        // try {
+        //   highlight(print(x, tsx()).code, { language: "tsx" });
+        // } catch (error) {
+        //   console.error("Error highlighting code:", error);
+        //   //console.dir(x, { depth: null });
+        //   console.log(fn.type);
+        //   console.log(highlight(print(fn, tsx()).code, { language: "tsx" }));
+        // }
 
         return fn;
       }),

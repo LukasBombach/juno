@@ -66,12 +66,12 @@ export const build = {
     right,
     ...span,
   }),
-  MemberExpression: (object: t.Expression, property: string): t.StaticMemberExpression => ({
+  MemberExpression: (object: t.Expression, property: string): t.ComputedMemberExpression => ({
     type: "MemberExpression",
     object,
-    property: b.ident(property),
+    property: b.literal(property),
     optional: false,
-    computed: false,
+    computed: true,
     ...span,
   }),
   CallExpression: (callee: t.Expression, args: t.Expression[]): t.CallExpression => ({
