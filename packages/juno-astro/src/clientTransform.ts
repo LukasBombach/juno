@@ -7,8 +7,9 @@ import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
+import { traverseWithControl, isNodeOfType } from "juno-ast";
 import { astId, findComponents, printHighlighted } from "./sharedTransform";
-import type { JSXElement } from "juno-ast";
+import type { JSXElement, Expression } from "juno-ast";
 
 export function transformJsxClient(input: string, id: string) {
   const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "ts" });
@@ -62,6 +63,95 @@ export function transformJsxClient(input: string, id: string) {
   });
 
   return print(program, tsx(), { indent: "  " });
+}
+
+function createHydration2(el: JSXElement, filename: string) {
+  // for each jsx element
+  // create an entry
+  //  if it's a component (uppercase first letter) add component: Component
+  //  if it has has reactive atts (ref, onX) add hidration attrs
+  //  if it has children that are expressions, recurse and add their hydration data as well
+  // return an array of these entries
+  const hydrations: Expression[] = [];
+
+  const id = pipe(astId(filename, el.openingElement), b.literal);
+
+  const name = pipe(
+    O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
+    O.map(identifier => identifier.name)
+  );
+
+  pipe(
+    name,
+    O.filter(name => /^[A-Z]/.test(name)),
+    O.map(name => b.object({ id, component: b.ident(name) })),
+    O.map(hydration => hydrations.push(hydration))
+  );
+
+  pipe(
+    name,
+    O.filter(name => /^[a-z]/.test(name)),
+    O.map(() => {
+      const attrs = pipe(
+        el.openingElement,
+        findAllByType("JSXAttribute"),
+        A.filter(attr => {
+          const name = as.JSXIdentifier(attr.name)?.name;
+          return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
+        }),
+        A.filterMap(attr => {
+          const name = as.JSXIdentifier(attr.name)?.name;
+          const value = pipe(
+            attr,
+            O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+            O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
+            O.toUndefined
+          );
+          return name && value ? O.some([name, value] as const) : O.none;
+        }),
+        A.match(() => undefined, R.fromEntries)
+      );
+
+      b.object({ id, ...attrs });
+    })
+  );
+
+  pipe(
+    el.children,
+    A.map(child => {
+      if (is.JSXElement(child)) {
+        hydrations.push(createHydration2(child, filename));
+      }
+
+      pipe(
+        child,
+        O.fromNullableK(as.JSXExpressionContainer),
+        O.map(c => c.expression),
+        O.filter(not.JSXEmptyExpression),
+        O.map(expression =>
+          pipe(
+            expression,
+            findAllByTypeShallow("JSXElement"),
+            A.map(jsxRoot => {
+              const parent = findParent(jsxRoot, expression);
+              const hydration = createHydration(jsxRoot, filename);
+
+              if (!parent) {
+                console.warn("No parent found for JSX root in", filename);
+                return;
+              }
+
+              replaceChild(parent, hydration, jsxRoot);
+
+              hydrations.push(expression);
+            })
+          )
+        )
+      );
+    })
+  );
+
+  return b.array(hydrations);
 }
 
 function createHydration(jsxRoot: JSXElement, filename: string) {

@@ -21,6 +21,8 @@ export const not = {
 
 export const as = {
   JSXIdentifier: (node: MaybeNode): t.JSXIdentifier | undefined => (is.JSXIdentifier(node) ? node : undefined),
+  JSXExpressionContainer: (node: MaybeNode): t.JSXExpressionContainer | undefined =>
+    is.JSXExpressionContainer(node) ? node : undefined,
 };
 
 /**
