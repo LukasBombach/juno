@@ -18,20 +18,7 @@ export function transformJsxClient(input: string, id: string) {
     pipe(
       fn,
       A.map(fn => {
-        const hasJsxReturn = pipe(
-          fn,
-          findAllByType("ReturnStatement"),
-          A.some(returnStatement => {
-            return pipe(returnStatement, findAllByType("JSXElement"), A.isNonEmpty);
-          })
-        );
-
-        if (!hasJsxReturn) {
-          return fn;
-        }
-
         const componentId = astId(id, fn);
-        // console.log(`client ${id.slice(-16)}:${fn.start}:${fn.end}`, componentId);
 
         const x = b.ExpressionStatement(
           b.AssignmentExpression(
