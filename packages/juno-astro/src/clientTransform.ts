@@ -5,10 +5,9 @@ import * as R from "fp-ts/ReadonlyRecord";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
-import { highlight } from "cli-highlight";
-import { pipe, is, as, b, replaceChild } from "juno-ast";
+import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import { astId, findComponents } from "./sharedTransform";
+import { astId, findComponents, printHighlighted } from "./sharedTransform";
 import type { JSXElement } from "juno-ast";
 
 export function transformJsxClient(input: string, id: string) {
@@ -100,6 +99,35 @@ function createHydration(jsxRoot: JSXElement, filename: string) {
           return name && value ? O.some([name, value] as const) : O.none;
         }),
         A.match(() => undefined, R.fromEntries)
+      );
+
+      pipe(
+        el,
+        findAllByType("JSXElement"),
+        A.flatMap(child => child.children),
+        A.filter(is.JSXExpressionContainer),
+        A.map(child => child.expression),
+        A.filter(not.JSXEmptyExpression),
+        A.map(expr => {
+          pipe(
+            expr,
+            findAllByTypeShallow("JSXElement"),
+            A.map(jsxRoot => {
+              const parent = findParent(jsxRoot, expr);
+              const hydration = createHydration(jsxRoot, filename);
+
+              if (!parent) {
+                console.warn("No parent found for JSX root in", filename);
+                return;
+              }
+
+              replaceChild(parent, hydration, jsxRoot);
+            })
+          );
+
+          console.debug("---");
+          console.debug(printHighlighted(expr));
+        })
       );
 
       return isComponent || attrs ? O.some(b.object({ id, component, ...attrs })) : O.none;
