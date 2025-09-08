@@ -5,9 +5,9 @@ import * as R from "fp-ts/ReadonlyRecord";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
+import c from "chalk";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import { traverseWithControl, isNodeOfType } from "juno-ast";
 import { astId, findComponents, printHighlighted } from "./sharedTransform";
 import type { JSXElement, Expression } from "juno-ast";
 
@@ -50,6 +50,15 @@ export function transformJsxClient(input: string, id: string) {
             const parent = findParent(jsxRoot, returnStatement);
             const hydration = createHydration(jsxRoot, id);
 
+            const hydration2 = createHydration2(jsxRoot, id);
+
+            console.debug("");
+            console.debug(c.green(id));
+            console.debug("");
+            console.debug(printHighlighted(b.array(hydration2)));
+            console.debug("");
+            console.debug("--");
+
             if (!parent) {
               console.warn("No parent found for JSX root in", id);
               return;
@@ -65,7 +74,7 @@ export function transformJsxClient(input: string, id: string) {
   return print(program, tsx(), { indent: "  " });
 }
 
-function createHydration2(el: JSXElement, filename: string) {
+function createHydration2(el: JSXElement, filename: string): Expression[] {
   // for each jsx element
   // create an entry
   //  if it's a component (uppercase first letter) add component: Component
@@ -112,7 +121,7 @@ function createHydration2(el: JSXElement, filename: string) {
         A.match(() => undefined, R.fromEntries)
       );
 
-      b.object({ id, ...attrs });
+      hydrations.push(b.object({ id, ...attrs }));
     })
   );
 
@@ -120,7 +129,7 @@ function createHydration2(el: JSXElement, filename: string) {
     el.children,
     A.map(child => {
       if (is.JSXElement(child)) {
-        hydrations.push(createHydration2(child, filename));
+        hydrations.push(...createHydration2(child, filename));
       }
 
       pipe(
@@ -151,7 +160,7 @@ function createHydration2(el: JSXElement, filename: string) {
     })
   );
 
-  return b.array(hydrations);
+  return hydrations;
 }
 
 function createHydration(jsxRoot: JSXElement, filename: string) {
@@ -215,8 +224,8 @@ function createHydration(jsxRoot: JSXElement, filename: string) {
             })
           );
 
-          console.debug("---");
-          console.debug(printHighlighted(expr));
+          // console.debug("---");
+          // console.debug(printHighlighted(expr));
         })
       );
 
