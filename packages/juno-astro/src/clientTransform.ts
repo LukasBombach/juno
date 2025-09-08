@@ -50,15 +50,15 @@ export function transformJsxClient(input: string, id: string) {
             const parent = findParent(jsxRoot, returnStatement);
             //const hydration = createHydration(jsxRoot, id);
 
-            console.debug("");
-            console.debug(c.green(id));
-            console.debug("");
+            // console.debug("");
+            // console.debug(c.green(id));
+            // console.debug("");
 
             const hydration2 = createHydration2(jsxRoot, id);
 
-            console.debug(printHighlighted(b.array(hydration2)));
-            console.debug("");
-            console.debug("--");
+            // console.debug(printHighlighted(b.array(hydration2)));
+            // console.debug("");
+            // console.debug("--");
 
             if (!parent) {
               console.warn("No parent found for JSX root in", id);
@@ -95,7 +95,12 @@ function createHydration2(el: JSXElement, filename: string): Expression[] {
     name,
     O.filter(name => /^[A-Z]/.test(name)),
     O.map(name => b.object({ id, component: b.ident(name) })),
-    O.map(hydration => hydrations.push(hydration))
+    O.map(hydration => {
+      console.debug("\n" + c.green(filename) + "\n");
+      console.debug(id.value, printHighlighted(el));
+
+      hydrations.push(hydration);
+    })
   );
 
   pipe(

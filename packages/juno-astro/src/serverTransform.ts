@@ -4,10 +4,11 @@ import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
+import c from "chalk";
 import { pipe, is, as, b } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
 import { astId, containsInteractiveJsx, containsWindowDefinedCheck } from "./sharedTransform";
-import { findComponents } from "./sharedTransform";
+import { findComponents, printHighlighted } from "./sharedTransform";
 import type { NodeOfType, JSXElement } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
@@ -106,7 +107,12 @@ function addHydrationIds(jsxRoot: JSXElement, filename: string) {
         );
 
       if (shouldBeHydrated) {
-        el.openingElement.attributes.unshift(b.jsxAttr("data-element-id", astId(filename, el.openingElement)));
+        const id = astId(filename, el.openingElement);
+
+        console.debug("\n" + c.blue(filename) + "\n");
+        console.debug(id, printHighlighted(el));
+
+        el.openingElement.attributes.unshift(b.jsxAttr("data-element-id", id));
       }
     })
   );
