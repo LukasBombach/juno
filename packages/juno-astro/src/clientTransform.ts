@@ -50,11 +50,12 @@ export function transformJsxClient(input: string, id: string) {
             const parent = findParent(jsxRoot, returnStatement);
             const hydration = createHydration(jsxRoot, id);
 
-            const hydration2 = createHydration2(jsxRoot, id);
-
             console.debug("");
             console.debug(c.green(id));
             console.debug("");
+
+            const hydration2 = createHydration2(jsxRoot, id);
+
             console.debug(printHighlighted(b.array(hydration2)));
             console.debug("");
             console.debug("--");
@@ -121,7 +122,9 @@ function createHydration2(el: JSXElement, filename: string): Expression[] {
         A.match(() => undefined, R.fromEntries)
       );
 
-      hydrations.push(b.object({ id, ...attrs }));
+      if (attrs) {
+        hydrations.push(b.object({ id, ...attrs }));
+      }
     })
   );
 
@@ -137,13 +140,33 @@ function createHydration2(el: JSXElement, filename: string): Expression[] {
         O.fromNullableK(as.JSXExpressionContainer),
         O.map(c => c.expression),
         O.filter(not.JSXEmptyExpression),
-        O.map(expression =>
-          pipe(
+
+        O.map(v => {
+          console.debug("Non-Empty JSX Expression");
+          console.debug(printHighlighted(v));
+          console.debug("");
+          return v;
+        }),
+
+        O.map(expression => {
+          return pipe(
             expression,
-            findAllByTypeShallow("JSXElement"),
+            findAllByType("JSXElement"),
+
+            A.map(v => {
+              console.debug("JSXElement found in expression");
+              console.debug(printHighlighted(v));
+              console.debug("");
+              return v;
+            }),
+
             A.map(jsxRoot => {
               const parent = findParent(jsxRoot, expression);
               const hydration = createHydration(jsxRoot, filename);
+
+              console.debug("Creating hydration for");
+              console.debug(printHighlighted(expression));
+              console.debug("");
 
               if (!parent) {
                 console.warn("No parent found for JSX root in", filename);
@@ -154,8 +177,8 @@ function createHydration2(el: JSXElement, filename: string): Expression[] {
 
               hydrations.push(expression);
             })
-          )
-        )
+          );
+        })
       );
     })
   );
