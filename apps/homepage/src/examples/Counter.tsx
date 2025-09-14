@@ -1,6 +1,6 @@
 import { signal } from "@maverick-js/signals";
 
-export default function ReactiveAssignments() {
+export function Counter() {
   const count = signal(1);
 
   return (

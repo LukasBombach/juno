@@ -30,5 +30,5 @@ export function Editor({ value = counterCode, className }: Props) {
     return () => editor()?.dispose();
   });
 
-  return <code className={className} ref={el => container.set(el)} />;
+  return <code className={className} ref={el => (container.set(el), undefined)} />;
 }

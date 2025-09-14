@@ -1,5 +1,6 @@
 import { signal, effect } from "@maverick-js/signals";
 import { Editor } from "./Editor";
+import { Counter } from "../examples/Counter";
 
 const counterCode = `let count = 0;
 
@@ -29,6 +30,7 @@ export function Playground() {
             {demo.title}
           </button>
         ))}
+        <Counter />
       </nav>
       <Editor
         value={demos[selectedDemo()].code}
