@@ -30,7 +30,7 @@ export function Playground() {
             {demo.title}
           </button>
         ))}
-        <Counter />
+        <Counter className="text-sm cursor-pointer text-neutral-700 text-left hover:underline" />
       </nav>
       <Editor
         value={demos[selectedDemo()].code}

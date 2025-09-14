@@ -15,6 +15,7 @@ export function renderToStaticMarkup(node: VNode): string {
   const closingTag = `</${tag}>`;
 
   const innerHTML = ensureArray(children)
+    .flat(Infinity)
     .map(child => {
       if (isVNode(child)) return renderToStaticMarkup(child);
       if (shouldBeRenderedToString(child)) return String(child);
