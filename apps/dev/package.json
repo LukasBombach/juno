@@ -10,12 +10,12 @@
   "devDependencies": {
     "@juno/hydrate": "workspace:*",
     "@juno/vite-plugin-juno": "workspace:*",
-    "vite-plugin-inspect": "0.8.7",
-    "vite-plugin-restart": "0.4.2"
+    "vite-plugin-inspect": "11.3.3",
+    "vite-plugin-restart": "1.0.0"
   },
   "dependencies": {
     "@maverick-js/signals": "6.0.0",
-    "@tailwindcss/vite": "4.0.0-beta.8",
-    "tailwindcss": "4.0.0-beta.8"
+    "@tailwindcss/vite": "4.1.13",
+    "tailwindcss": "4.1.13"
   }
 }
