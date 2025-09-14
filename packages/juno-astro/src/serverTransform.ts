@@ -8,16 +8,10 @@ import { pipe, is, as, b } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
 import { astId } from "./sharedTransform";
 import { findComponents } from "./sharedTransform";
-import type { NodeOfType, JSXElement } from "juno-ast";
+import type { JSXElement } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
   const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "ts" });
-
-  pipe(
-    program,
-    findComponents,
-    A.map(fn => addComponentId(fn, id))
-  );
 
   pipe(
     program,
@@ -28,20 +22,6 @@ export function transformJsxServer(input: string, id: string) {
   );
 
   return print(program, tsx(), { indent: "  " });
-}
-
-function addComponentId(
-  component: NodeOfType<"FunctionDeclaration" | "FunctionExpression" | "ArrowFunctionExpression">,
-  filename: string
-) {
-  pipe(
-    component,
-    findAllByTypeShallow("JSXElement"),
-    A.map(jsxRoot => {
-      const id = astId(filename, component);
-      jsxRoot.openingElement.attributes.unshift(b.jsxAttr("data-component-root", id));
-    })
-  );
 }
 
 function addHydrationIds(jsxRoot: JSXElement, filename: string) {
