@@ -6,22 +6,55 @@ declare global {
 
 window.JUNO_COMPONENTS = {};
 
-interface Hydration {
+/* interface Hydration {
   id: string;
   ref?: (el: Element) => void;
+} */
+
+type TODO_PROPS = Record<string, any>;
+
+interface ElementHydration {
+  elementId: string;
+  ref?: (el: Element) => void;
+  [key: string]: unknown;
+}
+
+interface ComponentHydration {
+  component: (props: TODO_PROPS) => Hydration;
+}
+
+type Hydration = ElementHydration | ElementHydration[] | ComponentHydration;
+
+function hydrate(hydration: Hydration): void {
+  if (Array.isArray(hydration)) {
+    hydration.forEach(hydrate);
+    return;
+  }
+
+  if (typeof hydration.component === "function") {
+    hydrate(hydration.component({}));
+    return;
+  }
+
+  console.log("Hydrating", hydration);
 }
 
 export default (element: HTMLElement) =>
   async (
-    Component: any,
+    component: any,
     props: Record<string, any>,
     { default: children, ...slotted }: Record<string, any>,
     { client }: Record<string, string>
   ) => {
-    const componentRoots = element.querySelectorAll(`[data-component-id]`);
+    // const hydrations = component({ ...props, children, ...slotted }); /* .flat(Infinity) */
+    // console.dir(hydrations);
+
+    hydrate(component({}));
+
+    /* const componentRoots = element.querySelectorAll(`[data-component-root]`);
 
     for (const root of componentRoots) {
-      const id = root.getAttribute("data-component-id");
+      const id = root.getAttribute("data-component-root");
       if (id && window.JUNO_COMPONENTS[id]) {
         const Comp = window.JUNO_COMPONENTS[id];
         const hydrations: Hydration[] = await Comp({ ...props, children, ...slotted }).flat(Infinity);
@@ -57,5 +90,5 @@ export default (element: HTMLElement) =>
         console.warn("Cannot find component", id, "in window.JUNO_COMPONENTS");
         console.dir(window.JUNO_COMPONENTS);
       }
-    }
+    } */
   };

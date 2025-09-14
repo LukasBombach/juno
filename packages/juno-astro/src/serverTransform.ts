@@ -7,7 +7,7 @@ import tsx from "esrap/languages/tsx";
 import c from "chalk";
 import { pipe, is, as, b } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
-import { astId, containsInteractiveJsx, containsWindowDefinedCheck } from "./sharedTransform";
+import { astId } from "./sharedTransform";
 import { findComponents, printHighlighted } from "./sharedTransform";
 import type { NodeOfType, JSXElement } from "juno-ast";
 
@@ -32,17 +32,14 @@ export function transformJsxServer(input: string, id: string) {
 }
 
 function addComponentId(
-  fn: NodeOfType<"FunctionDeclaration" | "FunctionExpression" | "ArrowFunctionExpression">,
+  component: NodeOfType<"FunctionDeclaration" | "FunctionExpression" | "ArrowFunctionExpression">,
   filename: string
 ) {
-  const componentShouldBeHydrated = containsInteractiveJsx(fn) || containsWindowDefinedCheck(fn);
-
-  if (componentShouldBeHydrated) {
-    pipe(
-      fn,
-      findAllByTypeShallow("JSXElement"),
-      A.map(jsxRoot => {
-        /*
+  pipe(
+    component,
+    findAllByTypeShallow("JSXElement"),
+    A.map(jsxRoot => {
+      /*
         const props = pipe(
           jsxRoot.openingElement.attributes,
           A.filter(is.JSXAttribute),
@@ -71,12 +68,10 @@ function addComponentId(
           )
         ); */
 
-        // a2517
-        const id = astId(filename, fn);
-        jsxRoot.openingElement.attributes.unshift(b.jsxAttr("data-component-id", id));
-      })
-    );
-  }
+      const id = astId(filename, component);
+      jsxRoot.openingElement.attributes.unshift(b.jsxAttr("data-component-root", id));
+    })
+  );
 }
 
 function addHydrationIds(jsxRoot: JSXElement, filename: string) {
@@ -85,7 +80,7 @@ function addHydrationIds(jsxRoot: JSXElement, filename: string) {
     findAllByType("JSXElement"),
     A.map(el => {
       const shouldBeHydrated =
-        as.JSXIdentifier(el.openingElement.name)?.name.match(/^[A-Z]/) ||
+        // as.JSXIdentifier(el.openingElement.name)?.name.match(/^[A-Z]/) ||
         pipe(
           el.openingElement,
           findAllByType("JSXAttribute"),
