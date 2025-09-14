@@ -6,11 +6,6 @@ declare global {
 
 window.JUNO_COMPONENTS = {};
 
-/* interface Hydration {
-  id: string;
-  ref?: (el: Element) => void;
-} */
-
 type TODO_PROPS = Record<string, any>;
 
 interface ElementHydration {
