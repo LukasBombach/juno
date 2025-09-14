@@ -51,6 +51,8 @@ export default (element: HTMLElement) =>
 
     hydrate(component({}));
 
+    [...element.querySelectorAll("[data-element-id]")].forEach(el => console.log(el));
+
     /* const componentRoots = element.querySelectorAll(`[data-component-root]`);
 
     for (const root of componentRoots) {
