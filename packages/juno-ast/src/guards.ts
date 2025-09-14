@@ -21,6 +21,8 @@ export const not = {
 
 export const as = {
   JSXIdentifier: (node: MaybeNode): t.JSXIdentifier | undefined => (is.JSXIdentifier(node) ? node : undefined),
+  JSXExpressionContainer: (node: MaybeNode): t.JSXExpressionContainer | undefined =>
+    is.JSXExpressionContainer(node) ? node : undefined,
 };
 
 /**
@@ -32,8 +34,7 @@ export function isNode(value: unknown): value is t.Node {
 }
 
 /**
- * legacy type guard
- * @deprecated
+ * is.* for mutlple types
  */
 export function isNodeOfType<T extends readonly [t.NodeType | undefined, ...(t.NodeType | undefined)[]]>(
   node: t.Node,

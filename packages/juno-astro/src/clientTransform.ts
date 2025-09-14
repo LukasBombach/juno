@@ -5,52 +5,29 @@ import * as R from "fp-ts/ReadonlyRecord";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
-import { highlight } from "cli-highlight";
-import { pipe, is, as, b, replaceChild } from "juno-ast";
+import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import { astId } from "./sharedTransform";
-import type { JSXElement } from "juno-ast";
+import { astId, findComponents } from "./sharedTransform";
+import type { JSXElement, Expression } from "juno-ast";
 
 export function transformJsxClient(input: string, id: string) {
   const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
-  pipe(program, findAllByType("FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"), fn => {
+  pipe(program, findComponents, fn => {
     pipe(
       fn,
       A.map(fn => {
-        const hasJsxReturn = pipe(
-          fn,
-          findAllByType("ReturnStatement"),
-          A.some(returnStatement => {
-            return pipe(returnStatement, findAllByType("JSXElement"), A.isNonEmpty);
-          })
-        );
-
-        if (!hasJsxReturn) {
-          return fn;
-        }
-
         const componentId = astId(id, fn);
-        // console.log(`client ${id.slice(-16)}:${fn.start}:${fn.end}`, componentId);
 
         const x = b.ExpressionStatement(
           b.AssignmentExpression(
-            b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), "_" + componentId),
+            b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), componentId),
             // @ts-expect-error wip
             b.ident(fn.id?.name)
           )
         );
 
         program.body.push(x);
-
-        try {
-          highlight(print(x, tsx()).code, { language: "tsx" });
-        } catch (error) {
-          console.error("Error highlighting code:", error);
-          //console.dir(x, { depth: null });
-          console.log(fn.type);
-          console.log(highlight(print(fn, tsx()).code, { language: "tsx" }));
-        }
 
         return fn;
       }),
@@ -61,14 +38,15 @@ export function transformJsxClient(input: string, id: string) {
           findAllByTypeShallow("JSXElement"),
           A.map(jsxRoot => {
             const parent = findParent(jsxRoot, returnStatement);
-            const hydration = createHydration(jsxRoot, id);
+
+            const hydration2 = createHydration(jsxRoot, id);
 
             if (!parent) {
               console.warn("No parent found for JSX root in", id);
               return;
             }
 
-            replaceChild(parent, hydration, jsxRoot);
+            replaceChild(parent, b.array(hydration2), jsxRoot);
           })
         );
       })
@@ -78,21 +56,35 @@ export function transformJsxClient(input: string, id: string) {
   return print(program, tsx(), { indent: "  " });
 }
 
-function createHydration(jsxRoot: JSXElement, filename: string) {
-  const hydration = pipe(
-    jsxRoot,
-    findAllByType("JSXElement"),
-    A.filterMap(el => {
-      const id = pipe(astId(filename, el.openingElement), b.literal);
+function createHydration(el: JSXElement, filename: string): Expression[] {
+  // for each jsx element
+  // create an entry
+  //  if it's a component (uppercase first letter) add component: Component
+  //  if it has has reactive atts (ref, onX) add hidration attrs
+  //  if it has children that are expressions, recurse and add their hydration data as well
+  // return an array of these entries
+  const hydrations: Expression[] = [];
 
-      const component = pipe(
-        O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
-        O.map(identifier => identifier.name),
-        O.filter(name => Boolean(name.match(/^[A-Z]/))),
-        O.map(name => b.ident(name)),
-        O.toUndefined
-      );
+  const elementId = pipe(astId(filename, el.openingElement), b.literal);
 
+  const name = pipe(
+    O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
+    O.map(identifier => identifier.name)
+  );
+
+  pipe(
+    name,
+    O.filter(name => /^[A-Z]/.test(name)),
+    O.map(name => b.object({ component: b.ident(name) })),
+    O.map(hydration => {
+      hydrations.push(hydration);
+    })
+  );
+
+  pipe(
+    name,
+    O.filter(name => /^[a-z]/.test(name)),
+    O.map(() => {
       const attrs = pipe(
         el.openingElement,
         findAllByType("JSXAttribute"),
@@ -113,9 +105,48 @@ function createHydration(jsxRoot: JSXElement, filename: string) {
         A.match(() => undefined, R.fromEntries)
       );
 
-      return component || attrs ? O.some(b.object({ id, component, ...attrs })) : O.none;
+      if (attrs) {
+        hydrations.push(b.object({ elementId, ...attrs }));
+      }
     })
   );
 
-  return b.array(hydration);
+  pipe(
+    el.children,
+    A.map(child => {
+      if (is.JSXElement(child)) {
+        hydrations.push(...createHydration(child, filename));
+      }
+
+      pipe(
+        child,
+        O.fromNullableK(as.JSXExpressionContainer),
+        O.map(c => c.expression),
+        O.filter(not.JSXEmptyExpression),
+
+        O.map(expression => {
+          return pipe(
+            expression,
+            findAllByType("JSXElement"),
+
+            A.map(jsxRoot => {
+              const parent = findParent(jsxRoot, expression);
+              const hydration = createHydration(jsxRoot, filename);
+
+              if (!parent) {
+                console.warn("No parent found for JSX root in", filename);
+                return;
+              }
+
+              replaceChild(parent, b.array(hydration), jsxRoot);
+
+              hydrations.push(expression);
+            })
+          );
+        })
+      );
+    })
+  );
+
+  return hydrations;
 }
