@@ -20,7 +20,7 @@ export function Playground() {
   effect(() => console.log("selected demo", selectedDemo()));
 
   return (
-    <div className="row-start-2 -row-end-2 -col-start-3 -col-end-2 rounded-xl shadow-window grid grid-rows-1 grid-cols-[minmax(200px,14%)_1fr] overflow-hidden">
+    <div className="row-start-5 -row-end-2 col-start-2 -col-end-2 md:row-start-2 md:-row-end-2 md:col-start-4 md:-col-end-2 rounded-xl shadow-window grid grid-rows-1 grid-cols-[minmax(200px,14%)_1fr] overflow-hidden">
       <nav className="p-7 flex flex-col gap-2 bg-neutral-200/80 border-r-1 border-r-neutral-950/10 ">
         {demos.map((demo, index) => (
           <button
