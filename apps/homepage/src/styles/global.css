@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 @theme {
+  /** we're doing px to have a stable container width regardless of font size */
+  --breakpoint-md: 960px;
+
   --color-purple: #7964c9;
   --color-editor-dark: #24292e;
   --color-editor-light: #ffffff;
@@ -8,3 +11,21 @@
   --shadow-window: 0px 8px 40px rgba(0, 0, 0, 0.25), 0px 0px 3px rgba(0, 0, 0, 0.55),
     inset 0px 0px 3px rgba(255, 255, 255, 0.1);
 }
+
+/* @layer components {
+  .layout-hero {
+    display: grid;
+
+    grid-template-rows: 100px 62px 1fr 100px;
+    grid-template-columns: 4% 130px 1fr 130px 4%;
+
+    grid-template-areas:
+      ". .    . .   ."
+      ". logo . cta .";
+
+    @media (min-width: theme(breakpoint.md)) {
+      grid-template-rows: 100px 28px 62px 64px 42px 1fr 100px;
+      grid-template-columns: 4% 130px 8% 1fr 4%;
+    }
+  }
+} */
