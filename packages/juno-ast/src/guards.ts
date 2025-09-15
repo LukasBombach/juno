@@ -10,6 +10,7 @@ export const is = {
   JSXElement: (node: MaybeNode): node is t.JSXElement => node?.type === "JSXElement",
   JSXIdentifier: (node: MaybeNode): node is t.JSXIdentifier => node?.type === "JSXIdentifier",
   JSXEmptyExpression: (node: MaybeNode): node is t.JSXEmptyExpression => node?.type === "JSXEmptyExpression",
+  JSXText: (node: MaybeNode): node is t.JSXText => node?.type === "JSXText",
   JSXExpressionContainer: (node: MaybeNode): node is t.JSXExpressionContainer =>
     node?.type === "JSXExpressionContainer",
 };

@@ -7,7 +7,7 @@ import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import { astId, findComponents } from "./sharedTransform";
+import { astId, findComponents, printHighlighted } from "./sharedTransform";
 import type { JSXElement, Expression } from "juno-ast";
 
 export function transformJsxClient(input: string, id: string) {
@@ -67,11 +67,17 @@ function createHydration(el: JSXElement, filename: string): Expression[] {
 
   const elementId = pipe(astId(filename, el.openingElement), b.literal);
 
+  /**
+   * JSX name
+   */
   const name = pipe(
     O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
     O.map(identifier => identifier.name)
   );
 
+  /**
+   * If it's a component (uppercase first letter), add component
+   */
   pipe(
     name,
     O.filter(name => /^[A-Z]/.test(name)),
@@ -81,6 +87,10 @@ function createHydration(el: JSXElement, filename: string): Expression[] {
     })
   );
 
+  /**
+   * If it has reactive attributes (ref, event handlers, reactive children),
+   * add JSX element with those attributes
+   */
   pipe(
     name,
     O.filter(name => /^[a-z]/.test(name)),
@@ -103,6 +113,21 @@ function createHydration(el: JSXElement, filename: string): Expression[] {
           return name && value ? O.some([name, value] as const) : O.none;
         }),
         A.match(() => undefined, R.fromEntries)
+      );
+
+      const children = pipe(
+        el.children,
+        A.filterMap(child => {
+          if (is.JSXElement(child)) return O.none;
+          if (is.JSXText(child)) return pipe(child.value.trim().length, O.fromPredicate(Boolean), O.map(b.number));
+          if (is.JSXExpressionContainer(child)) return pipe(child.expression, O.fromPredicate(not.JSXEmptyExpression));
+          throw new Error(`Unexpected child type in JSXElement ${child.type}`);
+        }),
+        O.fromPredicate(A.isNonEmpty),
+        O.map(children => {
+          console.log("CHILDREN", printHighlighted(b.array(children)));
+          return children;
+        })
       );
 
       if (attrs) {
