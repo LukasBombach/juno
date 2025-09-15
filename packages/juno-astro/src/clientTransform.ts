@@ -4,6 +4,7 @@ import * as O from "fp-ts/Option";
 import * as R from "fp-ts/ReadonlyRecord";
 import oxc from "oxc-parser";
 import { print } from "esrap";
+import c from "chalk";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
@@ -125,7 +126,8 @@ function createHydration(el: JSXElement, filename: string): Expression[] {
         }),
         O.fromPredicate(A.isNonEmpty),
         O.map(children => {
-          console.log("CHILDREN", printHighlighted(b.array(children)));
+          console.debug("\n" + c.green(filename) + "\n");
+          console.debug(printHighlighted(b.array(children)));
           return children;
         })
       );
