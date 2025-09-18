@@ -4,6 +4,7 @@ import tsx from "esrap/languages/tsx";
 import { highlight } from "cli-highlight";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
+import * as S from "fp-ts/String";
 import { is, as, b } from "juno-ast";
 import { pipe, matches, findAllByType, findFirstByType, findAllByTypeWithParents } from "juno-ast";
 import { contains } from "juno-ast";
@@ -30,6 +31,21 @@ export function findComponents(
       return pipe(fn, contains("JSXElement")) && !parents.some(p => is.JSXElement(p));
     }),
     A.map(([fn]) => fn)
+  );
+}
+
+export function findClientIdentifiers(root: NodeOfType<"JSXElement">): string[] {
+  return pipe(
+    root,
+    findAllByType("JSXAttribute"),
+    A.filter(attr => {
+      const name = as.JSXIdentifier(attr.name)?.name;
+      return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
+    }),
+    A.filterMap(attr => O.fromNullable(attr.value)),
+    A.flatMap(findAllByType("Identifier")),
+    A.map(id => id.name),
+    A.uniq(S.Eq)
   );
 }
 

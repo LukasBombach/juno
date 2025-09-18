@@ -8,17 +8,17 @@ import c from "chalk";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import { astId, findComponents, printHighlighted } from "./sharedTransform";
+import { astId, findComponents, findClientIdentifiers, printHighlighted } from "./sharedTransform";
 import type { JSXElement, Expression } from "juno-ast";
 
-export function transformJsxClient(input: string, id: string) {
-  const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "ts" });
+export function transformJsxClient(input: string, filename: string) {
+  const { program } = oxc.parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
   pipe(program, findComponents, fn => {
     pipe(
       fn,
       A.map(fn => {
-        const componentId = astId(id, fn);
+        const componentId = astId(filename, fn);
 
         const x = b.ExpressionStatement(
           b.AssignmentExpression(
@@ -40,10 +40,14 @@ export function transformJsxClient(input: string, id: string) {
           A.map(jsxRoot => {
             const parent = findParent(jsxRoot, returnStatement);
 
-            const hydration2 = createHydration(jsxRoot, id);
+            console.debug("\n" + c.green(filename) + "\n");
+            console.debug(printHighlighted(jsxRoot));
+            console.debug("\n", findClientIdentifiers(jsxRoot), "\n");
+
+            const hydration2 = createHydration(jsxRoot, filename);
 
             if (!parent) {
-              console.warn("No parent found for JSX root in", id);
+              console.warn("No parent found for JSX root in", filename);
               return;
             }
 
@@ -116,7 +120,7 @@ function createHydration(el: JSXElement, filename: string): Expression[] {
         A.match(() => undefined, R.fromEntries)
       );
 
-      const children = pipe(
+      /* const children = pipe(
         el.children,
         A.filterMap(child => {
           if (is.JSXElement(child)) return O.none;
@@ -130,7 +134,7 @@ function createHydration(el: JSXElement, filename: string): Expression[] {
           console.debug(printHighlighted(b.array(children)));
           return children;
         })
-      );
+      ); */
 
       if (attrs) {
         hydrations.push(b.object({ elementId, ...attrs }));
@@ -138,24 +142,31 @@ function createHydration(el: JSXElement, filename: string): Expression[] {
     })
   );
 
+  /**
+   * Iterate the JSX element's children
+   */
   pipe(
     el.children,
     A.map(child => {
+      /**
+       * Nested JSX element
+       */
       if (is.JSXElement(child)) {
         hydrations.push(...createHydration(child, filename));
       }
 
+      /**
+       * JSX expression container
+       */
       pipe(
         child,
         O.fromNullableK(as.JSXExpressionContainer),
         O.map(c => c.expression),
         O.filter(not.JSXEmptyExpression),
-
         O.map(expression => {
           return pipe(
             expression,
             findAllByType("JSXElement"),
-
             A.map(jsxRoot => {
               const parent = findParent(jsxRoot, expression);
               const hydration = createHydration(jsxRoot, filename);
