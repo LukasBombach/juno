@@ -39,12 +39,13 @@ export function transformJsxClient(input: string, filename: string) {
           findAllByTypeShallow("JSXElement"),
           A.map(jsxRoot => {
             const parent = findParent(jsxRoot, returnStatement);
+            const clientIndentifiers = findClientIdentifiers(jsxRoot);
 
-            console.debug("\n" + c.green(filename) + "\n");
-            console.debug(printHighlighted(jsxRoot));
-            console.debug("\n", findClientIdentifiers(jsxRoot), "\n");
+            console.debug("\n" + c.bgBlueBright(filename) + "\n");
+            console.debug(printHighlighted(jsxRoot), "\n");
+            // console.debug("\n", clientIndentifiers, "\n");
 
-            const hydration2 = createHydration(jsxRoot, filename);
+            const hydration2 = createHydration(jsxRoot, clientIndentifiers, filename);
 
             if (!parent) {
               console.warn("No parent found for JSX root in", filename);
@@ -61,7 +62,7 @@ export function transformJsxClient(input: string, filename: string) {
   return print(program, tsx(), { indent: "  " });
 }
 
-function createHydration(el: JSXElement, filename: string): Expression[] {
+function createHydration(el: JSXElement, identifiers: string[], filename: string): Expression[] {
   // for each jsx element
   // create an entry
   //  if it's a component (uppercase first letter) add component: Component
@@ -152,7 +153,7 @@ function createHydration(el: JSXElement, filename: string): Expression[] {
        * Nested JSX element
        */
       if (is.JSXElement(child)) {
-        hydrations.push(...createHydration(child, filename));
+        hydrations.push(...createHydration(child, identifiers, filename));
       }
 
       /**
@@ -164,12 +165,24 @@ function createHydration(el: JSXElement, filename: string): Expression[] {
         O.map(c => c.expression),
         O.filter(not.JSXEmptyExpression),
         O.map(expression => {
-          return pipe(
+          const containsClientIdentifiers = pipe(
+            expression,
+            findAllByType("Identifier"),
+            A.map(id => id.name),
+            A.some(name => identifiers.includes(name))
+          );
+
+          if (!containsClientIdentifiers) {
+            console.debug(c.red("skip"), printHighlighted(expression));
+            return;
+          }
+
+          pipe(
             expression,
             findAllByType("JSXElement"),
             A.map(jsxRoot => {
               const parent = findParent(jsxRoot, expression);
-              const hydration = createHydration(jsxRoot, filename);
+              const hydration = createHydration(jsxRoot, identifiers, filename);
 
               if (!parent) {
                 console.warn("No parent found for JSX root in", filename);
@@ -177,10 +190,12 @@ function createHydration(el: JSXElement, filename: string): Expression[] {
               }
 
               replaceChild(parent, b.array(hydration), jsxRoot);
-
-              hydrations.push(expression);
             })
           );
+
+          console.debug(c.greenBright("keep"), printHighlighted(expression));
+
+          hydrations.push(expression);
         })
       );
     })
