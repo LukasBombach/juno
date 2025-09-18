@@ -193,9 +193,11 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
             })
           );
 
-          console.debug(c.greenBright("keep"), printHighlighted(expression));
+          const hydration = b.ArrowFunctionExpression([], expression);
 
-          hydrations.push(expression);
+          console.debug(c.greenBright("keep"), printHighlighted(hydration));
+
+          hydrations.push(hydration);
         })
       );
     })

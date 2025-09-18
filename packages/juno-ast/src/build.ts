@@ -81,6 +81,19 @@ export const build = {
     optional: false,
     ...span,
   }),
+  ArrowFunctionExpression: (
+    params: t.IdentifierName[] = [],
+    body: t.Expression | t.BlockStatement
+  ): t.ArrowFunctionExpression => ({
+    type: "ArrowFunctionExpression",
+    params,
+    body,
+    expression: body.type !== "BlockStatement",
+    generator: false,
+    async: false,
+    id: null,
+    ...span,
+  }),
 };
 
 /**
