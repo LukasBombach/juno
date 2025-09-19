@@ -44,14 +44,16 @@ export function transformJsxClient(input: string, filename: string) {
             console.debug("\n" + c.bgBlueBright(filename) + "\n");
             console.debug(printHighlighted(jsxRoot), "\n");
 
-            const hydration2 = createHydration(jsxRoot, clientIndentifiers, filename);
+            const hydration = createHydration(jsxRoot, clientIndentifiers, filename);
+
+            console.debug(printHighlighted(b.array(hydration)), "\n");
 
             if (!parent) {
               console.warn("No parent found for JSX root in", filename);
               return;
             }
 
-            replaceChild(parent, b.array(hydration2), jsxRoot);
+            replaceChild(parent, b.array(hydration), jsxRoot);
           })
         );
       })
@@ -61,8 +63,13 @@ export function transformJsxClient(input: string, filename: string) {
   return print(program, tsx(), { indent: "  " });
 }
 
-function createHydration(el: JSXElement, identifiers: string[], filename: string): Expression[] {
-  const hydrations: Expression[] = [];
+function createHydration(
+  el: JSXElement,
+  identifiers: string[],
+  filename: string,
+  hydrations2: Expression[] = []
+) /* : Expression[] */ {
+  // const hydrations: Expression[] = [];
   const hydrationObject: Record<string, Expression> = {};
 
   const elementId = pipe(astId(filename, el.openingElement), b.literal);
@@ -84,12 +91,12 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
   /**
    * If it's a component (uppercase first letter), add component
    */
-  pipe(
-    name,
-    O.filter(name => /^[A-Z]/.test(name)),
-    O.map(name => b.object({ component: b.ident(name) })),
-    O.map(hydration => hydrations.push(hydration))
-  );
+  // pipe(
+  //   name,
+  //   O.filter(name => /^[A-Z]/.test(name)),
+  //   O.map(name => b.object({ component: b.ident(name) })),
+  //   O.map(hydration => hydrations.push(hydration))
+  // );
 
   /**
    * If it has reactive attributes (ref, event handlers, reactive children),
@@ -121,7 +128,7 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
 
       if (attrs) {
         Object.assign(hydrationObject, attrs);
-        hydrations.push(b.object({ elementId, ...attrs }));
+        // hydrations.push(b.object({ elementId, ...attrs }));
       }
     })
   );
@@ -138,7 +145,8 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
        * Nested JSX element
        */
       if (is.JSXElement(child)) {
-        hydrations.push(...createHydration(child, identifiers, filename));
+        // hydrations.push(...createHydration(child, identifiers, filename));
+        createHydration(child, identifiers, filename, hydrations2);
       }
 
       if (is.JSXText(child)) {
@@ -180,14 +188,14 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
             findAllByType("JSXElement"),
             A.map(jsxRoot => {
               const parent = findParent(jsxRoot, expression);
-              const hydration = createHydration(jsxRoot, identifiers, filename);
+              const subHydration = createHydration(jsxRoot, identifiers, filename, []);
 
               if (!parent) {
                 console.warn("No parent found for JSX root in", filename);
                 return;
               }
 
-              replaceChild(parent, b.array(hydration), jsxRoot);
+              replaceChild(parent, b.array(subHydration), jsxRoot);
             })
           );
 
@@ -195,7 +203,7 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
 
           children.push(hydration);
 
-          hydrations.push(hydration);
+          // hydrations.push(hydration);
         })
       );
     })
@@ -215,8 +223,9 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
 
   //console.debug(printHighlighted(b.array(hydrations)));
   if (Object.keys(hydrationObject).some(key => !/^elementId|name$/.test(key))) {
-    console.debug(printHighlighted(b.object(hydrationObject)));
+    // console.debug(printHighlighted(b.object(hydrationObject)));
+    hydrations2.push(b.object(hydrationObject));
   }
 
-  return hydrations;
+  return hydrations2;
 }
