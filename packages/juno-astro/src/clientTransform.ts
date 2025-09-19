@@ -43,7 +43,6 @@ export function transformJsxClient(input: string, filename: string) {
 
             console.debug("\n" + c.bgBlueBright(filename) + "\n");
             console.debug(printHighlighted(jsxRoot), "\n");
-            // console.debug("\n", clientIndentifiers, "\n");
 
             const hydration2 = createHydration(jsxRoot, clientIndentifiers, filename);
 
@@ -63,12 +62,6 @@ export function transformJsxClient(input: string, filename: string) {
 }
 
 function createHydration(el: JSXElement, identifiers: string[], filename: string): Expression[] {
-  // for each jsx element
-  // create an entry
-  //  if it's a component (uppercase first letter) add component: Component
-  //  if it has has reactive atts (ref, onX) add hidration attrs
-  //  if it has children that are expressions, recurse and add their hydration data as well
-  // return an array of these entries
   const hydrations: Expression[] = [];
 
   const elementId = pipe(astId(filename, el.openingElement), b.literal);
@@ -121,22 +114,6 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
         A.match(() => undefined, R.fromEntries)
       );
 
-      /* const children = pipe(
-        el.children,
-        A.filterMap(child => {
-          if (is.JSXElement(child)) return O.none;
-          if (is.JSXText(child)) return pipe(child.value.trim().length, O.fromPredicate(Boolean), O.map(b.number));
-          if (is.JSXExpressionContainer(child)) return pipe(child.expression, O.fromPredicate(not.JSXEmptyExpression));
-          throw new Error(`Unexpected child type in JSXElement ${child.type}`);
-        }),
-        O.fromPredicate(A.isNonEmpty),
-        O.map(children => {
-          console.debug("\n" + c.green(filename) + "\n");
-          console.debug(printHighlighted(b.array(children)));
-          return children;
-        })
-      ); */
-
       if (attrs) {
         hydrations.push(b.object({ elementId, ...attrs }));
       }
@@ -173,7 +150,6 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
           );
 
           if (!containsClientIdentifiers) {
-            console.debug(c.red("skip"), printHighlighted(expression));
             return;
           }
 
@@ -195,13 +171,13 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
 
           const hydration = b.ArrowFunctionExpression([], expression);
 
-          console.debug(c.greenBright("keep"), printHighlighted(hydration));
-
           hydrations.push(hydration);
         })
       );
     })
   );
+
+  console.debug(printHighlighted(b.array(hydrations)));
 
   return hydrations;
 }
