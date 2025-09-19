@@ -9,7 +9,7 @@ export function Counter(props: { className?: string } = {}) {
 
   return (
     <button onClick={() => count.set(count() + 1)} className={props.className}>
-      Clicked {count()} <SomeTextInside /> {count() === 1 ? "time" : "times"}
+      Clicked {count()} {count() === 1 ? "time" : "times"}
     </button>
   );
 }

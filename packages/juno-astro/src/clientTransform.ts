@@ -133,7 +133,7 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
    */
   pipe(
     el.children,
-    A.map(child => {
+    A.mapWithIndex((index, child) => {
       /**
        * Nested JSX element
        */
@@ -142,7 +142,16 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
       }
 
       if (is.JSXText(child)) {
-        const length = child.value.trim().length;
+        const isFirst = index === 0;
+        const isLast = index === el.children.length - 1;
+
+        // This is how the Browser collapses whitespace in text nodes
+        const length = isFirst
+          ? child.value.trimStart().length
+          : isLast
+          ? child.value.trimEnd().length
+          : Math.max(child.value.trim().length, 1);
+
         if (length) children.push(b.number(length));
       }
 
@@ -191,6 +200,14 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
       );
     })
   );
+
+  // cut children after last non-literal child
+  const lastNonLiteralIndex = children
+    .map((c, i) => (c.type !== "Literal" ? i : -1))
+    .reduce((a, b) => Math.max(a, b), -1);
+  if (lastNonLiteralIndex !== -1) {
+    children.splice(lastNonLiteralIndex + 1);
+  }
 
   if (children.filter(c => c.type !== "Literal").length) {
     hydrationObject.children = b.array(children);
