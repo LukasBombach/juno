@@ -9,7 +9,7 @@ import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import { astId, findComponents, findClientIdentifiers, printHighlighted } from "./sharedTransform";
-import type { JSXElement, Expression } from "juno-ast";
+import type { JSXElement, Expression, NodeOfType } from "juno-ast";
 
 export function transformJsxClient(input: string, filename: string) {
   const { program } = oxc.parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
@@ -126,6 +126,8 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
     })
   );
 
+  const children: Expression[] = [];
+
   /**
    * Iterate the JSX element's children
    */
@@ -137,6 +139,11 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
        */
       if (is.JSXElement(child)) {
         hydrations.push(...createHydration(child, identifiers, filename));
+      }
+
+      if (is.JSXText(child)) {
+        const length = child.value.trim().length;
+        if (length) children.push(b.number(length));
       }
 
       /**
@@ -177,11 +184,17 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
 
           const hydration = b.ArrowFunctionExpression([], expression);
 
+          children.push(hydration);
+
           hydrations.push(hydration);
         })
       );
     })
   );
+
+  if (children.filter(c => c.type !== "Literal").length) {
+    hydrationObject.children = b.array(children);
+  }
 
   //console.debug(printHighlighted(b.array(hydrations)));
   if (Object.keys(hydrationObject).some(key => !/^elementId|name$/.test(key))) {
