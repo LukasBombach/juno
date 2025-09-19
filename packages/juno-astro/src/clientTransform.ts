@@ -63,6 +63,7 @@ export function transformJsxClient(input: string, filename: string) {
 
 function createHydration(el: JSXElement, identifiers: string[], filename: string): Expression[] {
   const hydrations: Expression[] = [];
+  const hydrationObject: Record<string, Expression> = {};
 
   const elementId = pipe(astId(filename, el.openingElement), b.literal);
 
@@ -74,6 +75,12 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
     O.map(identifier => identifier.name)
   );
 
+  if (name._tag === "Some") {
+    hydrationObject.name = b.literal(name.value);
+  }
+
+  hydrationObject.elementId = elementId;
+
   /**
    * If it's a component (uppercase first letter), add component
    */
@@ -81,9 +88,7 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
     name,
     O.filter(name => /^[A-Z]/.test(name)),
     O.map(name => b.object({ component: b.ident(name) })),
-    O.map(hydration => {
-      hydrations.push(hydration);
-    })
+    O.map(hydration => hydrations.push(hydration))
   );
 
   /**
@@ -115,6 +120,7 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
       );
 
       if (attrs) {
+        Object.assign(hydrationObject, attrs);
         hydrations.push(b.object({ elementId, ...attrs }));
       }
     })
@@ -177,7 +183,10 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
     })
   );
 
-  console.debug(printHighlighted(b.array(hydrations)));
+  //console.debug(printHighlighted(b.array(hydrations)));
+  if (Object.keys(hydrationObject).some(key => !/^elementId|name$/.test(key))) {
+    console.debug(printHighlighted(b.object(hydrationObject)));
+  }
 
   return hydrations;
 }
