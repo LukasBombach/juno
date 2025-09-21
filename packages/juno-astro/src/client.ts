@@ -8,17 +8,21 @@ window.JUNO_COMPONENTS = {};
 
 type TODO_PROPS = Record<string, any>;
 
-interface ElementHydration {
-  elementId: string;
-  ref?: (el: Element) => void;
-  [key: string]: unknown;
-}
-
 interface ComponentHydration {
   component: (props: TODO_PROPS) => Hydration;
 }
 
-type Hydration = ElementHydration | ElementHydration[] | ComponentHydration;
+interface ElementHydration {
+  name?: string;
+  elementId: string;
+  ref?: (el: Element) => void;
+  children?: (() => JsxExpressionFunction | string | number)[];
+  [key: string]: unknown;
+}
+
+type JsxExpressionFunction = () => string | number | unknown;
+
+type Hydration = ComponentHydration | ElementHydration | ElementHydration[];
 
 function* hydrate(hydration: Hydration): Generator<ElementHydration, void, unknown> {
   if (Array.isArray(hydration)) {

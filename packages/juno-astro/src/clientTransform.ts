@@ -9,7 +9,7 @@ import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import { astId, findComponents, findClientIdentifiers, printHighlighted } from "./sharedTransform";
-import type { JSXElement, Expression, NodeOfType } from "juno-ast";
+import type { JSXElement, Expression } from "juno-ast";
 
 export function transformJsxClient(input: string, filename: string) {
   const { program } = oxc.parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
@@ -146,7 +146,20 @@ function createHydration(
        */
       if (is.JSXElement(child)) {
         // hydrations.push(...createHydration(child, identifiers, filename));
-        createHydration(child, identifiers, filename, hydrations2);
+
+        const jsxName = pipe(
+          O.fromNullable(as.JSXIdentifier(child.openingElement.name)),
+          O.map(identifier => identifier.name),
+          O.getOrElse(() => "")
+        );
+
+        const isComponent = /^[A-Z]/.test(jsxName);
+
+        if (isComponent) {
+          hydrations2.push(b.object({ component: b.literal(jsxName) }));
+        } else {
+          createHydration(child, identifiers, filename, hydrations2);
+        }
       }
 
       if (is.JSXText(child)) {
