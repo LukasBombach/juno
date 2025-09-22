@@ -67,9 +67,8 @@ function createHydration(
   el: JSXElement,
   identifiers: string[],
   filename: string,
-  hydrations2: Expression[] = []
+  hydrations: Expression[] = []
 ) /* : Expression[] */ {
-  // const hydrations: Expression[] = [];
   const hydrationObject: Record<string, Expression> = {};
 
   const elementId = pipe(astId(filename, el.openingElement), b.literal);
@@ -134,6 +133,7 @@ function createHydration(
   );
 
   const children: Expression[] = [];
+  const childrenHydrations: Expression[] = [];
 
   /**
    * Iterate the JSX element's children
@@ -156,9 +156,10 @@ function createHydration(
         const isComponent = /^[A-Z]/.test(jsxName);
 
         if (isComponent) {
-          hydrations2.push(b.object({ component: b.literal(jsxName) }));
+          childrenHydrations.push(b.object({ component: b.literal(jsxName) }));
+          // hydrations.push(b.object({ component: b.literal(jsxName) }));
         } else {
-          createHydration(child, identifiers, filename, hydrations2);
+          createHydration(child, identifiers, filename, hydrations);
         }
       }
 
@@ -237,8 +238,10 @@ function createHydration(
   //console.debug(printHighlighted(b.array(hydrations)));
   if (Object.keys(hydrationObject).some(key => !/^elementId|name$/.test(key))) {
     // console.debug(printHighlighted(b.object(hydrationObject)));
-    hydrations2.push(b.object(hydrationObject));
+    hydrations.push(b.object(hydrationObject));
   }
 
-  return hydrations2;
+  hydrations.push(...childrenHydrations);
+
+  return hydrations;
 }
