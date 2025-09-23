@@ -6,7 +6,7 @@ declare global {
   }
 }
 
-window.JUNO_COMPONENTS = {};
+// window.JUNO_COMPONENTS = {};
 
 type TODO_PROPS = Record<string, any>;
 

@@ -66,6 +66,13 @@ export const build = {
     right,
     ...span,
   }),
+  LogicalExpression: (left: t.Expression, operator: "||" | "&&" | "??", right: t.Expression): t.LogicalExpression => ({
+    type: "LogicalExpression",
+    left,
+    operator,
+    right,
+    ...span,
+  }),
   MemberExpression: (object: t.Expression, property: string): t.ComputedMemberExpression => ({
     type: "MemberExpression",
     object,

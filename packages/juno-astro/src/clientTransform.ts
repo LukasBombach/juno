@@ -9,10 +9,12 @@ import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import { astId, findComponents, findClientIdentifiers, printHighlighted } from "./sharedTransform";
-import type { JSXElement, Expression } from "juno-ast";
+import type { JSXElement, Expression, NodeOfType } from "juno-ast";
 
 export function transformJsxClient(input: string, filename: string) {
   const { program } = oxc.parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
+
+  program.body.unshift(b.ExpressionStatement(junoComponentsPreflight));
 
   pipe(program, findComponents, fn => {
     pipe(
@@ -41,12 +43,12 @@ export function transformJsxClient(input: string, filename: string) {
             const parent = findParent(jsxRoot, returnStatement);
             const clientIndentifiers = findClientIdentifiers(jsxRoot);
 
-            console.debug("\n" + c.bgBlueBright(filename) + "\n");
-            console.debug(printHighlighted(jsxRoot), "\n");
+            // console.debug("\n" + c.bgBlueBright(filename) + "\n");
+            // console.debug(printHighlighted(jsxRoot), "\n");
 
             const hydration = createHydration(jsxRoot, clientIndentifiers, filename);
 
-            console.debug(printHighlighted(b.array(hydration)), "\n");
+            // console.debug(printHighlighted(b.array(hydration)), "\n");
 
             if (!parent) {
               console.warn("No parent found for JSX root in", filename);
@@ -235,9 +237,9 @@ function createHydration(
     hydrationObject.children = b.array(children);
   }
 
-  //console.debug(printHighlighted(b.array(hydrations)));
+  // //console.debug(printHighlighted(b.array(hydrations)));
   if (Object.keys(hydrationObject).some(key => !/^elementId|name$/.test(key))) {
-    // console.debug(printHighlighted(b.object(hydrationObject)));
+    // // console.debug(printHighlighted(b.object(hydrationObject)));
     hydrations.push(b.object(hydrationObject));
   }
 
@@ -245,3 +247,8 @@ function createHydration(
 
   return hydrations;
 }
+
+const junoComponentsPreflight: NodeOfType<"AssignmentExpression"> = b.AssignmentExpression(
+  b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"),
+  b.LogicalExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), "??", b.object({}))
+);
