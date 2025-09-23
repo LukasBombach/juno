@@ -23,11 +23,15 @@
     "oxc-parser": "0.87.0"
   },
   "devDependencies": {
+    "@maverick-js/signals": "6.0.0",
     "@sveltejs/acorn-typescript": "1.0.5",
     "acorn": "8.15.0",
     "astro": "5.13.7",
     "cli-highlight": "2.1.11",
     "tsup": "8.5.0",
     "typescript": "5.9.2"
+  },
+  "peerDependencies": {
+    "@maverick-js/signals": "6.0.0"
   }
 }
