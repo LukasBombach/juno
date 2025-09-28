@@ -119,9 +119,15 @@ export default (element: HTMLElement) =>
                     hydrateElement(e);
                   }
                 }
+              } else {
+                console.log("non-array nested exp", exp);
               }
             }
+          } else {
+            console.log("non-array jsxExpression", jsxExpression);
           }
+        } else {
+          console.log("non-function child", child);
         }
       }
     }
