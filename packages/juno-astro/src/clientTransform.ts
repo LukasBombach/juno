@@ -158,7 +158,7 @@ function createHydration(
         const isComponent = /^[A-Z]/.test(jsxName);
 
         if (isComponent) {
-          childrenHydrations.push(b.object({ component: b.literal(jsxName) }));
+          childrenHydrations.push(b.object({ component: b.ident(jsxName) }));
           // hydrations.push(b.object({ component: b.literal(jsxName) }));
         } else {
           createHydration(child, identifiers, filename, hydrations);

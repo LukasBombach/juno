@@ -78,6 +78,12 @@ export default (element: HTMLElement) =>
       console.log("h", hydration);
       if (isElementHydration(hydration)) {
         hydrateElement(hydration);
+      } else if (isComponentHydration(hydration)) {
+        console.log(hydration.component);
+        const subHydrations = hydration.component({});
+        for (const subHydration of subHydrations) {
+          hydrate(subHydration);
+        }
       }
     }
 
