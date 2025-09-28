@@ -20,7 +20,7 @@ interface ElementHydration {
   name?: string;
   elementId: string;
   ref?: (el: Element) => void;
-  children?: (() => JsxExpressionFunction | number)[];
+  children?: (() => Hydration[])[];
   [key: string]: unknown;
 }
 
@@ -59,15 +59,38 @@ export default (element: HTMLElement) =>
     { default: children, ...slotted }: Record<string, any>,
     { client }: Record<string, string>
   ) => {
+    const elements = [...element.querySelectorAll("[data-element-id]")];
+
+    console.log(elements.map(el => `<${el.tagName.toLowerCase()}> ${el.getAttribute("data-element-id")}`));
+
     const hydrations = component({});
 
     for (const hydration of hydrations) {
+      hydrate(hydration);
+    }
+
+    function hydrate(hydration: Hydration) {
       console.log(hydration);
       if (isElementHydration(hydration)) {
-        for (const child of hydration.children || []) {
-          if (typeof child === "function") {
-            const result = child();
-            console.log(result);
+        hydrateElement(hydration);
+      }
+    }
+
+    function hydrateElement(hydration: ElementHydration) {
+      if (Object.keys(hydration).some(key => /(^ref$|^on[A-Z].*$)/.test(key))) {
+        // console.log(hydration.elementId);
+        // const el = elements.shift();
+        // if (el?.getAttribute("data-element-id") !== hydration.elementId) {
+        //   console.error("Mismatched hydration id", hydration.elementId, el);
+        //   return;
+        // }
+      }
+
+      for (const child of hydration.children || []) {
+        if (typeof child === "function") {
+          const hydrations = child();
+          for (const hydration of hydrations) {
+            hydrate(hydration);
           }
         }
       }
