@@ -12,6 +12,8 @@ type TODO_PROPS = Record<string, any>;
 
 type Component = (props: TODO_PROPS) => Hydration[];
 
+type MA<T> = T | T[];
+
 interface ComponentHydration {
   component: Component;
 }
@@ -20,7 +22,7 @@ interface ElementHydration {
   name?: string;
   elementId: string;
   ref?: (el: Element) => void;
-  children?: (() => Hydration[])[];
+  children?: (() => unknown)[];
   [key: string]: unknown;
 }
 
@@ -61,7 +63,10 @@ export default (element: HTMLElement) =>
   ) => {
     const elements = [...element.querySelectorAll("[data-element-id]")];
 
-    console.log(elements.map(el => `<${el.tagName.toLowerCase()}> ${el.getAttribute("data-element-id")}`));
+    console.log(
+      "ssr",
+      elements.map(el => `<${el.tagName.toLowerCase()}> ${el.getAttribute("data-element-id")}`)
+    );
 
     const hydrations = component({});
 
@@ -70,27 +75,47 @@ export default (element: HTMLElement) =>
     }
 
     function hydrate(hydration: Hydration) {
-      console.log(hydration);
+      console.log("h", hydration);
       if (isElementHydration(hydration)) {
         hydrateElement(hydration);
       }
     }
 
     function hydrateElement(hydration: ElementHydration) {
+      console.log("e", hydration);
       if (Object.keys(hydration).some(key => /(^ref$|^on[A-Z].*$)/.test(key))) {
-        // console.log(hydration.elementId);
-        // const el = elements.shift();
-        // if (el?.getAttribute("data-element-id") !== hydration.elementId) {
-        //   console.error("Mismatched hydration id", hydration.elementId, el);
-        //   return;
-        // }
+        const el = elements.shift();
+        if (!el) {
+          console.error("No more elements to hydrate for", hydration);
+          return;
+        } else if (el.getAttribute("data-element-id") !== hydration.elementId) {
+          console.error("Mismatched hydration id", hydration.elementId, el);
+        } else {
+          if (hydration.ref) {
+            hydration.ref(el);
+          }
+          for (const [name, value] of Object.entries(hydration)) {
+            if (name.match(/^on[A-Z]/)) {
+              el.addEventListener(name.slice(2).toLowerCase(), value as EventListener);
+            }
+          }
+        }
       }
 
       for (const child of hydration.children || []) {
         if (typeof child === "function") {
-          const hydrations = child();
-          for (const hydration of hydrations) {
-            hydrate(hydration);
+          const jsxExpression = child();
+
+          if (Array.isArray(jsxExpression)) {
+            for (const exp of jsxExpression) {
+              if (Array.isArray(exp)) {
+                for (const e of exp) {
+                  if (isElementHydration(e)) {
+                    hydrateElement(e);
+                  }
+                }
+              }
+            }
           }
         }
       }
