@@ -130,6 +130,31 @@ export default (element: HTMLElement) =>
           console.log("non-function child", child);
         }
       }
+
+      /**
+       * crazy algorithm to interleave static text nodes with dynamic ones
+       * based on the children array which contains numbers (static text length)
+       * and functions (dynamic text).
+       *
+       * We assume that the server rendered the exact same static text content
+       * as we have here, so we can split the text nodes at the correct indices.
+       */
+      // let index = 0;
+      // let text = el.firstChild;
+      // asssertChildNode(text);
+      // for (const child of hydration.children || []) {
+      //   if (typeof child === "number") {
+      //     index += child;
+      //   } else {
+      //     assertTextNode(text);
+      //     const currentText = text.splitText(index);
+      //     text = currentText.splitText(String(child()).length);
+      //     index = 0;
+      //     effect(() => {
+      //       currentText.textContent = String(child());
+      //     });
+      //   }
+      // }
     }
 
     return;
