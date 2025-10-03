@@ -73,7 +73,7 @@ export default (element: HTMLElement) =>
     }
 
     function hydrateComponent(hydration: ComponentHydration) {
-      // console.log("c", hydration);
+      console.log("c", hydration);
       const subHydrations = hydration.component({});
       for (const subHydration of subHydrations) {
         hydrate(subHydration);
