@@ -88,7 +88,8 @@ export default (element: HTMLElement) =>
 
     function hydrateElement(hydration: ElementHydration) {
       console.log("e", hydration);
-      if (Object.keys(hydration).some(key => /(^ref$|^on[A-Z].*$)/.test(key))) {
+      // if (Object.keys(hydration).some(key => /(^ref$|^on[A-Z].*$)/.test(key))) {
+      if ("elementId" in hydration) {
         const el = elements.shift();
         if (!el) {
           console.error("No more elements to hydrate for", hydration);

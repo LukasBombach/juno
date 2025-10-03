@@ -4,10 +4,10 @@ import * as O from "fp-ts/Option";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
-import { pipe, is, as, b } from "juno-ast";
+import { pipe, is, not, as, b } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType } from "juno-ast";
 import { astId } from "./sharedTransform";
-import { findComponents } from "./sharedTransform";
+import { findComponents, findClientIdentifiers } from "./sharedTransform";
 import type { JSXElement } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
@@ -25,11 +25,13 @@ export function transformJsxServer(input: string, id: string) {
 }
 
 function addHydrationIds(jsxRoot: JSXElement, filename: string) {
+  const clientIndentifiers = findClientIdentifiers(jsxRoot);
+
   pipe(
     jsxRoot,
     findAllByType("JSXElement"),
     A.map(el => {
-      const shouldBeHydrated = pipe(
+      const containsInteractiveAttributes = pipe(
         el.openingElement,
         findAllByType("JSXAttribute"),
         A.filter(attr => {
@@ -49,7 +51,29 @@ function addHydrationIds(jsxRoot: JSXElement, filename: string) {
         len => len > 0
       );
 
-      if (shouldBeHydrated) {
+      const containsInteractiveChildren = pipe(
+        el.children,
+        A.some(child => {
+          return pipe(
+            child,
+            O.fromNullableK(as.JSXExpressionContainer),
+            O.map(c => c.expression),
+            O.filter(not.JSXEmptyExpression),
+            O.map(expression => {
+              const containsClientIdentifiers = pipe(
+                expression,
+                findAllByType("Identifier"),
+                A.map(id => id.name),
+                A.some(name => clientIndentifiers.includes(name))
+              );
+              return containsClientIdentifiers;
+            }),
+            O.getOrElse(() => false)
+          );
+        })
+      );
+
+      if (containsInteractiveAttributes || containsInteractiveChildren) {
         const id = astId(filename, el.openingElement);
         el.openingElement.attributes.unshift(b.jsxAttr("data-element-id", id));
       }
