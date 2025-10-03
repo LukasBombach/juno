@@ -17,7 +17,7 @@ const demos = [
 export function Playground() {
   const selectedDemo = signal(0);
 
-  effect(() => console.log("selected demo", selectedDemo()));
+  // effect(() => console.log("selected demo", selectedDemo()));
 
   const hydrationChallenge = "do not put this static text in the client bundle";
 

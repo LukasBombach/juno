@@ -63,31 +63,40 @@ export default (element: HTMLElement) =>
   ) => {
     const elements = [...element.querySelectorAll("[data-element-id]")];
 
-    console.log(
-      "ssr",
-      elements.map(el => `<${el.tagName.toLowerCase()}> ${el.getAttribute("data-element-id")}`)
-    );
+    // console.log(
+    //   "ssr",
+    //   elements.map(el => `<${el.tagName.toLowerCase()}> ${el.getAttribute("data-element-id")}`)
+    // );
 
-    const hydrations = component({});
+    // const hydrations = component({});
+    // for (const hydration of hydrations) {
+    //   hydrate(hydration);
+    // }
 
-    for (const hydration of hydrations) {
-      hydrate(hydration);
-    }
+    hydrateComponent({ component });
 
     function hydrate(hydration: Hydration) {
-      console.log("h", hydration);
       if (isElementHydration(hydration)) {
         hydrateElement(hydration);
       } else if (isComponentHydration(hydration)) {
-        const subHydrations = hydration.component({});
-        for (const subHydration of subHydrations) {
-          hydrate(subHydration);
-        }
+        // console.log("c", hydration);
+        hydrateComponent(hydration);
+        // const subHydrations = hydration.component({});
+        // for (const subHydration of subHydrations) {
+        //   hydrate(subHydration);
+        // }
+      }
+    }
+
+    function hydrateComponent(hydration: ComponentHydration) {
+      const subHydrations = hydration.component({});
+      for (const subHydration of subHydrations) {
+        hydrate(subHydration);
       }
     }
 
     function hydrateElement(hydration: ElementHydration) {
-      console.log("e", hydration);
+      // console.log("e", hydration);
       // if (Object.keys(hydration).some(key => /(^ref$|^on[A-Z].*$)/.test(key))) {
       if ("elementId" in hydration) {
         const el = elements.shift();
@@ -109,6 +118,8 @@ export default (element: HTMLElement) =>
       }
 
       for (const child of hydration.children || []) {
+        console.log("child", child);
+
         if (typeof child === "function") {
           const jsxExpression = child();
 
@@ -121,14 +132,14 @@ export default (element: HTMLElement) =>
                   }
                 }
               } else {
-                console.log("non-array nested exp", exp);
+                // console.log("non-array nested exp", exp);
               }
             }
           } else {
-            console.log("non-array jsxExpression", jsxExpression);
+            // console.log("non-array jsxExpression", jsxExpression);
           }
         } else {
-          console.log("non-function child", child);
+          // console.log("non-function child", child);
         }
       }
 

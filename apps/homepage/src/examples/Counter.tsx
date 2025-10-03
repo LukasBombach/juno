@@ -7,7 +7,7 @@ function SomeTextInside() {
 export function Counter(props: { className?: string } = {}) {
   const count = signal(1);
 
-  effect(() => console.log(count()));
+  // effect(() => console.log("clicked", count(), count() === 1 ? "time" : "times"));
 
   return (
     <button onClick={() => count.set(count() + 1)} className={props.className}>
