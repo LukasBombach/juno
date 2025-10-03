@@ -1,6 +1,6 @@
 import { signal } from "@maverick-js/signals";
+import { Counter } from "./Counter";
 import { Editor } from "./Editor";
-import { Counter } from "../examples/Counter";
 
 const demos = [
   { title: "Hello World", code: `console.log('Hello, World!');` },
