@@ -42,13 +42,7 @@ export function transformJsxClient(input: string, filename: string) {
           A.map(jsxRoot => {
             const parent = findParent(jsxRoot, returnStatement);
             const clientIndentifiers = findClientIdentifiers(jsxRoot);
-
-            // console.debug("\n" + c.bgBlueBright(filename) + "\n");
-            // console.debug(printHighlighted(jsxRoot), "\n");
-
             const hydration = createHydration(jsxRoot, clientIndentifiers, filename);
-
-            // console.debug(printHighlighted(b.array(hydration)), "\n");
 
             if (!parent) {
               console.warn("No parent found for JSX root in", filename);
@@ -65,12 +59,7 @@ export function transformJsxClient(input: string, filename: string) {
   return print(program, tsx(), { indent: "  " });
 }
 
-function createHydration(
-  el: JSXElement,
-  identifiers: string[],
-  filename: string,
-  hydrations: Expression[] = []
-) /* : Expression[] */ {
+function createHydration(el: JSXElement, identifiers: string[], filename: string, hydrations: Expression[] = []) {
   const hydrationObject: Record<string, Expression> = {};
 
   const elementId = pipe(astId(filename, el.openingElement), b.literal);
@@ -88,16 +77,6 @@ function createHydration(
   }
 
   hydrationObject.elementId = elementId;
-
-  /**
-   * If it's a component (uppercase first letter), add component
-   */
-  // pipe(
-  //   name,
-  //   O.filter(name => /^[A-Z]/.test(name)),
-  //   O.map(name => b.object({ component: b.ident(name) })),
-  //   O.map(hydration => hydrations.push(hydration))
-  // );
 
   /**
    * If it has reactive attributes (ref, event handlers, reactive children),
@@ -129,7 +108,6 @@ function createHydration(
 
       if (attrs) {
         Object.assign(hydrationObject, attrs);
-        // hydrations.push(b.object({ elementId, ...attrs }));
       }
     })
   );
@@ -147,8 +125,6 @@ function createHydration(
        * Nested JSX element
        */
       if (is.JSXElement(child)) {
-        // hydrations.push(...createHydration(child, identifiers, filename));
-
         const jsxName = pipe(
           O.fromNullable(as.JSXIdentifier(child.openingElement.name)),
           O.map(identifier => identifier.name),
@@ -159,7 +135,6 @@ function createHydration(
 
         if (isComponent) {
           childrenHydrations.push(b.object({ component: b.ident(jsxName) }));
-          // hydrations.push(b.object({ component: b.literal(jsxName) }));
         } else {
           createHydration(child, identifiers, filename, hydrations);
         }
@@ -218,8 +193,6 @@ function createHydration(
           const hydration = b.ArrowFunctionExpression([], expression);
 
           children.push(hydration);
-
-          // hydrations.push(hydration);
         })
       );
     })
@@ -237,9 +210,7 @@ function createHydration(
     hydrationObject.children = b.array(children);
   }
 
-  // //console.debug(printHighlighted(b.array(hydrations)));
   if (Object.keys(hydrationObject).some(key => !/^elementId|name$/.test(key))) {
-    // // console.debug(printHighlighted(b.object(hydrationObject)));
     hydrations.push(b.object(hydrationObject));
   }
 
