@@ -81,49 +81,21 @@ export default (element: HTMLElement) =>
     }
 
     function hydrateElement(hydration: ElementHydration) {
-      // console.log("e", hydration);
-      if ("elementId" in hydration) {
-        const el = elements.shift();
-        if (!el) {
-          console.error("No more elements to hydrate for", hydration);
-          return;
-        } else if (el.getAttribute("data-element-id") !== hydration.elementId) {
-          console.error("Mismatched hydration id", hydration.elementId, el);
-        } else {
-          if (hydration.ref) {
-            hydration.ref(el);
-          }
-          for (const [name, value] of Object.entries(hydration)) {
-            if (name.match(/^on[A-Z]/)) {
-              el.addEventListener(name.slice(2).toLowerCase(), value as EventListener);
-            }
-          }
+      console.log("e", hydration);
+      const el = elements.shift();
+      if (!el) {
+        console.error("No more elements to hydrate for", hydration);
+        return;
+      } else if (el.getAttribute("data-element-id") !== hydration.elementId) {
+        console.error("Mismatched hydration id", hydration.elementId, el);
+      } else {
+        if (hydration.ref) {
+          hydration.ref(el);
         }
-      }
-
-      for (const child of hydration.children || []) {
-        console.log("child", child);
-
-        if (typeof child === "function") {
-          const jsxExpression = child();
-
-          if (Array.isArray(jsxExpression)) {
-            for (const exp of jsxExpression) {
-              if (Array.isArray(exp)) {
-                for (const e of exp) {
-                  if (isElementHydration(e)) {
-                    hydrateElement(e);
-                  }
-                }
-              } else {
-                // console.log("non-array nested exp", exp);
-              }
-            }
-          } else {
-            // console.log("non-array jsxExpression", jsxExpression);
+        for (const [name, value] of Object.entries(hydration)) {
+          if (name.match(/^on[A-Z]/)) {
+            el.addEventListener(name.slice(2).toLowerCase(), value as EventListener);
           }
-        } else {
-          // console.log("non-function child", child);
         }
       }
 
@@ -135,8 +107,45 @@ export default (element: HTMLElement) =>
        * We assume that the server rendered the exact same static text content
        * as we have here, so we can split the text nodes at the correct indices.
        */
-      // let index = 0;
-      // let text = el.firstChild;
+
+      let index = 0;
+      let text = el.firstChild;
+
+      for (const child of hydration.children || []) {
+        // console.log("child", child);
+
+        if (typeof child === "number") {
+          index += child;
+        } else if (typeof child === "function") {
+          const jsxExpressionValue = child();
+
+          if (Array.isArray(jsxExpressionValue)) {
+            for (const exp of jsxExpressionValue) {
+              if (Array.isArray(exp)) {
+                for (const e of exp) {
+                  if (isElementHydration(e)) {
+                    hydrateElement(e);
+                  }
+                }
+              } else {
+                // console.log("non-array nested exp", exp);
+              }
+            }
+          } else if (typeof jsxExpressionValue === "string" || typeof jsxExpressionValue === "number") {
+            if (isTextNode(text)) {
+              const currentText = text.splitText(index);
+              text = currentText.splitText(String(child()).length);
+              index = 0;
+              effect(() => {
+                currentText.textContent = String(child());
+              });
+            }
+          } else {
+            // console.log("non-function child", child);
+          }
+        }
+      }
+
       // asssertChildNode(text);
       // for (const child of hydration.children || []) {
       //   if (typeof child === "number") {
@@ -285,4 +294,8 @@ function assertTextNode(node: Node): asserts node is Text {
   if (node.nodeType !== Node.TEXT_NODE) {
     throw new Error(`Expected text node`);
   }
+}
+
+function isTextNode(node: Node | null): node is Text {
+  return node?.nodeType === Node.TEXT_NODE;
 }
