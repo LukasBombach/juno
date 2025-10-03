@@ -6,13 +6,9 @@ declare global {
   }
 }
 
-// window.JUNO_COMPONENTS = {};
-
 type TODO_PROPS = Record<string, any>;
 
 type Component = (props: TODO_PROPS) => Hydration[];
-
-type MA<T> = T | T[];
 
 interface ComponentHydration {
   component: Component;
@@ -25,8 +21,6 @@ interface ElementHydration {
   children?: (() => unknown)[];
   [key: string]: unknown;
 }
-
-type JsxExpressionFunction = () => string | number | unknown;
 
 type Hydration = ComponentHydration | ElementHydration;
 
@@ -68,27 +62,18 @@ export default (element: HTMLElement) =>
     //   elements.map(el => `<${el.tagName.toLowerCase()}> ${el.getAttribute("data-element-id")}`)
     // );
 
-    // const hydrations = component({});
-    // for (const hydration of hydrations) {
-    //   hydrate(hydration);
-    // }
-
     hydrateComponent({ component });
 
     function hydrate(hydration: Hydration) {
       if (isElementHydration(hydration)) {
         hydrateElement(hydration);
       } else if (isComponentHydration(hydration)) {
-        // console.log("c", hydration);
         hydrateComponent(hydration);
-        // const subHydrations = hydration.component({});
-        // for (const subHydration of subHydrations) {
-        //   hydrate(subHydration);
-        // }
       }
     }
 
     function hydrateComponent(hydration: ComponentHydration) {
+      // console.log("c", hydration);
       const subHydrations = hydration.component({});
       for (const subHydration of subHydrations) {
         hydrate(subHydration);
@@ -97,7 +82,6 @@ export default (element: HTMLElement) =>
 
     function hydrateElement(hydration: ElementHydration) {
       // console.log("e", hydration);
-      // if (Object.keys(hydration).some(key => /(^ref$|^on[A-Z].*$)/.test(key))) {
       if ("elementId" in hydration) {
         const el = elements.shift();
         if (!el) {
