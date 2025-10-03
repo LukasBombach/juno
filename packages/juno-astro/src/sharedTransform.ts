@@ -8,7 +8,7 @@ import * as S from "fp-ts/String";
 import { is, as, b } from "juno-ast";
 import { pipe, matches, findAllByType, findFirstByType, findAllByTypeWithParents } from "juno-ast";
 import { contains } from "juno-ast";
-import type { Node, NodeOfType } from "juno-ast";
+import type { Node, NodeOfType, Expression } from "juno-ast";
 
 export function astId(filename: string, node: Node): string {
   return createHash("md5")
@@ -112,4 +112,13 @@ export function containsInteractiveJsx(fn: Node): boolean {
 
 export function printHighlighted(node: Node) {
   return highlight(print(node, tsx(), { indent: "  " }).code, { language: "tsx", ignoreIllegals: true });
+}
+
+export function containsIdentifiers(expression: Expression, identifiers: string[]) {
+  return pipe(
+    expression,
+    findAllByType("Identifier"),
+    A.map(id => id.name),
+    A.some(name => identifiers.includes(name))
+  );
 }

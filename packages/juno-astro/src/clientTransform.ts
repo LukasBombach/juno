@@ -8,7 +8,7 @@ import c from "chalk";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import { astId, findComponents, findClientIdentifiers, printHighlighted } from "./sharedTransform";
+import { astId, findComponents, findClientIdentifiers, containsIdentifiers, printHighlighted } from "./sharedTransform";
 import type { JSXElement, Expression, NodeOfType } from "juno-ast";
 
 export function transformJsxClient(input: string, filename: string) {
@@ -163,14 +163,7 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
         O.map(c => c.expression),
         O.filter(not.JSXEmptyExpression),
         O.map(expression => {
-          const containsClientIdentifiers = pipe(
-            expression,
-            findAllByType("Identifier"),
-            A.map(id => id.name),
-            A.some(name => identifiers.includes(name))
-          );
-
-          if (!containsClientIdentifiers) {
+          if (!containsIdentifiers(expression, identifiers)) {
             return;
           }
 
