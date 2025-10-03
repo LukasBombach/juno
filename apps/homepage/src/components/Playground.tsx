@@ -2,16 +2,17 @@ import { signal } from "@maverick-js/signals";
 import { Editor } from "./Editor";
 import { Counter } from "../examples/Counter";
 
-const counterCode = `let count = 0;
+const demos = [
+  { title: "Hello World", code: `console.log('Hello, World!');` },
+  {
+    title: "Counter",
+    code: `let count = 0;
 
 const increment = () => {
   count++;
   console.log('Counter:', count);
-};`;
-
-const demos = [
-  { title: "Hello World", code: `console.log('Hello, World!');` },
-  { title: "Counter", code: counterCode },
+};`,
+  },
 ];
 
 export function Playground() {
