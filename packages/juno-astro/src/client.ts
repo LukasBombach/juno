@@ -12,6 +12,7 @@ type Component = (props: TODO_PROPS) => Hydration[];
 
 interface ComponentHydration {
   component: Component;
+  props: TODO_PROPS;
 }
 
 interface ElementHydration {
@@ -46,7 +47,7 @@ export default (element: HTMLElement) =>
       elements.map(el => `<${el.tagName.toLowerCase()}> ${el.getAttribute("data-element-id")}`)
     );
 
-    hydrateComponent({ component });
+    hydrateComponent({ component, props });
 
     function hydrate(hydration: Hydration) {
       if (isElementHydration(hydration)) {
@@ -58,7 +59,8 @@ export default (element: HTMLElement) =>
 
     function hydrateComponent(hydration: ComponentHydration) {
       console.log("c", hydration);
-      const subHydrations = hydration.component({});
+      const { component, props } = hydration;
+      const subHydrations = component(props);
       for (const subHydration of subHydrations) {
         hydrate(subHydration);
       }

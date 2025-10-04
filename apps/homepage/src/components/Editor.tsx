@@ -6,14 +6,7 @@ type Props = {
   className?: string;
 };
 
-const counterCode = `let count = 0;
-
-const increment = () => {
-  count++;
-  console.log('Counter:', count);
-};`;
-
-export function Editor({ value = counterCode, className }: Props) {
+export function Editor({ value = "", className }: Props) {
   const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
   const editor = signal<MonacoEditor | null>(null);
   const container = signal<HTMLElement | null>(null);
