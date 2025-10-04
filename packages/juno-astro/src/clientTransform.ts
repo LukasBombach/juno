@@ -1,7 +1,7 @@
 import { basename } from "node:path";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
-import * as R from "fp-ts/ReadonlyRecord";
+import * as R from "fp-ts/Record";
 import oxc from "oxc-parser";
 import { print } from "esrap";
 import c from "chalk";
@@ -101,7 +101,7 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
             O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
             O.toUndefined
           );
-          return name && value ? O.some([name, value] as const) : O.none;
+          return name && value ? O.some([name, value] as [string, Expression]) : O.none;
         }),
         A.match(() => undefined, R.fromEntries)
       );
@@ -134,7 +134,37 @@ function createHydration(el: JSXElement, identifiers: string[], filename: string
         const isComponent = /^[A-Z]/.test(jsxName);
 
         if (isComponent) {
-          childrenHydrations.push(b.object({ component: b.ident(jsxName) }));
+          const props = pipe(
+            child.openingElement,
+            findAllByType("JSXAttribute"),
+            A.filter(attr =>
+              pipe(
+                O.fromNullable(attr.value),
+                O.filter(is.JSXExpressionContainer),
+                O.map(c => c.expression),
+                O.filter(not.JSXEmptyExpression),
+                O.filter(expr => containsIdentifiers(expr, identifiers)),
+                O.isSome
+              )
+            ),
+            A.filterMap(attr => {
+              const name = as.JSXIdentifier(attr.name)?.name;
+              const value = pipe(
+                attr,
+                O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+                O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
+                O.toUndefined
+              );
+              return name && value ? O.some([name, value] as [string, Expression]) : O.none;
+            }),
+            A.match(() => ({}), R.fromEntries)
+          );
+          childrenHydrations.push(
+            b.object({
+              component: b.ident(jsxName),
+              props: b.object(props),
+            })
+          );
         } else {
           createHydration(child, identifiers, filename, hydrations);
         }
