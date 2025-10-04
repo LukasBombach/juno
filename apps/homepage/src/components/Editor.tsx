@@ -1,12 +1,13 @@
 import { signal, effect } from "@maverick-js/signals";
+import type { ReadSignal } from "@maverick-js/signals";
 import type { MonacoEditor, createEditor } from "./monacoEditor";
 
 type Props = {
-  value?: string;
+  value: ReadSignal<string>;
   className?: string;
 };
 
-export function Editor({ value = "", className }: Props) {
+export function Editor({ value, className }: Props) {
   const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
   const editor = signal<MonacoEditor | null>(null);
   const container = signal<HTMLElement | null>(null);
@@ -19,7 +20,7 @@ export function Editor({ value = "", className }: Props) {
   }
 
   effect(() => {
-    editor.set(monaco()?.createEditor(container(), { value }) ?? null);
+    editor.set(monaco()?.createEditor(container(), { value: value() }) ?? null);
     return () => editor()?.dispose();
   });
 
