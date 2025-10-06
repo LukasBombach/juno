@@ -1,7 +1,7 @@
 import { basename } from "node:path";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
-import oxc from "oxc-parser";
+import { parseSync } from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, not, as, b } from "juno-ast";
@@ -11,7 +11,7 @@ import { findComponents, findClientIdentifiers } from "./sharedTransform";
 import type { JSXElement } from "juno-ast";
 
 export function transformJsxServer(input: string, id: string) {
-  const { program } = oxc.parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "ts" });
+  const { program } = parseSync(basename(id), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
   pipe(
     program,

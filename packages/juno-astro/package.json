@@ -20,16 +20,16 @@
     "esrap": "2.1.0",
     "fp-ts": "2.16.11",
     "juno-ast": "file:../juno-ast",
-    "oxc-parser": "0.87.0"
+    "oxc-parser": "0.94.0"
   },
   "devDependencies": {
     "@maverick-js/signals": "6.0.0",
-    "@sveltejs/acorn-typescript": "1.0.5",
+    "@sveltejs/acorn-typescript": "1.0.6",
     "acorn": "8.15.0",
-    "astro": "5.13.7",
+    "astro": "5.14.1",
     "cli-highlight": "2.1.11",
     "tsup": "8.5.0",
-    "typescript": "5.9.2"
+    "typescript": "5.9.3"
   },
   "peerDependencies": {
     "@maverick-js/signals": "6.0.0"

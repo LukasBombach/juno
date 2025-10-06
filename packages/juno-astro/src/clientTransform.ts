@@ -2,17 +2,16 @@ import { basename } from "node:path";
 import * as A from "fp-ts/Array";
 import * as O from "fp-ts/Option";
 import * as R from "fp-ts/Record";
-import oxc from "oxc-parser";
+import { parseSync } from "oxc-parser";
 import { print } from "esrap";
-import c from "chalk";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import { astId, findComponents, findClientIdentifiers, containsIdentifiers, printHighlighted } from "./sharedTransform";
+import { astId, findComponents, findClientIdentifiers, containsIdentifiers } from "./sharedTransform";
 import type { JSXElement, Expression, NodeOfType } from "juno-ast";
 
 export function transformJsxClient(input: string, filename: string) {
-  const { program } = oxc.parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
+  const { program } = parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
   program.body.unshift(b.ExpressionStatement(junoComponentsPreflight));
 

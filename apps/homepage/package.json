@@ -10,12 +10,12 @@
   },
   "dependencies": {
     "@maverick-js/signals": "6.0.0",
-    "@tailwindcss/vite": "4.1.13",
-    "astro": "5.13.7",
+    "@tailwindcss/vite": "4.1.14",
+    "astro": "5.14.1",
     "juno-astro": "file:../../packages/juno-astro",
-    "monaco-editor": "0.53.0",
+    "monaco-editor": "0.54.0",
     "monaco-themes": "0.4.7",
-    "tailwindcss": "4.1.13"
+    "tailwindcss": "4.1.14"
   },
   "devDependencies": {
     "vite-plugin-inspect": "11.3.3",
