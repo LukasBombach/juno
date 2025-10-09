@@ -29,9 +29,6 @@ importers:
 
   apps/homepage:
     dependencies:
-      '@maverick-js/signals':
-        specifier: 6.0.0
-        version: 6.0.0
       '@preact/signals-core':
         specifier: 1.12.1
         version: 1.12.1
@@ -104,9 +101,6 @@ importers:
         specifier: 0.94.0
         version: 0.94.0
     devDependencies:
-      '@maverick-js/signals':
-        specifier: 6.0.0
-        version: 6.0.0
       '@preact/signals-core':
         specifier: 1.12.1
         version: 1.12.1
@@ -482,9 +476,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
-
-  '@maverick-js/signals@6.0.0':
-    resolution: {integrity: sha512-aPAxQOjxcGaLpjMcfE0mRuMgnCVLfdPSGINYmKDjTbTfY37lZdz9CGnVDrkr+svNSADZbUVk7oPVjXA2+vtxYg==}
 
   '@napi-rs/wasm-runtime@1.0.6':
     resolution: {integrity: sha512-DXj75ewm11LIWUk198QSKUTxjyRjsBwk09MuMk5DGK+GDUtyPhhEHOGP/Xwwj3DjQXXkivoBirmOnKrLfc0+9g==}
@@ -2677,8 +2668,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@maverick-js/signals@6.0.0': {}
 
   '@napi-rs/wasm-runtime@1.0.6':
     dependencies:

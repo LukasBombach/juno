@@ -1,9 +1,9 @@
-import { signal, effect } from "@maverick-js/signals";
-import type { ReadSignal } from "@maverick-js/signals";
+import { signal, effect } from "@preact/signals-core";
+import type { Signal } from "@preact/signals-core";
 import type { MonacoEditor, createEditor } from "./monacoEditor";
 
 type Props = {
-  value: ReadSignal<string>;
+  value: Signal<string>;
   className?: string;
 };
 
@@ -15,14 +15,14 @@ export function Editor({ value, className }: Props) {
   if (typeof window === "object") {
     import("./monacoEditor").then(({ setupMonaco, createEditor }) => {
       setupMonaco();
-      monaco.set({ createEditor });
+      monaco.value = { createEditor };
     });
   }
 
   effect(() => {
-    editor.set(monaco()?.createEditor(container(), { value: value() }) ?? null);
-    return () => editor()?.dispose();
+    editor.value = monaco.value?.createEditor(container.value, { value: value.value }) ?? null;
+    return () => editor.value?.dispose();
   });
 
-  return <code className={className} ref={el => (container.set(el), undefined)} />;
+  return <code className={className} ref={el => ((container.value = el), undefined)} />;
 }
