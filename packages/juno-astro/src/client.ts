@@ -1,4 +1,4 @@
-import { effect } from "@maverick-js/signals";
+import { effect } from "@preact/signals-core";
 
 declare global {
   interface Window {
@@ -100,11 +100,25 @@ export default (element: HTMLElement) =>
       for (const child of hydration.children || []) {
         // console.log("child", child);
 
+        /**
+         * child is a number: static text length
+         */
         if (typeof child === "number") {
           index += child;
+
+          /**
+           * child is a function: JSX container
+           */
         } else if (typeof child === "function") {
+          /**
+           * execute child once to know what kind of value it is (string, number, array)
+           */
           const jsxExpressionValue = child();
 
+          /**
+           * jsx returns array: must be the result of nested JSX (e.g. <div>{condition && <span>...</span>}</div>)
+           * todo we have a nested array here, because of arr.map(<jsx>), we're treatig that wrong, but its good enough for now
+           */
           if (Array.isArray(jsxExpressionValue)) {
             for (const exp of jsxExpressionValue) {
               if (Array.isArray(exp)) {
@@ -120,15 +134,21 @@ export default (element: HTMLElement) =>
           } else if (typeof jsxExpressionValue === "string" || typeof jsxExpressionValue === "number") {
             if (isTextNode(text)) {
               const currentText = text.splitText(index);
-              text = currentText.splitText(String(child()).length);
+              text = currentText.splitText(String(jsxExpressionValue).length);
               index = 0;
               effect(() => {
                 currentText.textContent = String(child());
               });
             }
           } else {
-            // console.log("non-function child", child);
+            console.log("non-function jsxExpressionValue", jsxExpressionValue);
           }
+
+          /**
+           * child is not a number or function: error
+           */
+        } else {
+          console.log("non-function child", child);
         }
       }
     }

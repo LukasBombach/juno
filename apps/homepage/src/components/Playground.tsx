@@ -1,4 +1,4 @@
-import { signal } from "@maverick-js/signals";
+import { signal } from "@preact/signals-core";
 import { Counter } from "./Counter";
 import { Editor } from "./Editor";
 
@@ -23,7 +23,7 @@ export function Playground() {
       <nav className="p-7 flex flex-col gap-2 bg-neutral-200/80 border-r-1 border-r-neutral-950/10 dark:bg-neutral-900/70">
         {demos.map((demo, index) => (
           <button
-            onClick={() => code.set(demos[index].code)}
+            onClick={() => (code.value = demos[index].code)}
             className="text-sm cursor-pointer text-neutral-700 text-left hover:underline dark:text-neutral-100"
           >
             {demo.title}

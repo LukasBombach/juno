@@ -23,7 +23,7 @@
     "oxc-parser": "0.94.0"
   },
   "devDependencies": {
-    "@maverick-js/signals": "6.0.0",
+    "@preact/signals-core": "1.12.1",
     "@sveltejs/acorn-typescript": "1.0.6",
     "acorn": "8.15.0",
     "astro": "5.14.1",
@@ -32,6 +32,6 @@
     "typescript": "5.9.3"
   },
   "peerDependencies": {
-    "@maverick-js/signals": "6.0.0"
+    "@preact/signals-core": "1.12.1"
   }
 }
