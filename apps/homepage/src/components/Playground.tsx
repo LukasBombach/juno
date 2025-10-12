@@ -15,6 +15,12 @@ const increment = () => {
   },
 ];
 
+async function fetchDemoCode(demoName: string): Promise<string> {
+  const response = await fetch(`/transpiler/${demoName}`);
+  const data = await response.json();
+  return data.code;
+}
+
 export function Playground() {
   const code = signal(demos[0].code);
 
@@ -31,6 +37,9 @@ export function Playground() {
           </button>
         ))}
         <Counter className={buttonCss} />
+        <button onClick={() => fetchDemoCode("Counter").then(v => (code.value = v))} className={buttonCss}>
+          Counter Code
+        </button>
       </nav>
       <Editor
         value={code}
