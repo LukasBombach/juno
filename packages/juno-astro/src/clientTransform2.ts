@@ -18,6 +18,25 @@ export function transformJsxClient(input: string, filename: string) {
   return print(program, tsx(), { indent: "  " });
 }
 
+function createHydration(filename: string, el: JSXElement, identifiers: string[]) {
+  const elementName = pipe(
+    O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
+    O.map(identifier => identifier.name),
+    O.toUndefined
+  );
+
+  const isComponent = pipe(
+    O.fromNullable(elementName),
+    O.filter(name => /^[A-Z]/.test(name)),
+    O.isSome
+  );
+
+  if (isComponent) {
+    // todo
+    return;
+  }
+}
+
 /**
  * window.JUNO_COMPONENTS preflight:
  *
