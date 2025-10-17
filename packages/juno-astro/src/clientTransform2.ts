@@ -21,11 +21,11 @@ export function transformJsxClient(input: string, filename: string) {
 /**
  * window.JUNO_COMPONENTS preflight:
  *
- * window.JUNO_COMPONENTS = {};
+ * window.JUNO_COMPONENTS = window.JUNO_COMPONENTS ?? {};
  * window.JUNO_COMPONENTS["a12e"] = Component;
  */
 function injectJunoComponentsPreflight(program: Program, filename: string) {
-  program.body.unshift(
+  program.body.push(
     b.ExpressionStatement(
       b.AssignmentExpression(
         b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"),
