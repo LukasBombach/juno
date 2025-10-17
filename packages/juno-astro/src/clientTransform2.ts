@@ -32,8 +32,57 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
   );
 
   if (isComponent) {
-    // todo
-    return;
+    return b.object({
+      component: b.ident(elementName!),
+      props: pipe(
+        el.openingElement,
+        findAllByType("JSXAttribute"),
+        A.filter(attr =>
+          pipe(
+            O.fromNullable(attr.value),
+            O.filter(is.JSXExpressionContainer),
+            O.map(c => c.expression),
+            O.filter(not.JSXEmptyExpression),
+            O.filter(expr => containsIdentifiers(expr, identifiers)),
+            O.isSome
+          )
+        ),
+        A.filterMap(attr => {
+          const name = as.JSXIdentifier(attr.name)?.name;
+          const value = pipe(
+            attr,
+            O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+            O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
+            O.toUndefined
+          );
+          return name && value ? O.some([name, value] as [string, Expression]) : O.none;
+        }),
+        A.match(() => ({} as Record<string, Expression>), R.fromEntries),
+        props => b.object(props)
+      ),
+    });
+  } else {
+    const props = pipe(
+      el.openingElement,
+      findAllByType("JSXAttribute"),
+      A.filter(attr => {
+        const name = as.JSXIdentifier(attr.name)?.name;
+        return name === "ref" || Boolean(name?.match(/^on[A-Z]/));
+      }),
+      A.filterMap(attr => {
+        const name = as.JSXIdentifier(attr.name)?.name;
+        const value = pipe(
+          attr,
+          O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+          O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
+          O.toUndefined
+        );
+        return name && value ? O.some([name, value] as [string, Expression]) : O.none;
+      }),
+      A.match(() => undefined, R.fromEntries),
+      O.fromNullable,
+      O.map(b.object)
+    );
   }
 }
 
