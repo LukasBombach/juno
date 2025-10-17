@@ -13,7 +13,7 @@ import type { JSXElement, Expression, NodeOfType, Program } from "juno-ast";
 export function transformJsxClient(input: string, filename: string) {
   const { program } = parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
-  injectJunoComponentsPreflight(program, filename);
+  addJunoComponentsMap(program, filename);
 
   return print(program, tsx(), { indent: "  " });
 }
@@ -24,7 +24,7 @@ export function transformJsxClient(input: string, filename: string) {
  * window.JUNO_COMPONENTS = window.JUNO_COMPONENTS ?? {};
  * window.JUNO_COMPONENTS["a12e"] = Component;
  */
-function injectJunoComponentsPreflight(program: Program, filename: string) {
+function addJunoComponentsMap(program: Program, filename: string) {
   program.body.push(
     b.ExpressionStatement(
       b.AssignmentExpression(
