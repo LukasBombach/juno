@@ -21,15 +21,15 @@ export function transformJsxClient(input: string, filename: string) {
       A.map(fn => {
         const componentId = astId(filename, fn);
 
-        const x = b.ExpressionStatement(
-          b.AssignmentExpression(
-            b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), componentId),
-            // @ts-expect-error wip
-            b.ident(fn.id?.name)
+        program.body.push(
+          b.ExpressionStatement(
+            b.AssignmentExpression(
+              b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), componentId),
+              // @ts-expect-error wip
+              b.ident(fn.id?.name)
+            )
           )
         );
-
-        program.body.push(x);
 
         return fn;
       }),
