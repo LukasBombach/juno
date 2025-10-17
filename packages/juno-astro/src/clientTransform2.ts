@@ -19,6 +19,8 @@ export function transformJsxClient(input: string, filename: string) {
 }
 
 function createHydration(filename: string, el: JSXElement, identifiers: string[]) {
+  const elementId = astId(filename, el);
+
   const elementName = pipe(
     O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
     O.map(identifier => identifier.name),
@@ -82,6 +84,32 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
       A.match(() => undefined, R.fromEntries),
       O.fromNullable,
       O.map(b.object)
+    );
+
+    const children = pipe(
+      el.children,
+      A.filter(child => is.JSXText(child) || is.JSXExpressionContainer(child)),
+      A.mapWithIndex((index, child) => {
+        if (is.JSXText(child)) {
+          const isFirst = index === 0;
+          const isLast = index === el.children.length - 1;
+
+          // This is how the Browser collapses whitespace in text nodes
+          const length = isFirst
+            ? child.value.trimStart().length
+            : isLast
+            ? child.value.trimEnd().length
+            : Math.max(child.value.trim().length, 1);
+
+          if (length) return b.number(length);
+        } else {
+          const v = pipe(
+            child.expression,
+            O.fromPredicate(not.JSXEmptyExpression),
+            O.filter(expr => containsIdentifiers(expr, identifiers))
+          );
+        }
+      })
     );
   }
 }
