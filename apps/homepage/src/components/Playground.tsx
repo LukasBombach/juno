@@ -30,6 +30,12 @@ export function Playground() {
           </button>
         ))}
         <Counter className="text-sm cursor-pointer text-neutral-700 text-left hover:underline dark:text-neutral-100" />
+        <button
+          onClick={() => console.log("test")}
+          className="text-sm cursor-pointer text-neutral-700 text-left hover:underline dark:text-neutral-100"
+        >
+          Counter Code
+        </button>
       </nav>
       <Editor
         value={code}
