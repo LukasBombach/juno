@@ -8,7 +8,8 @@ import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import { astId, findComponents, findClientIdentifiers, containsIdentifiers } from "./sharedTransform";
-import type { JSXElement, Expression, NodeOfType, Program } from "juno-ast";
+import type { Option } from "fp-ts/Option";
+import type { JSXElement, Expression, NodeOfType, Program, ArrowFunctionExpression, NumericLiteral } from "juno-ast";
 
 export function transformJsxClient(input: string, filename: string) {
   const { program } = parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
@@ -80,16 +81,16 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
           O.toUndefined
         );
         return name && value ? O.some([name, value] as [string, Expression]) : O.none;
-      }),
-      A.match(() => undefined, R.fromEntries),
-      O.fromNullable,
-      O.map(b.object)
+      })
+      // A.match(() => undefined, R.fromEntries),
+      // O.fromNullable,
+      // O.map(b.object)
     );
 
     const children = pipe(
       el.children,
       A.filter(child => is.JSXText(child) || is.JSXExpressionContainer(child)),
-      A.mapWithIndex((index, child) => {
+      A.filterMapWithIndex((index, child): Option<ArrowFunctionExpression | NumericLiteral> => {
         if (is.JSXText(child)) {
           const isFirst = index === 0;
           const isLast = index === el.children.length - 1;
@@ -101,12 +102,13 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
             ? child.value.trimEnd().length
             : Math.max(child.value.trim().length, 1);
 
-          if (length) return b.number(length);
+          return O.fromNullable(length ? b.number(length) : undefined);
         } else {
-          const v = pipe(
+          return pipe(
             child.expression,
             O.fromPredicate(not.JSXEmptyExpression),
-            O.filter(expr => containsIdentifiers(expr, identifiers))
+            O.filter(expr => containsIdentifiers(expr, identifiers)),
+            O.map(expr => b.ArrowFunctionExpression([], expr))
           );
         }
       })
