@@ -35,35 +35,37 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
   );
 
   if (isComponent) {
-    return b.object({
-      component: b.ident(elementName!),
-      props: pipe(
-        el.openingElement,
-        findAllByType("JSXAttribute"),
-        A.filter(attr =>
-          pipe(
-            O.fromNullable(attr.value),
-            O.filter(is.JSXExpressionContainer),
-            O.map(c => c.expression),
-            O.filter(not.JSXEmptyExpression),
-            O.filter(expr => containsIdentifiers(expr, identifiers)),
-            O.isSome
-          )
+    return O.some(
+      b.object({
+        component: b.ident(elementName!),
+        props: pipe(
+          el.openingElement,
+          findAllByType("JSXAttribute"),
+          A.filter(attr =>
+            pipe(
+              O.fromNullable(attr.value),
+              O.filter(is.JSXExpressionContainer),
+              O.map(c => c.expression),
+              O.filter(not.JSXEmptyExpression),
+              O.filter(expr => containsIdentifiers(expr, identifiers)),
+              O.isSome
+            )
+          ),
+          A.filterMap(attr => {
+            const name = as.JSXIdentifier(attr.name)?.name;
+            const value = pipe(
+              attr,
+              O.fromNullableK(findFirstByType("JSXExpressionContainer")),
+              O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
+              O.toUndefined
+            );
+            return name && value ? O.some([name, value] as [string, Expression]) : O.none;
+          }),
+          A.match(() => ({} as Record<string, Expression>), R.fromEntries),
+          props => b.object(props)
         ),
-        A.filterMap(attr => {
-          const name = as.JSXIdentifier(attr.name)?.name;
-          const value = pipe(
-            attr,
-            O.fromNullableK(findFirstByType("JSXExpressionContainer")),
-            O.map(v => (is.JSXEmptyExpression(v.expression) ? b.ident("undefined") : v.expression)),
-            O.toUndefined
-          );
-          return name && value ? O.some([name, value] as [string, Expression]) : O.none;
-        }),
-        A.match(() => ({} as Record<string, Expression>), R.fromEntries),
-        props => b.object(props)
-      ),
-    });
+      })
+    );
   } else {
     const props = pipe(
       el.openingElement,
@@ -113,6 +115,19 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
         }
       })
     );
+
+    if (props.length && children.length) {
+      return O.some(
+        b.object({
+          name: b.literal(elementName ?? ""),
+          elementId: b.literal(elementId),
+          ...{ props: b.object(R.fromEntries(props)) },
+          ...{ children: b.array(children) },
+        })
+      );
+    } else {
+      return O.none;
+    }
   }
 }
 
