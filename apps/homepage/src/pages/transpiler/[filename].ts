@@ -14,8 +14,8 @@ async function bundle(filename: string) {
     // @ts-expect-error work in progress
     plugins: junoViteConfig.plugins,
     build: {
-      minify: false,
       write: false,
+      minify: "terser",
       lib: {
         entry: `src/components/${filename}.tsx`,
         fileName: (_format, name) => `${name}.js`,
