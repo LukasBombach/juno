@@ -5,14 +5,13 @@ import * as R from "fp-ts/Record";
 import { parseSync } from "oxc-parser";
 import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
-import { pipe, is, as, not, b, replaceChild } from "juno-ast";
+import { pipe, is, as, not, b, replaceChild, findAllByTypeWithParents } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
 import {
   astId,
   findComponents,
   findClientIdentifiers,
   containsIdentifiers,
-  takeUntilLast,
   stringifyHighlighted,
 } from "./sharedTransform";
 import type { Option } from "fp-ts/Option";
@@ -47,8 +46,9 @@ function transformJsx(program: Program, filename: string) {
 
             const hydrations = pipe(
               jsxRoot,
-              findAllByType("JSXElement"),
-              A.filterMap(jsxEl => createHydration(filename, jsxEl, clientIndentifiers)),
+              findAllByTypeWithParents("JSXElement"),
+              A.filter(([, parents]) => !pipe(parents, A.some(is.JSXExpressionContainer))),
+              A.filterMap(([jsxEl]) => createHydration(filename, jsxEl, clientIndentifiers)),
               hs => b.array(hs)
             );
 
@@ -159,7 +159,7 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
           );
         }
       }),
-      takeUntilLast<ArrowFunctionExpression | NumericLiteral>(is.ArrowFunctionExpression)
+      A.takeLeftWhile<ArrowFunctionExpression | NumericLiteral>(is.ArrowFunctionExpression)
     );
 
     if (props.length || children.length) {
