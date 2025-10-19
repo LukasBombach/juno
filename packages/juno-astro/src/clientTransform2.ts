@@ -15,8 +15,42 @@ export function transformJsxClient(input: string, filename: string) {
   const { program } = parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
   addJunoComponentsMap(program, filename);
+  transformJsx(program, filename);
 
   return print(program, tsx(), { indent: "  " });
+}
+
+function transformJsx(program: Program, filename: string) {
+  pipe(program, findComponents, fn => {
+    pipe(
+      fn,
+      A.flatMap(findAllByTypeShallow("ReturnStatement")),
+      A.map(returnStatement => {
+        pipe(
+          returnStatement,
+          findAllByTypeShallow("JSXElement"),
+          A.map(jsxRoot => {
+            const parent = findParent(jsxRoot, returnStatement);
+            const clientIndentifiers = findClientIdentifiers(jsxRoot);
+
+            if (!parent) {
+              console.warn("No parent found for JSX root in", filename);
+              return;
+            }
+
+            const hydrations = pipe(
+              jsxRoot,
+              findAllByType("JSXElement"),
+              A.filterMap(jsxEl => createHydration(filename, jsxEl, clientIndentifiers)),
+              hs => b.array(hs)
+            );
+
+            replaceChild(parent, hydrations, jsxRoot);
+          })
+        );
+      })
+    );
+  });
 }
 
 function createHydration(filename: string, el: JSXElement, identifiers: string[]) {
