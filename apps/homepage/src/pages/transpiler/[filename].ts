@@ -1,7 +1,8 @@
 import path from "node:path";
+import fs from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { build } from "vite";
-import { viteConfig as junoViteConfig } from "juno-astro/vite";
+import { minify } from "terser";
+import { transformJsxClient } from "juno-astro/clientTransform";
 
 import type { APIRoute } from "astro";
 
@@ -15,27 +16,6 @@ export function getStaticPaths() {
 
 const __dirname = fileURLToPath(new URL("../../..", import.meta.url));
 
-async function bundle(filename: string) {
-  return await build({
-    configFile: false,
-    root: path.resolve(__dirname, "."),
-    // @ts-expect-error work in progress
-    plugins: junoViteConfig.plugins,
-    build: {
-      write: false,
-      minify: "terser",
-      lib: {
-        entry: `src/components/${filename}.tsx`,
-        fileName: (_format, name) => `${name}.js`,
-        formats: ["es"],
-      },
-      rollupOptions: {
-        external: ["@preact/signals-core"],
-      },
-    },
-  });
-}
-
 export const GET: APIRoute = async ({ params }) => {
   const filename = params.filename;
 
@@ -43,13 +23,9 @@ export const GET: APIRoute = async ({ params }) => {
     return new Response("Filename is required", { status: 400 });
   }
 
-  const result = await bundle(filename);
+  const file = await fs.readFile(path.resolve(__dirname, `src/components/${filename}.tsx`), "utf-8");
+  const transformed = transformJsxClient(file, `src/components/${filename}.tsx`);
+  // const { code } = await minify(transformed.code);
 
-  if (!Array.isArray(result)) {
-    return new Response("Vite build did not return an array", { status: 500 });
-  }
-
-  const code = result[0].output[0].code;
-
-  return Response.json({ code }, { status: 200 });
+  return Response.json({ code: transformed.code }, { status: 200 });
 };

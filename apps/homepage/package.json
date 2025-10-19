@@ -15,7 +15,8 @@
     "juno-astro": "file:../../packages/juno-astro",
     "monaco-editor": "0.54.0",
     "monaco-themes": "0.4.7",
-    "tailwindcss": "4.1.14"
+    "tailwindcss": "4.1.14",
+    "terser": "5.44.0"
   },
   "devDependencies": {
     "vite-plugin-inspect": "11.3.3",

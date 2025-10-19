@@ -4,11 +4,11 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./vite": "./src/vite.ts",
     "./server.ts": "./src/server.ts",
     "./client.ts": "./src/client.ts",
     "./jsx-runtime": "./src/jsxRuntime.ts",
-    "./jsx-dev-runtime": "./src/jsxRuntime.ts"
+    "./jsx-dev-runtime": "./src/jsxRuntime.ts",
+    "./clientTransform": "./src/clientTransform.ts"
   },
   "files": [
     "src"
