@@ -10,6 +10,7 @@ import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from
 import { astId, findComponents, findClientIdentifiers, containsIdentifiers } from "./sharedTransform";
 import type { Option } from "fp-ts/Option";
 import type { JSXElement, Expression, Program, ArrowFunctionExpression, NumericLiteral } from "juno-ast";
+import type * as t from "juno-ast";
 
 export function transformJsxClient(input: string, filename: string) {
   const { program } = parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
@@ -25,33 +26,35 @@ function transformJsx(program: Program, filename: string) {
     pipe(
       fn,
       A.flatMap(findAllByTypeShallow("ReturnStatement")),
-      A.map(returnStatement => {
-        pipe(
-          returnStatement,
-          findAllByTypeShallow("JSXElement"),
-          A.map(jsxRoot => {
-            const parent = findParent(jsxRoot, returnStatement);
-            const clientIndentifiers = findClientIdentifiers(jsxRoot);
-
-            if (!parent) {
-              console.warn("No parent found for JSX root in", filename);
-              return;
-            }
-
-            const hydrations = pipe(
-              jsxRoot,
-              findAllByTypeWithParents("JSXElement"),
-              A.filter(([, parents]) => !pipe(parents, A.some(is.JSXExpressionContainer))),
-              A.filterMap(([jsxEl]) => createHydration(filename, jsxEl, clientIndentifiers)),
-              hs => b.array(hs)
-            );
-
-            replaceChild(parent, hydrations, jsxRoot);
-          })
-        );
-      })
+      A.map(returnStatement => transformJsxRoots(returnStatement, filename))
     );
   });
+}
+
+function transformJsxRoots(node: t.Node, filename: string) {
+  pipe(
+    node,
+    findAllByTypeShallow("JSXElement"),
+    A.map(jsxRoot => {
+      const parent = findParent(jsxRoot, node);
+      const clientIndentifiers = findClientIdentifiers(jsxRoot);
+
+      if (!parent) {
+        console.warn("No parent found for JSX root in", filename);
+        return;
+      }
+
+      const hydrations = pipe(
+        jsxRoot,
+        findAllByTypeWithParents("JSXElement"),
+        A.filter(([, parents]) => !pipe(parents, A.some(is.JSXExpressionContainer))),
+        A.filterMap(([jsxEl]) => createHydration(filename, jsxEl, clientIndentifiers)),
+        hs => b.array(hs)
+      );
+
+      replaceChild(parent, hydrations, jsxRoot);
+    })
+  );
 }
 
 function createHydration(filename: string, el: JSXElement, identifiers: string[]) {
@@ -148,11 +151,10 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
             child.expression,
             O.fromPredicate(not.JSXEmptyExpression),
             O.filter(expr => containsIdentifiers(expr, identifiers)),
-            /**
-             * 💡
-             * RECURSE REPLACING JSX ROOTS WITH HYDRATION ARRAYS HERE
-             * 💡
-             */
+            O.map(expr => {
+              transformJsxRoots(expr, filename);
+              return expr;
+            }),
             O.map(expr => b.ArrowFunctionExpression([], expr))
           );
         }
