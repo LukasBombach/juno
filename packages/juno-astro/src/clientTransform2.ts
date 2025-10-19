@@ -7,15 +7,9 @@ import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild, findAllByTypeWithParents } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import {
-  astId,
-  findComponents,
-  findClientIdentifiers,
-  containsIdentifiers,
-  stringifyHighlighted,
-} from "./sharedTransform";
+import { astId, findComponents, findClientIdentifiers, containsIdentifiers } from "./sharedTransform";
 import type { Option } from "fp-ts/Option";
-import type { JSXElement, Expression, NodeOfType, Program, ArrowFunctionExpression, NumericLiteral } from "juno-ast";
+import type { JSXElement, Expression, Program, ArrowFunctionExpression, NumericLiteral } from "juno-ast";
 
 export function transformJsxClient(input: string, filename: string) {
   const { program } = parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
