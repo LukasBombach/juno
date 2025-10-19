@@ -13,6 +13,8 @@ export const is = {
   JSXText: (node: MaybeNode): node is t.JSXText => node?.type === "JSXText",
   JSXExpressionContainer: (node: MaybeNode): node is t.JSXExpressionContainer =>
     node?.type === "JSXExpressionContainer",
+  ArrowFunctionExpression: (node: MaybeNode): node is t.ArrowFunctionExpression =>
+    node?.type === "ArrowFunctionExpression",
 };
 
 export const not = {
