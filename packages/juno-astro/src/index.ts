@@ -1,5 +1,5 @@
 import type { AstroIntegration, AstroRenderer } from "astro";
-import { transformJsxClient } from "./clientTransform2";
+import { transformJsxClient } from "./clientTransform";
 import { transformJsxServer } from "./serverTransform";
 
 export default function (): AstroIntegration {
