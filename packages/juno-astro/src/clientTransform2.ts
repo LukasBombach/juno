@@ -7,7 +7,7 @@ import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild, findAllByTypeWithParents } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import { astId, findComponents, findClientIdentifiers, containsIdentifiers } from "./sharedTransform";
+import { astId, findComponents, findClientIdentifiers, containsIdentifiers, takeUntilLast } from "./sharedTransform";
 import type { Option } from "fp-ts/Option";
 import type { JSXElement, Expression, Program, ArrowFunctionExpression, NumericLiteral } from "juno-ast";
 import type * as t from "juno-ast";
@@ -159,7 +159,7 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
           );
         }
       }),
-      A.takeLeftWhile<ArrowFunctionExpression | NumericLiteral>(is.ArrowFunctionExpression)
+      takeUntilLast<ArrowFunctionExpression | NumericLiteral>(is.ArrowFunctionExpression)
     );
 
     if (props.length || children.length) {

@@ -123,3 +123,14 @@ export function containsIdentifiers(expression: Expression, identifiers: string[
     A.some(name => identifiers.includes(name))
   );
 }
+
+export function takeUntilLast<A>(predicate: Predicate<A>): (arr: Array<A>) => Array<A> {
+  return arr =>
+    pipe(
+      A.findLastIndex(predicate)(arr),
+      O.match(
+        () => [],
+        i => A.takeLeft(i + 1)(arr)
+      )
+    );
+}
