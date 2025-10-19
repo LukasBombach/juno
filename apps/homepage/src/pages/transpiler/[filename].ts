@@ -5,6 +5,14 @@ import { viteConfig as junoViteConfig } from "juno-astro/vite";
 
 import type { APIRoute } from "astro";
 
+export function getStaticPaths() {
+  return [
+    { params: { filename: "Counter" } },
+    { params: { filename: "Editor" } },
+    { params: { filename: "Playground" } },
+  ];
+}
+
 const __dirname = fileURLToPath(new URL("../../..", import.meta.url));
 
 async function bundle(filename: string) {
@@ -26,10 +34,6 @@ async function bundle(filename: string) {
       },
     },
   });
-}
-
-export function getStaticPaths() {
-  return [{ params: { filename: "Counter" } }];
 }
 
 export const GET: APIRoute = async ({ params }) => {
