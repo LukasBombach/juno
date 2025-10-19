@@ -148,7 +148,11 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
             child.expression,
             O.fromPredicate(not.JSXEmptyExpression),
             O.filter(expr => containsIdentifiers(expr, identifiers)),
-            // O.map(expr => (console.debug(stringifyHighlighted(expr)), expr)),
+            /**
+             * 💡
+             * RECURSE REPLACING JSX ROOTS WITH HYDRATION ARRAYS HERE
+             * 💡
+             */
             O.map(expr => b.ArrowFunctionExpression([], expr))
           );
         }
