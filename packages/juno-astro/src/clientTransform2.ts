@@ -58,7 +58,7 @@ function transformJsxRoots(node: t.Node, filename: string) {
 }
 
 function createHydration(filename: string, el: JSXElement, identifiers: string[]) {
-  const elementId = astId(filename, el);
+  const elementId = astId(filename, el.openingElement);
 
   const elementName = pipe(
     O.fromNullable(as.JSXIdentifier(el.openingElement.name)),
