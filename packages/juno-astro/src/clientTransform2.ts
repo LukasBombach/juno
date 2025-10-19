@@ -7,7 +7,14 @@ import { print } from "esrap";
 import tsx from "esrap/languages/tsx";
 import { pipe, is, as, not, b, replaceChild } from "juno-ast";
 import { findAllByType, findAllByTypeShallow, findFirstByType, findParent } from "juno-ast";
-import { astId, findComponents, findClientIdentifiers, containsIdentifiers } from "./sharedTransform";
+import {
+  astId,
+  findComponents,
+  findClientIdentifiers,
+  containsIdentifiers,
+  takeUntilLast,
+  stringifyHighlighted,
+} from "./sharedTransform";
 import type { Option } from "fp-ts/Option";
 import type { JSXElement, Expression, NodeOfType, Program, ArrowFunctionExpression, NumericLiteral } from "juno-ast";
 
@@ -118,15 +125,15 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
         );
         return name && value ? O.some([name, value] as [string, Expression]) : O.none;
       })
-      // A.match(() => undefined, R.fromEntries),
-      // O.fromNullable,
-      // O.map(b.object)
     );
 
     const children = pipe(
       el.children,
       A.filter(child => is.JSXText(child) || is.JSXExpressionContainer(child)),
       A.filterMapWithIndex((index, child): Option<ArrowFunctionExpression | NumericLiteral> => {
+        /**
+         * JSXText
+         */
         if (is.JSXText(child)) {
           const isFirst = index === 0;
           const isLast = index === el.children.length - 1;
@@ -140,23 +147,28 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
 
           return O.fromNullable(length ? b.number(length) : undefined);
         } else {
+          /**
+           * JSXExpressionContainer
+           */
           return pipe(
             child.expression,
             O.fromPredicate(not.JSXEmptyExpression),
             O.filter(expr => containsIdentifiers(expr, identifiers)),
+            // O.map(expr => (console.debug(stringifyHighlighted(expr)), expr)),
             O.map(expr => b.ArrowFunctionExpression([], expr))
           );
         }
-      })
+      }),
+      takeUntilLast<ArrowFunctionExpression | NumericLiteral>(is.ArrowFunctionExpression)
     );
 
-    if (props.length && children.length) {
+    if (props.length || children.length) {
       return O.some(
         b.object({
           name: b.literal(elementName ?? ""),
           elementId: b.literal(elementId),
-          ...{ props: b.object(R.fromEntries(props)) },
-          ...{ children: b.array(children) },
+          ...(props.length ? R.fromEntries(props) : {}),
+          ...(children.length ? { children: b.array(children) } : {}),
         })
       );
     } else {
