@@ -1,7 +1,9 @@
 import path from "node:path";
 import fs from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { transform } from "oxc-transform";
 import { minify } from "terser";
+import { format } from "prettier";
 import { transformJsxClient } from "juno-astro/clientTransform";
 
 import type { APIRoute } from "astro";
@@ -24,8 +26,20 @@ export const GET: APIRoute = async ({ params }) => {
   }
 
   const file = await fs.readFile(path.resolve(__dirname, `src/components/${filename}.tsx`), "utf-8");
-  const transformed = transformJsxClient(file, `src/components/${filename}.tsx`);
-  // const { code } = await minify(transformed.code);
+  const junoResult = transformJsxClient(file, `src/components/${filename}.tsx`);
+  const oxcResult = transform(`${filename}.tsx`, junoResult.code, {
+    typescript: {
+      jsxPragma: "React.createElement",
+      jsxPragmaFrag: "React.Fragment",
+      onlyRemoveTypeImports: false,
+      allowNamespaces: true,
+      removeClassFieldsWithoutInitializer: false,
+      rewriteImportExtensions: false,
+    },
+  });
 
-  return Response.json({ code: transformed.code }, { status: 200 });
+  const minified = await minify(oxcResult.code, { mangle: false });
+  const formatted = await format(minified.code || "", { parser: "typescript" });
+
+  return Response.json({ code: formatted }, { status: 200 });
 };
