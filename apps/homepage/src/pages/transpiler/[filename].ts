@@ -41,9 +41,10 @@ export const GET: APIRoute = async ({ params }) => {
   const minified = await minify(oxcResult.code, {
     mangle: false,
     format: {
-      beautify: true,
+      beautify: true, // keep whitespace and indentation
     },
   });
+  // const formatted = await format(minified.code || "", { parser: "typescript" });
 
   return Response.json({ code: minified.code }, { status: 200 });
 };
