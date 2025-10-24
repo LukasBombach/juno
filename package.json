@@ -5,7 +5,9 @@
   "author": "Lukas Bombach",
   "license": "MIT",
   "scripts": {
-    "dev": "pnpm --filter @juno/homepage dev"
+    "dev": "pnpm --filter @juno/homepage dev",
+    "build": "pnpm --filter @juno/homepage build",
+    "preview": "pnpm --filter @juno/homepage preview"
   },
   "devDependencies": {
     "@types/node": "24.7.0",
@@ -15,5 +17,5 @@
     "typescript": "5.9.3",
     "vite": "7.1.9"
   },
-  "packageManager": "pnpm@10.18.1"
+  "packageManager": "pnpm@10.18.3"
 }
