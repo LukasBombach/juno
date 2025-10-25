@@ -34,7 +34,7 @@ export function transformJsxClient(input: string, filename: string) {
       return component;
     }),
     A.filter(component => {
-      if (component.id?.name === "Playground") {
+      if (component.id?.name === "SomeTextInside") {
         console.log("Client components found:", component.id?.name);
 
         console.dir(pipe(component, findAllByType("ReturnStatement")), { depth: null });
@@ -257,19 +257,19 @@ function addJunoComponentsMap(program: Program, filename: string) {
       )
     )
   );
-  pipe(
-    program,
-    findComponents,
-    A.map(fn => {
-      program.body.push(
-        b.ExpressionStatement(
-          b.AssignmentExpression(
-            b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), astId(filename, fn)),
-            // @ts-expect-error wip
-            b.ident(fn.id?.name)
-          )
-        )
-      );
-    })
-  );
+  // pipe(
+  //   program,
+  //   findComponents,
+  //   A.map(fn => {
+  //     program.body.push(
+  //       b.ExpressionStatement(
+  //         b.AssignmentExpression(
+  //           b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), astId(filename, fn)),
+  //           // @ts-expect-error wip
+  //           b.ident(fn.id?.name)
+  //         )
+  //       )
+  //     );
+  //   })
+  // );
 }
