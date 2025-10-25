@@ -42,13 +42,24 @@ export const GET: APIRoute = async ({ params }) => {
     mangle: false,
     format: {
       beautify: true, // keep whitespace and indentation
+      braces: true,
     },
     compress: {
+      defaults: false,
+      conditionals: false,
       dead_code: true,
+      keep_fargs: false,
+      side_effects: true,
       toplevel: true,
+      unused: true,
     },
   });
-  // const formatted = await format(minified.code || "", { parser: "typescript" });
 
-  return Response.json({ code: minified.code }, { status: 200 });
+  const formatted = await format(minified.code || "", {
+    parser: "typescript",
+    printWidth: 120,
+    objectWrap: "collapse",
+  });
+
+  return Response.json({ code: formatted }, { status: 200 });
 };
