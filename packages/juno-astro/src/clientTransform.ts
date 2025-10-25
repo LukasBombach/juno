@@ -15,8 +15,60 @@ import type * as t from "juno-ast";
 export function transformJsxClient(input: string, filename: string) {
   const { program } = parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
+  const components = pipe(program, findComponents);
+
+  // console.log("\n" + filename + "\n");
+
   addJunoComponentsMap(program, filename);
   transformJsx(program, filename);
+
+  const clientComponents = pipe(
+    components,
+    A.map(component => {
+      // console.log("processing", component.id?.name);
+
+      if (component.id?.name === "Playground") {
+        // console.dir(component, { depth: null });
+      }
+
+      return component;
+    }),
+    A.filter(component => {
+      if (component.id?.name === "Playground") {
+        console.log("Client components found:", component.id?.name);
+
+        console.dir(pipe(component, findAllByType("ReturnStatement")), { depth: null });
+      }
+
+      return pipe(
+        component,
+        findAllByType("ReturnStatement"),
+        A.some(returnStatement =>
+          pipe(
+            O.fromNullable(returnStatement.argument),
+            O.filter(arg => arg.type === "ArrayExpression"),
+            O.map(arr => arr.elements.length > 0),
+            O.getOrElse(() => false)
+          )
+        )
+      );
+    })
+  );
+
+  pipe(
+    clientComponents,
+    A.map(fn => {
+      program.body.push(
+        b.ExpressionStatement(
+          b.AssignmentExpression(
+            b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), astId(filename, fn)),
+            // @ts-expect-error wip
+            b.ident(fn.id?.name)
+          )
+        )
+      );
+    })
+  );
 
   return print(program, tsx(), { indent: "  " });
 }
@@ -36,13 +88,14 @@ function transformJsxRoots(node: t.Node, filename: string) {
     node,
     findAllByTypeShallow("JSXElement"),
     A.map(jsxRoot => {
-      const parent = findParent(jsxRoot, node);
+      // const grandParent = directParent ? findParent(jsxRoot, directParent) : null;
+      // const parent = is.ParenthesizedExpression(grandParent) ? grandParent : directParent;
       const clientIndentifiers = findClientIdentifiers(jsxRoot);
 
-      if (!parent) {
-        console.warn("No parent found for JSX root in", filename);
-        return;
-      }
+      // if (!parent) {
+      //   console.warn("No parent found for JSX root in", filename);
+      //   return;
+      // }
 
       const hydrations = pipe(
         jsxRoot,
@@ -52,7 +105,19 @@ function transformJsxRoots(node: t.Node, filename: string) {
         hs => b.array(hs)
       );
 
-      replaceChild(parent, hydrations, jsxRoot);
+      const rootParent = findParent(jsxRoot, node);
+
+      const oldChild = is.ParenthesizedExpression(rootParent) ? rootParent : jsxRoot;
+      const parentForReplacement = findParent(oldChild, node);
+
+      if (!parentForReplacement) {
+        console.warn("No parent found for JSX root in", filename);
+        return;
+      }
+
+      const newChild = hydrations;
+
+      replaceChild(parentForReplacement, newChild, oldChild);
     })
   );
 }

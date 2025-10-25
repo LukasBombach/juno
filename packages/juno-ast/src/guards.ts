@@ -15,6 +15,8 @@ export const is = {
     node?.type === "JSXExpressionContainer",
   ArrowFunctionExpression: (node: MaybeNode): node is t.ArrowFunctionExpression =>
     node?.type === "ArrowFunctionExpression",
+  ParenthesizedExpression: (node: MaybeNode): node is t.ParenthesizedExpression =>
+    node?.type === "ParenthesizedExpression",
 };
 
 export const not = {
