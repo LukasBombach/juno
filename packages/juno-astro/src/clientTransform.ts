@@ -17,29 +17,15 @@ export function transformJsxClient(input: string, filename: string) {
 
   const components = pipe(program, findComponents);
 
-  // console.log("\n" + filename + "\n");
-
   addJunoComponentsMap(program, filename);
   transformJsx(program, filename);
 
-  const clientComponents = pipe(
+  pipe(
     components,
     A.map(component => {
-      // console.log("processing", component.id?.name);
-
-      if (component.id?.name === "Playground") {
-        // console.dir(component, { depth: null });
-      }
-
       return component;
     }),
     A.filter(component => {
-      if (component.id?.name === "SomeTextInside") {
-        console.log("Client components found:", component.id?.name);
-
-        console.dir(pipe(component, findAllByType("ReturnStatement")), { depth: null });
-      }
-
       return pipe(
         component,
         findAllByType("ReturnStatement"),
@@ -52,11 +38,7 @@ export function transformJsxClient(input: string, filename: string) {
           )
         )
       );
-    })
-  );
-
-  pipe(
-    clientComponents,
+    }),
     A.map(fn => {
       program.body.push(
         b.ExpressionStatement(
@@ -88,14 +70,7 @@ function transformJsxRoots(node: t.Node, filename: string) {
     node,
     findAllByTypeShallow("JSXElement"),
     A.map(jsxRoot => {
-      // const grandParent = directParent ? findParent(jsxRoot, directParent) : null;
-      // const parent = is.ParenthesizedExpression(grandParent) ? grandParent : directParent;
       const clientIndentifiers = findClientIdentifiers(jsxRoot);
-
-      // if (!parent) {
-      //   console.warn("No parent found for JSX root in", filename);
-      //   return;
-      // }
 
       const hydrations = pipe(
         jsxRoot,
@@ -105,9 +80,13 @@ function transformJsxRoots(node: t.Node, filename: string) {
         hs => b.array(hs)
       );
 
-      const rootParent = findParent(jsxRoot, node);
+      const jsxParent = findParent(jsxRoot, node);
 
-      const oldChild = is.ParenthesizedExpression(rootParent) ? rootParent : jsxRoot;
+      /**
+       * If the JSX root is parenthesized, we need to replace the parenthesized expression
+       * instead of the JSX root itself.
+       */
+      const oldChild = is.ParenthesizedExpression(jsxParent) ? jsxParent : jsxRoot;
       const parentForReplacement = findParent(oldChild, node);
 
       if (!parentForReplacement) {
@@ -257,19 +236,4 @@ function addJunoComponentsMap(program: Program, filename: string) {
       )
     )
   );
-  // pipe(
-  //   program,
-  //   findComponents,
-  //   A.map(fn => {
-  //     program.body.push(
-  //       b.ExpressionStatement(
-  //         b.AssignmentExpression(
-  //           b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), astId(filename, fn)),
-  //           // @ts-expect-error wip
-  //           b.ident(fn.id?.name)
-  //         )
-  //       )
-  //     );
-  //   })
-  // );
 }

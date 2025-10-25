@@ -43,6 +43,10 @@ export const GET: APIRoute = async ({ params }) => {
     format: {
       beautify: true, // keep whitespace and indentation
     },
+    compress: {
+      dead_code: true,
+      toplevel: true,
+    },
   });
   // const formatted = await format(minified.code || "", { parser: "typescript" });
 
