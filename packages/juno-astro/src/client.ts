@@ -1,11 +1,5 @@
 import { effect } from "@preact/signals-core";
 
-declare global {
-  interface Window {
-    JUNO_COMPONENTS: Record<string, Function>;
-  }
-}
-
 type TODO_PROPS = Record<string, any>;
 
 type Component = (props: TODO_PROPS) => Hydration[];
