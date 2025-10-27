@@ -5,11 +5,23 @@ function SomeTextInside() {
 }
 
 export function Counter(props: { className?: string } = {}) {
-  const count = signal(1);
+  let button: HTMLButtonElement | null = null;
+  let count = 1;
+
+  function setButton(el: HTMLButtonElement | null) {
+    button = el;
+  }
+
+  function update() {
+    if (button) {
+      count++;
+      button.textContent = `Clicked ${count} times`;
+    }
+  }
 
   return (
-    <button onClick={() => count.value++} className={props.className}>
-      Clicked {count.value} {count.value === 1 ? "time" : "times"}
+    <button className={props.className} ref={setButton} onClick={update}>
+      Clicked 1 time
     </button>
   );
 }
