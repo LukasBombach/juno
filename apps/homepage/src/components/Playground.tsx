@@ -2,19 +2,19 @@ import { signal } from "@preact/signals-core";
 import { Counter } from "./Counter";
 import { Editor } from "./Editor";
 
-function fetchDemoCode(demoName: string) {
+function fetchDemo(demoName: string) {
   return fetch(`/transpiler/${demoName}`)
     .then(r => r.json())
     .then(d => d.code)
     .catch(console.error);
 }
 
-export function Playground() {
+export async function Playground() {
   const code = signal("");
   const demos = ["Counter", "Editor", "Playground"];
 
   if (typeof window === "object") {
-    fetchDemoCode("Counter").then(v => (code.value = v));
+    code.value = await fetchDemo("Counter");
   }
 
   return (
@@ -22,7 +22,7 @@ export function Playground() {
       <nav className="p-7 flex flex-col gap-2 bg-neutral-200/80 border-r-1 border-r-neutral-950/10 dark:bg-neutral-900/70">
         {demos.map(demo => (
           <button
-            onClick={() => fetchDemoCode(demo).then(v => (code.value = v))}
+            onClick={async () => (code.value = await fetchDemo(demo))}
             className="text-sm cursor-pointer text-neutral-700 text-left hover:underline dark:text-neutral-100"
           >
             {demo}
