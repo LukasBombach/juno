@@ -18,7 +18,7 @@ export interface VNode<P = Record<string, unknown>> {
 }
 
 interface FunctionComponent<P = {}> {
-  (props: RenderableProps<P>, context?: any): VNode<P>; // ComponentChildren; purposely ignoring the truth for easier development
+  (props: RenderableProps<P>, context?: any): VNode<P> | Promise<VNode<P>>; // ComponentChildren; purposely ignoring the truth for easier development
   displayName?: string;
   defaultProps?: Partial<P> | undefined;
 }
@@ -50,15 +50,15 @@ type RenderableProps<P, RefType = any> = P &
  * props (including children), a key, and a flag indicating if the children are static.
  * It returns a VNode that represents the component or element.
  */
-function createVNode<P = {}>(
+async function createVNode<P = {}>(
   type: FunctionComponent<P> | string,
   props: P & { children: ComponentChildren },
   _key: Key,
   _isStaticChildren: boolean,
   _source: Source
-): VNode<P> {
+): Promise<VNode<P>> {
   // todo: hide vnode prop in prototype
-  return typeof type === "function" ? type(props) : { type, props, [vnode]: true };
+  return typeof type === "function" ? await type(props) : { type, props, [vnode]: true };
 }
 
 /**

@@ -1,9 +1,5 @@
 import { signal } from "@preact/signals-core";
 
-function SomeTextInside() {
-  return <span>Julia ist lieP</span>;
-}
-
 export function Counter(props: { className?: string } = {}) {
   const count = signal(1);
 

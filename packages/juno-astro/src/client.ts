@@ -2,7 +2,7 @@ import { effect } from "@preact/signals-core";
 
 type TODO_PROPS = Record<string, any>;
 
-type Component = (props: TODO_PROPS) => Hydration[];
+type Component = (props: TODO_PROPS) => Promise<Hydration[]>;
 
 interface ComponentHydration {
   component: Component;
@@ -41,20 +41,20 @@ export default (element: HTMLElement) =>
       elements.map(el => `<${el.tagName.toLowerCase()}> ${el.getAttribute("data-element-id")}`)
     );
 
-    hydrateComponent({ component, props });
+    await hydrateComponent({ component, props });
 
-    function hydrate(hydration: Hydration) {
+    async function hydrate(hydration: Hydration) {
       if (isElementHydration(hydration)) {
         hydrateElement(hydration);
       } else if (isComponentHydration(hydration)) {
-        hydrateComponent(hydration);
+        await hydrateComponent(hydration);
       }
     }
 
-    function hydrateComponent(hydration: ComponentHydration) {
+    async function hydrateComponent(hydration: ComponentHydration) {
       console.log("c", hydration);
       const { component, props } = hydration;
-      const subHydrations = component(props);
+      const subHydrations = await component(props);
       for (const subHydration of subHydrations) {
         hydrate(subHydration);
       }
