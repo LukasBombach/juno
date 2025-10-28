@@ -2,11 +2,14 @@ import { signal } from "@preact/signals-core";
 import { Counter } from "./Counter";
 import { Editor } from "./Editor";
 
-function fetchDemo(demoName: string) {
-  return fetch(`/transpiler/${demoName}`)
-    .then(r => r.json())
-    .then(d => d.code)
-    .catch(console.error);
+async function fetchDemo(demoName: string) {
+  try {
+    const result = await fetch(`/transpiler/${demoName}`);
+    const data = await result.json();
+    return data.code;
+  } catch (message) {
+    return console.error(message);
+  }
 }
 
 export async function Playground() {
