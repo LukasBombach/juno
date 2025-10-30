@@ -12,7 +12,28 @@ import '../styles/global.css'
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro Basics</title>
 	</head>
-	<body>
-		<h1>Lukas Bombach</h1>
+	<body class="p-40 grid gap-10">
+		<header>
+			<h1>Lukas Bombach</h1>
+			<p>I'm a web developer from Berlin, Germany</p>
+			<p>You can find me on <a href="https://github.com/LukasBombach" class="underline" rel="nofollow">GitHub</a></p>
+		</header>
+
+		<main>
+			<ul>
+				<li>
+					<time datetime="2025-12" class="font-bold uppercase text-sm">2025 Dec</time>
+					<a href="/syntax-highlighting-with-just-two-html-elements">
+						Syntax highlighting with just two html elements
+					</a>
+				</li>
+				<li>
+					<time datetime="2019-05" class="font-bold uppercase text-sm">2019 May</time>
+					<a href="https://medium.com/@luke_schmuke/how-we-achieved-the-best-web-performance-with-partial-hydration-20fab9c808d5" rel="nofollow">
+						The case of partial hydration (on Medium)
+					</a>
+				</li>
+			</ul>
+		</main>
 	</body>
 </html>
