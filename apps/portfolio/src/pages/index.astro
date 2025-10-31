@@ -12,24 +12,25 @@ import '../styles/global.css'
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro Basics</title>
 	</head>
-	<body class="p-40 grid gap-10 dark:bg-zinc-950 dark:text-neutral-100">
+	<body class="p-40 grid gap-16 dark:bg-zinc-950 dark:text-neutral-100">
 		<header>
 			<h1>Lukas Bombach</h1>
 			<p>I'm a web developer from Berlin, Germany</p>
 			<p>You can find me on <a href="https://github.com/LukasBombach" class="underline" rel="nofollow">GitHub</a></p>
 		</header>
 
-		<main>
+		<main class="grid gap-1">
+			<h2 class="font-semibold">Articles</h2>
 			<ul>
-				<li class="grid content-center grid-flow-col-dense justify-start gap-2 leading-7">
-					<time datetime="2025-12" class="uppercase text-xs font-medium">2025 Dec</time>
-					<a class="dark:text-emerald-700" href="/syntax-highlighting-with-just-two-html-elements">
+				<li class="grid items-baseline grid-flow-col-dense justify-start gap-4 leading-7">
+					<time datetime="2025-12" class="uppercase text-xs font-semibold text-neutral-400">2025 Dec</time>
+					<a class="underline" href="/syntax-highlighting-with-just-two-html-elements">
 						Syntax highlighting with just two html elements
 					</a>
 				</li>
-				<li class="grid content-center grid-flow-col-dense justify-start gap-2 leading-7">
-					<time datetime="2019-05" class="uppercase text-xs font-medium">2019 May</time>
-					<a class="dark:text-emerald-700" href="https://medium.com/@luke_schmuke/how-we-achieved-the-best-web-performance-with-partial-hydration-20fab9c808d5" rel="nofollow">
+				<li class="grid items-baseline grid-flow-col-dense justify-start gap-4 leading-7">
+					<time datetime="2019-05" class="uppercase text-xs font-semibold text-neutral-400">2019 May</time>
+					<a class="underline" href="https://medium.com/@luke_schmuke/how-we-achieved-the-best-web-performance-with-partial-hydration-20fab9c808d5" rel="nofollow">
 						The case of partial hydration (on Medium)
 					</a>
 				</li>
