@@ -13,5 +13,7 @@ export function Counter() {
 
   addListener(count, () => (document.title = `Clicks: ${count}`));
 
+  addListener(() => (document.title = `Clicks: ${count}`));
+
   return <button onClick={increment}>Clicks: {count}</button>;
 }
