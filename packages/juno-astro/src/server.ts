@@ -9,7 +9,7 @@ const renderToStaticMarkup: AsyncRendererComponentFn<{
   html: string;
   attrs?: Record<string, string>;
 }> = async function (Component, props, slots, metadata) {
-  return { html: junoRenderToStaticMarkup(Component(props)) };
+  return { html: await junoRenderToStaticMarkup(Component(props)) };
 };
 
 export default {

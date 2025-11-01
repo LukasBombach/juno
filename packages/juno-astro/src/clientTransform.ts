@@ -15,42 +15,7 @@ import type * as t from "juno-ast";
 export function transformJsxClient(input: string, filename: string) {
   const { program } = parseSync(basename(filename), input, { sourceType: "module", lang: "tsx", astType: "ts" });
 
-  const components = pipe(program, findComponents);
-
-  addJunoComponentsMap(program, filename);
   transformJsx(program, filename);
-
-  pipe(
-    components,
-    A.map(component => {
-      return component;
-    }),
-    A.filter(component => {
-      return pipe(
-        component,
-        findAllByType("ReturnStatement"),
-        A.some(returnStatement =>
-          pipe(
-            O.fromNullable(returnStatement.argument),
-            O.filter(arg => arg.type === "ArrayExpression"),
-            O.map(arr => arr.elements.length > 0),
-            O.getOrElse(() => false)
-          )
-        )
-      );
-    }),
-    A.map(fn => {
-      program.body.push(
-        b.ExpressionStatement(
-          b.AssignmentExpression(
-            b.MemberExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), astId(filename, fn)),
-            // @ts-expect-error wip
-            b.ident(fn.id?.name)
-          )
-        )
-      );
-    })
-  );
 
   return print(program, tsx(), { indent: "  " });
 }
@@ -219,21 +184,4 @@ function createHydration(filename: string, el: JSXElement, identifiers: string[]
       return O.none;
     }
   }
-}
-
-/**
- * window.JUNO_COMPONENTS preflight:
- *
- * window.JUNO_COMPONENTS = window.JUNO_COMPONENTS ?? {};
- * window.JUNO_COMPONENTS["a12e"] = Component;
- */
-function addJunoComponentsMap(program: Program, filename: string) {
-  program.body.push(
-    b.ExpressionStatement(
-      b.AssignmentExpression(
-        b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"),
-        b.LogicalExpression(b.MemberExpression(b.ident("window"), "JUNO_COMPONENTS"), "??", b.object({}))
-      )
-    )
-  );
 }

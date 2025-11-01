@@ -7,16 +7,21 @@ type Props = {
   className?: string;
 };
 
-export function Editor({ value, className }: Props) {
-  const monaco = signal<{ createEditor: typeof createEditor } | null>(null);
-  const editor = signal<MonacoEditor | null>(null);
+type MonacoApi = { createEditor: typeof createEditor };
+
+async function initializeMonaco() {
+  const { setupMonaco, createEditor } = await import("./monacoEditor");
+  setupMonaco();
+  return { createEditor };
+}
+
+export async function Editor({ value, className }: Props) {
   const container = signal<HTMLElement | null>(null);
+  const editor = signal<MonacoEditor | null>(null);
+  const monaco = signal<MonacoApi | null>(null);
 
   if (typeof window === "object") {
-    import("./monacoEditor").then(({ setupMonaco, createEditor }) => {
-      setupMonaco();
-      monaco.value = { createEditor };
-    });
+    monaco.value = await initializeMonaco();
   }
 
   effect(() => {

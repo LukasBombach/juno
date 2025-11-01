@@ -1,6 +1,7 @@
 import { vnode, type VNode } from "./jsxRuntime";
 
-export function renderToStaticMarkup(node: VNode): string {
+export async function renderToStaticMarkup(asyncNode: Promise<VNode> | VNode): Promise<string> {
+  const node = await asyncNode;
   const tag = node.type;
   const { children, ...props } = node.props;
 
@@ -14,15 +15,22 @@ export function renderToStaticMarkup(node: VNode): string {
   const openingTag = `<${[tag, ...attributes].join(" ")}>`;
   const closingTag = `</${tag}>`;
 
-  const innerHTML = ensureArray(children)
-    .flat(Infinity)
-    .map(child => {
-      if (isVNode(child)) return renderToStaticMarkup(child);
-      if (shouldBeRenderedToString(child)) return String(child);
-      return undefined;
-    })
-    .filter(child => child !== undefined)
-    .join("");
+  const childrenArray = ensureArray(children).flat(Infinity);
+
+  let innerHTML: string = "";
+
+  for (let child of childrenArray) {
+    child = child instanceof Promise ? await child : child;
+    if (isVNode(child)) {
+      innerHTML += await renderToStaticMarkup(child);
+    } else if (shouldBeRenderedToString(child)) {
+      innerHTML += String(child);
+    } else if (shouldBeSkipped(child)) {
+      // Skip rendering this child
+    } else {
+      console.warn("Unsupported child type for static rendering:", child);
+    }
+  }
 
   return `${openingTag}${innerHTML}${closingTag}`;
 }
@@ -37,4 +45,8 @@ function isVNode(node: VNode["props"]["children"]): node is VNode {
 
 function shouldBeRenderedToString(value: unknown): boolean {
   return ["string", "number", "bigint", "object", "function"].includes(typeof value);
+}
+
+function shouldBeSkipped(value: unknown): boolean {
+  return value === null || value === undefined || typeof value === "boolean";
 }
