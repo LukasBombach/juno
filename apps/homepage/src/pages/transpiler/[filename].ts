@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { transform } from "oxc-transform";
 import { minify } from "terser";
 import { format } from "prettier";
+import { codeToHtml } from "shiki";
 import { transformJsxClient } from "juno-astro/clientTransform";
 
 import type { APIRoute } from "astro";
@@ -61,5 +62,13 @@ export const GET: APIRoute = async ({ params }) => {
     objectWrap: "collapse",
   });
 
-  return Response.json({ code: formatted }, { status: 200 });
+  const html = await codeToHtml(formatted, {
+    lang: "javascript",
+    themes: {
+      light: "one-light",
+      dark: "one-dark-pro",
+    },
+  });
+
+  return Response.json({ code: formatted, html }, { status: 200 });
 };

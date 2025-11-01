@@ -76,6 +76,9 @@ export default (element: HTMLElement) =>
           if (name.match(/^on[A-Z]/)) {
             el.addEventListener(name.slice(2).toLowerCase(), value as EventListener);
           }
+          if (name === "dangerouslySetInnerHTML") {
+            el.innerHTML = (value as { __html: string }).__html;
+          }
         }
       }
 

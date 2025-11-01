@@ -6,7 +6,7 @@ async function fetchDemo(demoName: string) {
   try {
     const result = await fetch(`/transpiler/${demoName}`);
     const data = await result.json();
-    return data.code;
+    return data.html;
   } catch (message) {
     return console.error(message);
   }
@@ -33,10 +33,14 @@ export async function Playground() {
         ))}
         <Counter className="text-sm cursor-pointer text-neutral-700 text-left hover:underline dark:text-neutral-100" />
       </nav>
-      <Editor
+      <div
+        className="p-5 py-7 bg-editor-light text-neutral-800 dark:bg-editor-dark dark:text-neutral-100"
+        dangerouslySetInnerHTML={{ __html: code.value }}
+      />
+      {/* <Editor
         value={code}
         className="p-5 py-7 bg-editor-light text-neutral-800 dark:bg-editor-dark dark:text-neutral-100"
-      />
+      /> */}
     </div>
   );
 }

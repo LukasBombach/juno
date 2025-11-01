@@ -21,6 +21,7 @@
     "terser": "5.44.0"
   },
   "devDependencies": {
+    "shiki": "3.14.0",
     "vite-plugin-inspect": "11.3.3",
     "vite-plugin-restart": "1.0.0"
   }
