@@ -13,7 +13,7 @@ export function Counter(props: { className?: string } = {}) {
 }
 
 export const CounterTemplate = `
-<button data-juno-element-id="a0ef-1">
-  Clicked <slot name="1"></slot> <slot name="2"></slot>
-</button>
+  <button data-juno-element-id="a0ef-1">
+    Clicked <slot name="1"></slot> <slot name="2"></slot>
+  </button>
 `;
