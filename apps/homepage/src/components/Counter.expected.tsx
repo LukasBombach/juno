@@ -17,3 +17,9 @@ export const CounterTemplate = `
     Clicked <slot name="1"></slot> <slot name="2"></slot>
   </button>
 `;
+
+export const CounterTemplate2 = (vars: any = {}) => `
+  <button class="${vars.className}">
+    Clicked ${vars.children[0]} ${vars.children[1]}
+  </button>
+`;
