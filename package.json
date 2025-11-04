@@ -5,6 +5,7 @@
   "author": "Lukas Bombach",
   "license": "MIT",
   "scripts": {
+    "portfolio": "pnpm --filter portfolio dev",
     "dev": "pnpm --filter @juno/homepage dev",
     "build": "pnpm --filter @juno/homepage build",
     "preview": "pnpm --filter @juno/homepage preview"
