@@ -28,3 +28,27 @@ export function CounterTemplate() {
     </button>
   `;
 }
+
+export function CounterTemplate2() {
+  return `
+    <button>
+      Clicked <!-- --> <!-- -->
+    </button>
+  `;
+}
+
+export function CounterTemplate3() {
+  return `
+    <button>
+      Clicked <![CDATA[]]> <![CDATA[]]>
+    </button>
+  `;
+}
+
+export function CounterTemplate4() {
+  return `
+    <button>
+      Clicked <?exp ?> <?exp ?>
+    </button>
+  `;
+}
