@@ -21,6 +21,14 @@ export function CounterHydration() {
   ];
 }
 
+export function CounterTemplateSSRresultIGuess() {
+  return `
+    <button>
+      Clicked 1 time
+    </button>
+  `;
+}
+
 export function CounterTemplate() {
   return `
     <button>
