@@ -1,0 +1,26 @@
+{
+  "name": "juno-vite",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "chalk": "5.6.2",
+    "esrap": "2.1.0",
+    "fp-ts": "2.16.11",
+    "juno-ast": "file:../juno-ast",
+    "oxc-parser": "0.94.0"
+  },
+  "devDependencies": {
+    "@preact/signals-core": "1.12.1",
+    "@sveltejs/acorn-typescript": "1.0.6",
+    "acorn": "8.15.0",
+    "cli-highlight": "2.1.11",
+    "tsup": "8.5.0",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "@preact/signals-core": "1.12.1"
+  }
+}
