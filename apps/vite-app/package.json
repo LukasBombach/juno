@@ -12,7 +12,8 @@
     "juno-vite": "file:../../packages/juno-vite"
   },
   "devDependencies": {
-    "typescript": "~5.9.3",
+    "@types/react": "19.2.0",
+    "typescript": "5.9.3",
     "vite": "npm:rolldown-vite@7.1.14"
   },
   "pnpm": {
