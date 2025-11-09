@@ -1,4 +1,4 @@
-export function Counter() {
+export function Counter(this: { count: number }) {
   this.count = 1;
 
   const increment = () => {

@@ -1,9 +1,9 @@
 import { $ } from "juno";
 
 export function Counter() {
-  const props = $({ count: 0 });
+  const state = $({ count: 0 });
 
-  const handleClick = () => props.count++;
+  const handleClick = () => state.count++;
 
-  return <button onClick={handleClick}>Number of clicks: {props.count}</button>;
+  return <button onClick={handleClick}>Number of clicks: {state.count}</button>;
 }
