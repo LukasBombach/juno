@@ -1,27 +1,36 @@
-import type { Plugin, IndexHtmlTransformResult } from "vite";
+import type { Plugin } from "vite";
 
 export default function junoPlugin(): Plugin {
   return {
     name: "vite-plugin-juno",
     enforce: "pre",
 
-    transformIndexHtml(): IndexHtmlTransformResult {
-      return {
-        html: `
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        const url = req.url || "/";
+        if (url === "/") {
+          const raw = `
           <!DOCTYPE html>
           <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>JUNRRRR</title>
-          </head>
-          <body>
-          junoooo  
-          </body>
+            <head>
+              <meta charset="UTF-8" />
+              <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>juno</title>
+            </head>
+            <body>
+              <script type="module" src="/src/main.ts"></script>
+            </body>
           </html>
-        `,
-        tags: [],
-      };
+        `;
+          const transformed = await server.transformIndexHtml(url, raw);
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "text/html");
+          res.end(transformed);
+          return;
+        }
+        next();
+      });
     },
   };
 }
