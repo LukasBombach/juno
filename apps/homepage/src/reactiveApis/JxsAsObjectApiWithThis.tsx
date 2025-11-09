@@ -1,0 +1,39 @@
+import { fragment } from "juno";
+
+interface CounterProps {
+  className: string;
+}
+
+interface ButtonProps {
+  count: number;
+}
+
+export function Counter() {
+  const button = <button onClick={() => this.count++}>Number of clicks: {this.count}</button>;
+
+  return button;
+}
+
+export function Counter1() {
+  const handleClick = () => this.count++;
+
+  const button = ({ count }: ButtonProps) => <button onClick={handleClick}>Number of clicks: {count}</button>;
+
+  return button;
+}
+
+export function Counter2() {
+  return (props: ButtonProps) => <button onClick={() => props.count++}>Number of clicks: {props.count}</button>;
+}
+
+export function Counter3({ className }: CounterProps) {
+  const handleClick = () => button.count++;
+
+  const button = ({ count }: ButtonProps) => (
+    <button className={className} onClick={handleClick}>
+      Number of clicks: {count}
+    </button>
+  );
+
+  return button;
+}

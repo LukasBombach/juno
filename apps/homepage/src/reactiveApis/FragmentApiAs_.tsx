@@ -1,4 +1,4 @@
-import { fragment } from "juno";
+import { fragment as _ } from "juno";
 
 interface CounterProps {
   className: string;
@@ -9,7 +9,7 @@ interface ButtonProps {
 }
 
 export function Counter() {
-  const button = fragment(({ count = 0 }: ButtonProps) => (
+  const button = _(({ count = 0 }: ButtonProps) => (
     <button onClick={() => button.count++}>Number of clicks: {count}</button>
   ));
 
@@ -19,23 +19,19 @@ export function Counter() {
 export function Counter1() {
   const handleClick = () => button.count++;
 
-  const button = fragment(({ count = 0 }: ButtonProps) => (
-    <button onClick={handleClick}>Number of clicks: {count}</button>
-  ));
+  const button = _(({ count = 0 }: ButtonProps) => <button onClick={handleClick}>Number of clicks: {count}</button>);
 
   return button;
 }
 
 export function Counter2() {
-  return fragment((props: ButtonProps) => (
-    <button onClick={() => props.count++}>Number of clicks: {props.count}</button>
-  ));
+  return _((props: ButtonProps) => <button onClick={() => props.count++}>Number of clicks: {props.count}</button>);
 }
 
 export function Counter3({ className }: CounterProps) {
   const handleClick = () => button.count++;
 
-  const button = fragment(({ count = 0 }: ButtonProps) => (
+  const button = _(({ count = 0 }: ButtonProps) => (
     <button className={className} onClick={handleClick}>
       Number of clicks: {count}
     </button>
