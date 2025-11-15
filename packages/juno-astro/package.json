@@ -4,6 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./renderToStaticMarkup": "./src/renderToStaticMarkup.ts",
     "./server.ts": "./src/server.ts",
     "./client.ts": "./src/client.ts",
     "./jsx-runtime": "./src/jsxRuntime.ts",
@@ -11,7 +12,7 @@
     "./clientTransform": "./src/clientTransform.ts"
   },
   "files": [
-    "src"
+    "src/**/*"
   ],
   "scripts": {
     "build": "tsup src/*.ts --dts --clean --format esm"

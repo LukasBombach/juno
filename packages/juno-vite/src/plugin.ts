@@ -1,3 +1,7 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { renderToStaticMarkup } from "./renderToStaticMarkup.ts";
+
 import type { Plugin } from "vite";
 
 export default function junoPlugin(): Plugin {
@@ -8,7 +12,13 @@ export default function junoPlugin(): Plugin {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const url = req.url || "/";
+
         if (url === "/") {
+          const filePath = new URL(join(server.config.root, "src/index.tsx"), import.meta.url);
+
+          const contents = await readFile(filePath, { encoding: "utf8" });
+          console.log({ contents });
+
           const raw = `
           <!DOCTYPE html>
           <html lang="en">
@@ -24,6 +34,7 @@ export default function junoPlugin(): Plugin {
           </html>
         `;
           const transformed = await server.transformIndexHtml(url, raw);
+
           res.statusCode = 200;
           res.setHeader("Content-Type", "text/html");
           res.end(transformed);
