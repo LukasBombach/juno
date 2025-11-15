@@ -1,5 +1,3 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { renderToStaticMarkup } from "./renderToStaticMarkup.ts";
 
 import type { Plugin } from "vite";
@@ -14,10 +12,9 @@ export default function junoPlugin(): Plugin {
         const url = req.url || "/";
 
         if (url === "/") {
-          const filePath = new URL(join(server.config.root, "src/index.tsx"), import.meta.url);
+          const { default: Page } = await server.ssrLoadModule("src/index.tsx");
 
-          const contents = await readFile(filePath, { encoding: "utf8" });
-          console.log({ contents });
+          console.log(await renderToStaticMarkup(Page()));
 
           const raw = `
           <!DOCTYPE html>
