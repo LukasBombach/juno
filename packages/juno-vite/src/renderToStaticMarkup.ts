@@ -5,7 +5,7 @@ export async function renderToStaticMarkup(asyncNode: Promise<VNode> | VNode): P
   const tag = node.type;
   const { children, ...props } = node.props;
 
-  console.log("Rendering node:", tag);
+  console.log("Rendering node:", node);
 
   const attributes = Object.entries(props)
     .filter(([, value]) => value !== undefined && value !== null && value !== false && typeof value !== "function")
@@ -23,6 +23,9 @@ export async function renderToStaticMarkup(asyncNode: Promise<VNode> | VNode): P
 
   for (let child of childrenArray) {
     child = child instanceof Promise ? await child : child;
+
+    console.log("Processing child:", child);
+
     if (isVNode(child)) {
       innerHTML += await renderToStaticMarkup(child);
     } else if (shouldBeRenderedToString(child)) {
