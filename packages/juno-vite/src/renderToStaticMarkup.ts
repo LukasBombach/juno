@@ -12,11 +12,13 @@ export async function renderToStaticMarkup(asyncNode: Promise<VNode> | VNode): P
       return value === true ? name : `${name}="${value}"`;
     });
 
+  const doctypePrefix = tag === "html" ? "<!DOCTYPE html>" : "";
+
   const childrenArray = ensureArray(children).flat(Infinity).filter(Boolean);
   const selfClosing = !childrenArray.length;
 
   if (selfClosing) {
-    return `<${[tag, ...attributes].join(" ")} />`;
+    return `${doctypePrefix}<${[tag, ...attributes].join(" ")} />`;
   }
 
   const openingTag = `<${[tag, ...attributes].join(" ")}>`;
@@ -38,7 +40,7 @@ export async function renderToStaticMarkup(asyncNode: Promise<VNode> | VNode): P
     }
   }
 
-  return `${openingTag}${innerHTML}${closingTag}`;
+  return `${doctypePrefix}${openingTag}${innerHTML}${closingTag}`;
 }
 
 function ensureArray<V>(value: V | V[]): V[] {
