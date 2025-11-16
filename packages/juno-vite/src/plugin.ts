@@ -24,9 +24,6 @@ export default function junoPlugin(): Plugin {
         if (url === "/") {
           const { default: Page } = await server.ssrLoadModule("src/index.tsx");
           const raw = await renderToStaticMarkup(Page());
-
-          console.log(raw);
-
           const transformed = await server.transformIndexHtml(url, raw);
 
           res.statusCode = 200;

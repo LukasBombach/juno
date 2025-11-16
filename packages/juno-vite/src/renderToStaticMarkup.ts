@@ -12,11 +12,15 @@ export async function renderToStaticMarkup(asyncNode: Promise<VNode> | VNode): P
       return value === true ? name : `${name}="${value}"`;
     });
 
+  const childrenArray = ensureArray(children).flat(Infinity).filter(Boolean);
+  const selfClosing = !childrenArray.length;
+
+  if (selfClosing) {
+    return `<${[tag, ...attributes].join(" ")} />`;
+  }
+
   const openingTag = `<${[tag, ...attributes].join(" ")}>`;
   const closingTag = `</${tag}>`;
-
-  const childrenArray = ensureArray(children).flat(Infinity);
-  // console.log("Rendering children:", childrenArray);
 
   let innerHTML: string = "";
 
