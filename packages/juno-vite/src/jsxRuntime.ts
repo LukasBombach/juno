@@ -14,7 +14,7 @@ export interface VNode<P = Record<string, unknown>> {
   type: string;
   props: P & { children: ComponentChildren };
   key?: Key;
-  [vnode]: true;
+  vnode: true;
 }
 
 interface FunctionComponent<P = {}> {
@@ -58,7 +58,7 @@ async function createVNode<P = {}>(
   _source: Source
 ): Promise<VNode<P>> {
   // todo: hide vnode prop in prototype
-  return typeof type === "function" ? await type(props) : { type, props, [vnode]: true };
+  return typeof type === "function" ? await type(props) : { type, props, vnode: true };
 }
 
 /**

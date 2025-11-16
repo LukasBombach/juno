@@ -23,23 +23,10 @@ export default function junoPlugin(): Plugin {
 
         if (url === "/") {
           const { default: Page } = await server.ssrLoadModule("src/index.tsx");
+          const raw = await renderToStaticMarkup(Page());
 
-          console.log(await renderToStaticMarkup(Page()));
+          console.log(raw);
 
-          const raw = `
-          <!DOCTYPE html>
-          <html lang="en">
-            <head>
-              <meta charset="UTF-8" />
-              <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-              <title>juno</title>
-            </head>
-            <body>
-              <script type="module" src="/src/main.ts"></script>
-            </body>
-          </html>
-        `;
           const transformed = await server.transformIndexHtml(url, raw);
 
           res.statusCode = 200;

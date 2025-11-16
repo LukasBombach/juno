@@ -1,11 +1,9 @@
-import { vnode, type VNode } from "./jsxRuntime.ts";
+import type { VNode } from "./jsxRuntime.ts";
 
 export async function renderToStaticMarkup(asyncNode: Promise<VNode> | VNode): Promise<string> {
   const node = await asyncNode;
   const tag = node.type;
   const { children, ...props } = node.props;
-
-  console.log("Rendering node:", node);
 
   const attributes = Object.entries(props)
     .filter(([, value]) => value !== undefined && value !== null && value !== false && typeof value !== "function")
@@ -18,13 +16,12 @@ export async function renderToStaticMarkup(asyncNode: Promise<VNode> | VNode): P
   const closingTag = `</${tag}>`;
 
   const childrenArray = ensureArray(children).flat(Infinity);
+  // console.log("Rendering children:", childrenArray);
 
   let innerHTML: string = "";
 
   for (let child of childrenArray) {
     child = child instanceof Promise ? await child : child;
-
-    console.log("Processing child:", child);
 
     if (isVNode(child)) {
       innerHTML += await renderToStaticMarkup(child);
@@ -45,7 +42,7 @@ function ensureArray<V>(value: V | V[]): V[] {
 }
 
 function isVNode(node: VNode["props"]["children"]): node is VNode {
-  return Boolean(node) && typeof node === "object" && node !== null && vnode in node;
+  return Boolean(node) && typeof node === "object" && node !== null && "vnode" in node;
 }
 
 function shouldBeRenderedToString(value: unknown): boolean {
