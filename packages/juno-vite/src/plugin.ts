@@ -7,6 +7,18 @@ export default function junoPlugin(): Plugin {
     name: "vite-plugin-juno",
     enforce: "pre",
 
+    config(config) {
+      return {
+        ...config,
+        esbuild: {
+          ...(config.esbuild ?? {}),
+          jsx: "automatic",
+          jsxFactory: "createElement",
+          jsxImportSource: "juno-vite",
+        },
+      };
+    },
+
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const url = req.url || "/";

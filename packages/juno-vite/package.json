@@ -4,7 +4,9 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./plugin": "./src/plugin.ts"
+    "./plugin": "./src/plugin.ts",
+    "./jsx-runtime": "./src/jsxRuntime.ts",
+    "./jsx-dev-runtime": "./src/jsxRuntime.ts"
   },
   "dependencies": {
     "chalk": "5.6.2",
