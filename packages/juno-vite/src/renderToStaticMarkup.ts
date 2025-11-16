@@ -5,6 +5,8 @@ export async function renderToStaticMarkup(asyncNode: Promise<VNode> | VNode): P
   const tag = node.type;
   const { children, ...props } = node.props;
 
+  console.log("Rendering node:", tag);
+
   const attributes = Object.entries(props)
     .filter(([, value]) => value !== undefined && value !== null && value !== false && typeof value !== "function")
     .map(([key, value]) => {

@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "juno-vite": "file:../../packages/juno-vite"
+    "juno-vite": "file:../../packages/juno-vite",
+    "vite-plugin-inspect": "11.3.3",
+    "vite-plugin-restart": "1.0.0"
   },
   "devDependencies": {
     "@types/react": "19.2.0",

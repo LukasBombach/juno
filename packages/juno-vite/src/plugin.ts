@@ -12,8 +12,6 @@ export default function junoPlugin(): Plugin {
         ...config,
         esbuild: {
           ...(config.esbuild ?? {}),
-          jsx: "automatic",
-          jsxFactory: "createElement",
           jsxImportSource: "juno-vite",
         },
       };
