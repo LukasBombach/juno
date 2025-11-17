@@ -1,4 +1,6 @@
 export default function App() {
+  let clicks = 0;
+
   return (
     <html lang="en">
       <head>
@@ -7,7 +9,10 @@ export default function App() {
         <meta name="viewport" content="width=device-width" />
         <title>juno</title>
       </head>
-      <body>hello world</body>
+      <body>
+        <h1>hello world</h1>
+        <button onClick={() => console.log("Button clicked", ++clicks)}>Click me</button>
+      </body>
     </html>
   );
 }
